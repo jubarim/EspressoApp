@@ -61,6 +61,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)
