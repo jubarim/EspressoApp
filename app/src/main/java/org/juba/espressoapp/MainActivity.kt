@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import org.juba.espressoapp.ui.coffee.CoffeeScreen
 import org.juba.espressoapp.ui.gear.GearScreen
@@ -42,8 +43,8 @@ fun EspressoApp() {
         navigationSuiteItems = {
             AppDestination.entries.forEach {
                 item(
-                    icon = { Icon(it.icon, contentDescription = it.label) },
-                    label = { Text(it.label) },
+                    icon = { Icon(it.icon, contentDescription = stringResource(it.labelRes)) },
+                    label = { Text(stringResource(it.labelRes)) },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it },
                 )

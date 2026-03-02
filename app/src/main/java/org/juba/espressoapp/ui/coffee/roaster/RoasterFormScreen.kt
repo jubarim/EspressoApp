@@ -20,9 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.juba.espressoapp.R
 import org.juba.espressoapp.ui.designsystem.EspressoTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,17 +43,24 @@ fun RoasterFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (viewModel.uiState.value.name.isEmpty()) "Add Roaster" else "Edit Roaster") },
+                title = {
+                    val title = if (viewModel.uiState.value.name.isEmpty()) {
+                        stringResource(R.string.roaster_add)
+                    } else {
+                        stringResource(R.string.roaster_edit)
+                    }
+                    Text(title)
+                },
                 navigationIcon = {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
                     }
                 },
                 actions = {
                     TextButton(
                         onClick = viewModel::save,
                         enabled = !uiState.isSaving,
-                    ) { Text("Save") }
+                    ) { Text(stringResource(R.string.action_save)) }
                 },
             )
         },
@@ -69,28 +78,28 @@ fun RoasterFormScreen(
             EspressoTextField(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChange,
-                label = "Name *",
+                label = stringResource(R.string.field_name),
                 errorMessage = uiState.nameError,
             )
             EspressoTextField(
                 value = uiState.country,
                 onValueChange = viewModel::onCountryChange,
-                label = "Country",
+                label = stringResource(R.string.field_country),
             )
             EspressoTextField(
                 value = uiState.website,
                 onValueChange = viewModel::onWebsiteChange,
-                label = "Website",
+                label = stringResource(R.string.field_website),
             )
             EspressoTextField(
                 value = uiState.logoUrl,
                 onValueChange = viewModel::onLogoUrlChange,
-                label = "Logo URL",
+                label = stringResource(R.string.field_logo_url),
             )
             EspressoTextField(
                 value = uiState.notes,
                 onValueChange = viewModel::onNotesChange,
-                label = "Notes",
+                label = stringResource(R.string.field_notes),
                 singleLine = false,
             )
         }

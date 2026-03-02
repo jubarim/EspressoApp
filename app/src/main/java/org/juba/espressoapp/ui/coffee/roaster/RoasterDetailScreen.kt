@@ -34,12 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Roaster
 import org.juba.espressoapp.ui.designsystem.EmptyStateContent
 
@@ -67,7 +69,7 @@ fun RoasterDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
             )
@@ -99,10 +101,10 @@ fun RoasterDetailScreen(
                         (uiState as? RoasterDetailUiState.Success)?.roaster?.id
                             ?.let { onEdit(it) }
                     }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.cd_edit))
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cd_delete))
                     }
                 }
             }
@@ -112,16 +114,16 @@ fun RoasterDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete roaster?") },
-            text = { Text("This roaster will be removed. This action cannot be undone.") },
+            title = { Text(stringResource(R.string.roaster_delete_dialog_title)) },
+            text = { Text(stringResource(R.string.roaster_delete_dialog_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDeleteDialog = false
                     viewModel.delete()
-                }) { Text("Delete") }
+                }) { Text(stringResource(R.string.action_delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
@@ -136,7 +138,7 @@ private fun RoasterDetailContent(roaster: Roaster, modifier: Modifier = Modifier
                     .data(uri)
                     .crossfade(true)
                     .build(),
-                contentDescription = "${roaster.name} logo",
+                contentDescription = stringResource(R.string.roaster_logo_cd, roaster.name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -147,9 +149,9 @@ private fun RoasterDetailContent(roaster: Roaster, modifier: Modifier = Modifier
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            roaster.country?.let { DetailRow(label = "Country", value = it) }
-            roaster.website?.let { DetailRow(label = "Website", value = it) }
-            roaster.notes?.let { DetailRow(label = "Notes", value = it) }
+            roaster.country?.let { DetailRow(label = stringResource(R.string.field_country), value = it) }
+            roaster.website?.let { DetailRow(label = stringResource(R.string.field_website), value = it) }
+            roaster.notes?.let { DetailRow(label = stringResource(R.string.field_notes), value = it) }
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.juba.espressoapp.ui.gear
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,20 +19,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import org.juba.espressoapp.R
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-private enum class GearCategory(val label: String) {
-    GRINDERS("Grinders"),
-    ESPRESSO_MACHINES("Espresso Machines"),
-    FILTER_BASKETS("Filter Baskets"),
+private enum class GearCategory(@param:StringRes val labelRes: Int) {
+    GRINDERS(R.string.gear_category_grinders),
+    ESPRESSO_MACHINES(R.string.gear_category_espresso_machines),
+    FILTER_BASKETS(R.string.gear_category_filter_baskets),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GearScreen(modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Gear") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_gear)) }) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier,
     ) { innerPadding ->
@@ -41,7 +44,7 @@ fun GearScreen(modifier: Modifier = Modifier) {
         ) {
             items(GearCategory.entries) { category ->
                 ListItem(
-                    headlineContent = { Text(category.label) },
+                    headlineContent = { Text(stringResource(category.labelRes)) },
                     trailingContent = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("0")

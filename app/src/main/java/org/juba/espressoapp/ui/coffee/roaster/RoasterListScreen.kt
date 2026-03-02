@@ -31,12 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Roaster
 import org.juba.espressoapp.ui.designsystem.EmptyStateContent
 
@@ -54,17 +56,17 @@ fun RoasterListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Roasters") },
+                title = { Text(stringResource(R.string.coffee_category_roasters)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddRoaster) {
-                Icon(Icons.Default.Add, contentDescription = "Add roaster")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add_roaster))
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -83,8 +85,8 @@ fun RoasterListScreen(
 
             is RoasterListUiState.Success -> if (state.roasters.isEmpty()) {
                 EmptyStateContent(
-                    message = "No roasters yet.\nTap + to add your first one.",
-                    actionLabel = "Add Roaster",
+                    message = stringResource(R.string.roaster_list_empty_message),
+                    actionLabel = stringResource(R.string.roaster_add),
                     onAction = onAddRoaster,
                     modifier = Modifier.padding(innerPadding),
                 )
@@ -117,7 +119,7 @@ private fun RoasterAvatar(roaster: Roaster) {
                 .data(imageUri)
                 .crossfade(true)
                 .build(),
-            contentDescription = "${roaster.name} logo",
+            contentDescription = stringResource(R.string.roaster_logo_cd, roaster.name),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(40.dp)

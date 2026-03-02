@@ -18,7 +18,7 @@ class RoasterDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val roasterId: String = checkNotNull(savedStateHandle["roasterId"])
+    private val roasterId: String = checkNotNull(savedStateHandle[RoasterFormViewModel.ROASTER_ID])
 
     private val _uiState = MutableStateFlow<RoasterDetailUiState>(RoasterDetailUiState.Loading)
     val uiState: StateFlow<RoasterDetailUiState> = _uiState.asStateFlow()

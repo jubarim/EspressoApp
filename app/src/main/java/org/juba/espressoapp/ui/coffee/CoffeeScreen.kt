@@ -1,5 +1,6 @@
 package org.juba.espressoapp.ui.coffee
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,16 +19,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import org.juba.espressoapp.R
 import org.juba.espressoapp.ui.coffee.roaster.RoasterDetailScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterFormScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterListScreen
 
-private enum class CoffeeCategory(val label: String, val route: String) {
-    ROASTERS("Roasters", "roaster_list"),
-    COFFEE_BEANS("Coffee Beans", "coffee_bean_list"),
+private enum class CoffeeCategory(@param:StringRes val labelRes: Int, val route: String) {
+    ROASTERS(R.string.coffee_category_roasters, "roaster_list"),
+    COFFEE_BEANS(R.string.coffee_category_coffee_beans, "coffee_bean_list"),
 }
 
 private const val ROUTE_HOME = "coffee_home"
@@ -77,7 +80,7 @@ private fun CoffeeHomeScreen(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Coffee") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_coffee)) }) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier,
     ) { innerPadding ->
@@ -87,7 +90,7 @@ private fun CoffeeHomeScreen(
         ) {
             items(CoffeeCategory.entries) { category ->
                 ListItem(
-                    headlineContent = { Text(category.label) },
+                    headlineContent = { Text(stringResource(category.labelRes)) },
                     trailingContent = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(

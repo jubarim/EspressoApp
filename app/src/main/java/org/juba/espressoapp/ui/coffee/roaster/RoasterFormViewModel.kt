@@ -20,7 +20,7 @@ class RoasterFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val roasterId: String? = savedStateHandle["roasterId"]
+    private val roasterId: String? = savedStateHandle[ROASTER_ID]
 
     private val _uiState = MutableStateFlow(RoasterFormUiState())
     val uiState: StateFlow<RoasterFormUiState> = _uiState.asStateFlow()
@@ -85,5 +85,9 @@ class RoasterFormViewModel @Inject constructor(
                 else it.copy(isSaving = false)
             }
         }
+    }
+
+    companion object {
+        const val ROASTER_ID = "roasterId"
     }
 }

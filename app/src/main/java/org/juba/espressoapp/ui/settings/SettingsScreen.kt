@@ -11,14 +11,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import org.juba.espressoapp.R
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Settings") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_settings)) }) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier,
     ) { innerPadding ->
@@ -28,7 +30,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 .padding(innerPadding),
             contentAlignment = Alignment.Center,
         ) {
-            Text("Settings — coming soon.")
+            Text(stringResource(R.string.settings_coming_soon))
         }
     }
 }
