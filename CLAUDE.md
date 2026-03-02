@@ -287,6 +287,12 @@ Includes ratio calculation, extraction time input, and the main home screen list
 The repository interface in domain must be written without any Room-specific assumptions so that
 a `FirebaseRepository` implementation can be added alongside the Room one later.
 
+### Future — Global snackbar with undo for destructive actions
+Replace confirmation dialogs on delete with a snackbar + Undo action (leveraging soft-delete:
+undo = set `is_deleted = 0`). Requires a shared `SnackbarHostState` hoisted to the app root,
+exposed via `CompositionLocal` or an app-level ViewModel `Channel`. Current behaviour: confirmation
+dialog before delete.
+
 ---
 
 ## 8. Offline-First & Future Firebase Sync
