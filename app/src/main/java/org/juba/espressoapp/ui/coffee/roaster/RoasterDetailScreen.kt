@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,9 +32,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import org.juba.espressoapp.domain.model.Roaster
 import org.juba.espressoapp.ui.designsystem.EmptyStateContent
 
@@ -123,13 +129,28 @@ fun RoasterDetailScreen(
 
 @Composable
 private fun RoasterDetailContent(roaster: Roaster, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        roaster.country?.let { DetailRow(label = "Country", value = it) }
-        roaster.website?.let { DetailRow(label = "Website", value = it) }
-        roaster.notes?.let { DetailRow(label = "Notes", value = it) }
+    Column(modifier = modifier) {
+        roaster.imageUri?.let { uri ->
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(uri)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "${roaster.name} logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+            )
+        }
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            roaster.country?.let { DetailRow(label = "Country", value = it) }
+            roaster.website?.let { DetailRow(label = "Website", value = it) }
+            roaster.notes?.let { DetailRow(label = "Notes", value = it) }
+        }
     }
 }
 

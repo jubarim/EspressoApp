@@ -37,6 +37,7 @@ class RoasterFormViewModel @Inject constructor(
                         name = roaster.name,
                         country = roaster.country ?: "",
                         website = roaster.website ?: "",
+                        logoUrl = roaster.imageUri ?: "",
                         notes = roaster.notes ?: "",
                     )
                 }
@@ -51,6 +52,8 @@ class RoasterFormViewModel @Inject constructor(
     fun onCountryChange(value: String) = _uiState.update { it.copy(country = value) }
 
     fun onWebsiteChange(value: String) = _uiState.update { it.copy(website = value) }
+
+    fun onLogoUrlChange(value: String) = _uiState.update { it.copy(logoUrl = value) }
 
     fun onNotesChange(value: String) = _uiState.update { it.copy(notes = value) }
 
@@ -69,7 +72,7 @@ class RoasterFormViewModel @Inject constructor(
                 name = state.name.trim(),
                 country = state.country.trim().ifBlank { null },
                 website = state.website.trim().ifBlank { null },
-                imageUri = null,
+                imageUri = state.logoUrl.trim().ifBlank { null },
                 notes = state.notes.trim().ifBlank { null },
                 createdAt = now,
                 updatedAt = now,

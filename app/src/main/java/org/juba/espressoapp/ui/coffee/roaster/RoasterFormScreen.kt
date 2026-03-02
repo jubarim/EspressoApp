@@ -83,6 +83,11 @@ fun RoasterFormScreen(
                 label = "Website",
             )
             EspressoTextField(
+                value = uiState.logoUrl,
+                onValueChange = viewModel::onLogoUrlChange,
+                label = "Logo URL",
+            )
+            EspressoTextField(
                 value = uiState.notes,
                 onValueChange = viewModel::onNotesChange,
                 label = "Notes",
