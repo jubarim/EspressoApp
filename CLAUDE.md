@@ -25,18 +25,22 @@ All versions are pinned in `gradle/libs.versions.toml`.
 |---|---|
 | Kotlin | 2.3.10 (K2 compiler enabled) |
 | AGP | 9.0.1 |
+| KSP | 2.3.5 |
 | Min SDK | 26 |
 | Target SDK | 36 |
 | Compose BOM | 2026.02.01 |
-| Material 3 | Via Compose BOM |
+| Material 3 | 1.5.0-alpha14 (override — required for `HorizontalFloatingToolbar`) |
 | NavigationSuiteScaffold | `material3-adaptive-navigation-suite` |
-| Room | To be added — local DB, offline-first |
-| Hilt | To be added — DI |
+| Room | 2.8.4 — local DB, offline-first |
+| Hilt | 2.59.2 — DI |
+| Navigation Compose | 2.9.7 |
+| Hilt Navigation Compose | 1.3.0 |
+| Coil | 3.1.0 — image loading (`coil-compose` + `coil-network-okhttp`) |
 | Architecture | MVVM (prefer MVI for complex screens) |
 
-Dynamic Color is already wired in `Theme.kt` (Android 12+ / API 31+, guarded by `Build.VERSION.SDK_INT >= S`).
+Dynamic Color is wired in `Theme.kt` (Android 12+ / API 31+, guarded by `Build.VERSION.SDK_INT >= S`).
 
-`NavigationSuiteScaffold` is already wired in `MainActivity.kt` with placeholder destinations.
+`NavigationSuiteScaffold` is wired in `MainActivity.kt` with the real 4-tab `AppDestination` enum (Shots / Coffee / Gear / Settings).
 
 ---
 
@@ -197,17 +201,17 @@ roasters ──< coffee_beans ──< shot_logs >── grinders
 ## 6. UI / UX Requirements
 
 ### Navigation
-`NavigationSuiteScaffold` is already scaffolded in `MainActivity`. Replace the placeholder
-`AppDestinations` enum with the real three tabs:
+`NavigationSuiteScaffold` is wired in `MainActivity` with the real 4-tab `AppDestination` enum.
+Each tab's label comes from a `@param:StringRes` resource (see Section 11).
 
-| Tab | Label | Content | Icon suggestion |
+| Tab | Label | Content | Icon |
 |---|---|---|---|
-| 0 | Shots | Shot log list | Coffee cup / list |
-| 1 | Coffee | Roasters, Coffee Beans | Bean / leaf icon |
+| 0 | Shots | Shot log list | `Icons.AutoMirrored.Filled.List` |
+| 1 | Coffee | Roasters, Coffee Beans | `Icons.Default.Favorite` ← placeholder |
 | 2 | Gear | Grinders, Espresso Machines, Filter Baskets | `Icons.Default.Build` |
 | 3 | Settings | App preferences | `Icons.Default.Settings` |
 
-> Note: the Coffee tab icon currently uses `Icons.Default.Favorite` as a placeholder.
+> Coffee tab icon uses `Icons.Default.Favorite` as a placeholder.
 > Replace with a proper bean/cafe icon once `material-icons-extended` is added.
 
 ### Screens
@@ -256,28 +260,31 @@ roasters ──< coffee_beans ──< shot_logs >── grinders
 
 ## 7. Implementation Roadmap
 
-### Phase 0 — Navigation shell
-Wire the real bottom navigation before any feature work:
-1. Replace the placeholder `AppDestinations` enum with `Shots`, `Gear`, `Settings`.
-2. Create stub screens for each tab (`ShotsScreen`, `GearScreen`, `SettingsScreen`).
-3. `GearScreen` shows the categorized list (5 rows, counts hardcoded to 0 for now).
-4. Verify `NavigationSuiteScaffold` adapts correctly to phone / tablet / foldable.
+### ✅ Phase 0 — Navigation shell
+Real 4-tab navigation (Shots / Coffee / Gear / Settings) is live in `MainActivity.kt`.
+- `AppDestination` enum uses `@param:StringRes labelRes` for tab labels.
+- Each tab has its own `Scaffold` + `TopAppBar` with `contentWindowInsets = WindowInsets(0,0,0,0)`.
+- `CoffeeScreen` and `GearScreen` show categorized list rows (counts still hardcoded to 0).
+- All UI strings are in `res/values/strings.xml` — use `stringResource()` everywhere.
 
-### Phase 1 — Roaster module (vertical slice)
-Build the full vertical slice for **Roasters** as the reference implementation:
-1. Room Entity + DAO
-2. Repository interface (domain) + implementation (data)
-3. Domain model + mappers
-4. `RoasterListViewModel` + `RoasterListUiState`
-5. `RoasterListScreen` + `RoasterDetailScreen` (reachable from the Gear → Roasters row)
-6. Live count on the Gear screen row
-7. Unit tests for mapper + repo (in-memory Room)
+### ✅ Phase 1 — Roaster module (vertical slice)
+Full CRUD vertical slice is complete and establishes patterns for all subsequent modules:
+- **Data:** `RoasterEntity`, `RoasterDao`, `AppDatabase` (v1), `RoasterMapper`, `RoasterRepositoryImpl`, `DataModule`
+- **Domain:** `Roaster`, `RoasterRepository`
+- **UI:** `RoasterListScreen` (FAB, round avatar with initial fallback), `RoasterDetailScreen` (M3 Expressive `HorizontalFloatingToolbar`, full-width logo header), `RoasterFormScreen` (name / country / website / logo URL / notes)
+- **Design system:** `EspressoTextField`, `EmptyStateContent` in `ui/designsystem/`
+- **Navigation:** `CoffeeScreen` is a `NavHost` with routes for list → detail → form
+- **Logo:** URL text field; loaded with Coil 3 (`AsyncImage`); INTERNET permission added
+- **Tests:** `RoasterMapperTest`, `RoasterRepositoryTest` (Robolectric + in-memory Room)
 
-This slice establishes the patterns that all subsequent modules must follow.
+### Phase 2 — Remaining equipment entities ← next
+Follow the same vertical slice pattern for:
+1. **Coffee Beans** (FK → roasters, additional fields: origin, process, roast\_level, roast\_date)
+2. **Grinders** (brand + model required)
+3. **Espresso Machines** (brand + model required)
+4. **Filter Baskets** (brand required)
 
-### Phase 2 — Remaining equipment entities
-Follow the same vertical slice pattern for: Coffee Beans, Grinders, Espresso Machines,
-Filter Baskets. Order can be adjusted based on priority.
+Each new entity needs a Room DB version bump and migration script.
 
 ### Phase 3 — Shot Log module
 The most complex module. Depends on all equipment entities being queryable.
@@ -343,14 +350,25 @@ Design principles to apply now so that sync is possible later:
 
 ## 11. Key Decisions & Notes
 
-- **Navigation tabs are Shots / Gear / Settings** — `AppDestinations` enum in `MainActivity.kt`
-  must be replaced with these three; the placeholder destinations (Home, Favorites, Profile)
-  are throwaway scaffold code.
+- **Navigation tabs are Shots / Coffee / Gear / Settings** — `AppDestination` enum in
+  `AppDestination.kt`; labels come from `@param:StringRes` resources.
 - **Min SDK is 26** (set in `app/build.gradle.kts`) — requirement doc said 24+, 26 is fine.
 - **Codebase language is English** — source notes were in Portuguese; all code, comments and
   strings must be in English.
+- **All UI strings live in `strings.xml`** — always use `stringResource()` in Composables;
+  never hardcode user-visible strings in Kotlin.
+- **`@param:StringRes` on enum constructors** — Kotlin 2.x requires the explicit `@param:`
+  target when annotating primary constructor parameters, otherwise the compiler emits a warning.
 - **Kotlin 2.3.10 / K2** — use K2-compatible patterns; avoid deprecated APIs.
 - **`compileSdk` uses `release(36) { minorApiLevel = 1 }`** — AGP 9 syntax, do not change to the
   old integer form.
 - **Do not add `kotlin.android` plugin** — AGP 9.0 includes Kotlin support built-in; applying
   `org.jetbrains.kotlin.android` explicitly causes a build error.
+- **Material 3 Expressive override** — BOM ships M3 stable; `HorizontalFloatingToolbar` requires
+  M3 1.5.0-alpha14+. Override only `androidx-compose-material3` in `libs.versions.toml`.
+- **Coil 3 for images** — use `coil-compose` + `coil-network-okhttp`. `AsyncImage` for URL-based
+  images; letter-initial `Box` as fallback when `imageUri` is null.
+- **Room DB migrations** — `AppDatabase` is at version 1 (Roasters only). Every new entity
+  requires a version bump and a `Migration` object added to the `databaseBuilder` in `DataModule`.
+- **`hiltViewModel` import** — use `androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel`,
+  not the deprecated `androidx.hilt.navigation.compose.hiltViewModel`.
