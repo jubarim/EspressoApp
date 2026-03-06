@@ -7,7 +7,7 @@ import org.juba.espressoapp.data.local.entity.RoasterEntity
 
 @Database(
     entities = [RoasterEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

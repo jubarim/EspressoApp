@@ -150,6 +150,7 @@ private fun RoasterDetailContent(roaster: Roaster, modifier: Modifier = Modifier
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             roaster.country?.let { DetailRow(label = stringResource(R.string.field_country), value = it) }
+            roaster.city?.let { DetailRow(label = stringResource(R.string.field_city), value = it) }
             roaster.website?.let { DetailRow(label = stringResource(R.string.field_website), value = it) }
             roaster.notes?.let { DetailRow(label = stringResource(R.string.field_notes), value = it) }
         }

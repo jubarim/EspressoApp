@@ -39,6 +39,7 @@ class RoasterRepositoryTest {
         id = id,
         name = name,
         country = "PT",
+        city = null,
         website = null,
         imageUri = null,
         notes = null,

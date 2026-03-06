@@ -31,7 +31,7 @@ abstract class DataModule {
                 context,
                 AppDatabase::class.java,
                 "espresso_app.db",
-            ).build()
+            ).fallbackToDestructiveMigration(true).build()
 
         @Provides
         fun provideRoasterDao(db: AppDatabase): RoasterDao = db.roasterDao()

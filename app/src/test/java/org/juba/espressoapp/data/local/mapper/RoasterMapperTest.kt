@@ -12,6 +12,7 @@ class RoasterMapperTest {
         id = "abc-123",
         name = "Square Mile",
         country = "UK",
+        city = "London",
         website = "https://squaremilecoffee.com",
         imageUri = null,
         notes = "Great light roasts",
@@ -24,6 +25,7 @@ class RoasterMapperTest {
         id = "abc-123",
         name = "Square Mile",
         country = "UK",
+        city = "London",
         website = "https://squaremilecoffee.com",
         imageUri = null,
         notes = "Great light roasts",
@@ -46,9 +48,10 @@ class RoasterMapperTest {
 
     @Test
     fun `nullable fields survive round trip`() {
-        val sparse = entity.copy(country = null, website = null, notes = null, imageUri = null)
+        val sparse = entity.copy(country = null, city = null, website = null, notes = null, imageUri = null)
         val result = sparse.toDomain()
         assertNull(result.country)
+        assertNull(result.city)
         assertNull(result.website)
         assertNull(result.notes)
         assertNull(result.imageUri)

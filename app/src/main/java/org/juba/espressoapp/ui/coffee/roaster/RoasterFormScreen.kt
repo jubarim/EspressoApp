@@ -87,6 +87,11 @@ fun RoasterFormScreen(
                 label = stringResource(R.string.field_country),
             )
             EspressoTextField(
+                value = uiState.city,
+                onValueChange = viewModel::onCityChange,
+                label = stringResource(R.string.field_city),
+            )
+            EspressoTextField(
                 value = uiState.website,
                 onValueChange = viewModel::onWebsiteChange,
                 label = stringResource(R.string.field_website),

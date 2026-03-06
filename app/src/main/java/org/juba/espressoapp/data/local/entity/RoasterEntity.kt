@@ -10,6 +10,7 @@ data class RoasterEntity(
     val id: String,
     val name: String,
     val country: String?,
+    val city: String?,
     val website: String?,
     @ColumnInfo(name = "image_uri") val imageUri: String?,
     val notes: String?,
