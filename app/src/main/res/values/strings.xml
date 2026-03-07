@@ -47,6 +47,11 @@
     <string name="cd_edit">Edit</string>
     <string name="cd_delete">Delete</string>
 
+    <!-- Selection bottom sheet / picker -->
+    <string name="picker_search_placeholder">Search…</string>
+    <string name="picker_confirm">Confirm</string>
+    <string name="picker_no_selection">Select one…</string>
+
     <!-- Common actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
