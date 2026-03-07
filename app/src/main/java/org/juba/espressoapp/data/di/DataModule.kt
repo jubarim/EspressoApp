@@ -8,8 +8,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import org.juba.espressoapp.BuildConfig
 import org.juba.espressoapp.data.local.dao.RoasterDao
 import org.juba.espressoapp.data.local.database.AppDatabase
+import org.juba.espressoapp.data.local.seed.DatabaseSeedCallback
 import org.juba.espressoapp.data.repository.RoasterRepositoryImpl
 import org.juba.espressoapp.domain.repository.RoasterRepository
 import javax.inject.Singleton
@@ -31,7 +33,9 @@ abstract class DataModule {
                 context,
                 AppDatabase::class.java,
                 "espresso_app.db",
-            ).fallbackToDestructiveMigration(true).build()
+            ).fallbackToDestructiveMigration(true)
+                .apply { if (BuildConfig.DEBUG) addCallback(DatabaseSeedCallback) }
+                .build()
 
         @Provides
         fun provideRoasterDao(db: AppDatabase): RoasterDao = db.roasterDao()
