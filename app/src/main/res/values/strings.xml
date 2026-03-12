@@ -52,6 +52,25 @@
     <string name="picker_confirm">Confirm</string>
     <string name="picker_no_selection">Select one…</string>
 
+    <!-- Coffee Bean list -->
+    <string name="coffee_bean_list_empty_message">No coffee beans yet.\nTap + to add your first one.</string>
+    <string name="coffee_bean_add">Add Coffee Bean</string>
+    <string name="cd_add_coffee_bean">Add coffee bean</string>
+
+    <!-- Coffee Bean form -->
+    <string name="coffee_bean_edit">Edit Coffee Bean</string>
+    <string name="field_roaster">Roaster *</string>
+    <string name="field_origin">Origin</string>
+    <string name="field_process">Process</string>
+    <string name="field_roast_level">Roast Level</string>
+    <string name="field_roast_date">Roast Date</string>
+    <string name="field_image_url">Image URL</string>
+
+    <!-- Coffee Bean detail -->
+    <string name="coffee_bean_delete_dialog_title">Delete coffee bean?</string>
+    <string name="coffee_bean_delete_dialog_message">This coffee bean will be removed. This action cannot be undone.</string>
+    <string name="coffee_bean_image_cd">%s image</string>
+
     <!-- Common actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
