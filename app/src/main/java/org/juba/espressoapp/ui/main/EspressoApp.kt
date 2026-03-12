@@ -16,6 +16,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.juba.espressoapp.ui.coffee.CoffeeHomeScreen
+import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanDetailScreen
+import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanFormScreen
+import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanListScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterDetailScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterFormScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterListScreen
@@ -36,7 +39,9 @@ fun EspressoApp() {
     val selectedDestination = when (currentRoute) {
         AppRoutes.SHOTS -> AppDestinations.SHOTS
         AppRoutes.COFFEE_HOME, AppRoutes.ROASTER_LIST,
-        AppRoutes.ROASTER_DETAIL, AppRoutes.ROASTER_FORM -> AppDestinations.COFFEE
+        AppRoutes.ROASTER_DETAIL, AppRoutes.ROASTER_FORM,
+        AppRoutes.COFFEE_BEAN_LIST, AppRoutes.COFFEE_BEAN_DETAIL,
+        AppRoutes.COFFEE_BEAN_FORM -> AppDestinations.COFFEE
         AppRoutes.GEAR -> AppDestinations.GEAR
         AppRoutes.SETTINGS -> AppDestinations.SETTINGS
         else -> AppDestinations.SHOTS
@@ -88,6 +93,25 @@ fun EspressoApp() {
                 arguments = listOf(navArgument("roasterId") { nullable = true; defaultValue = null }),
             ) {
                 RoasterFormScreen(onDismiss = { navController.popBackStack() })
+            }
+            composable(AppRoutes.COFFEE_BEAN_LIST) {
+                CoffeeBeanListScreen(
+                    onBack = { navController.popBackStack() },
+                    onBeanClick = { id -> navController.navigate("coffee_bean_detail/$id") },
+                    onAddBean = { navController.navigate("coffee_bean_form") },
+                )
+            }
+            composable(AppRoutes.COFFEE_BEAN_DETAIL) {
+                CoffeeBeanDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate("coffee_bean_form?beanId=$id") },
+                )
+            }
+            composable(
+                AppRoutes.COFFEE_BEAN_FORM,
+                arguments = listOf(navArgument("beanId") { nullable = true; defaultValue = null }),
+            ) {
+                CoffeeBeanFormScreen(onDismiss = { navController.popBackStack() })
             }
             composable(AppRoutes.GEAR) { GearScreen() }
             composable(AppRoutes.SETTINGS) { SettingsScreen() }
