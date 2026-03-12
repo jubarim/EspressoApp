@@ -43,7 +43,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Roaster
-import org.juba.espressoapp.ui.designsystem.EmptyStateContent
+import org.juba.espressoapp.designsystem.EmptyStateContent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

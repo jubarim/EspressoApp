@@ -1,4 +1,4 @@
-package org.juba.espressoapp.ui.designsystem
+package org.juba.espressoapp.designsystem
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.juba.espressoapp.R
+import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
 /**
  * Read-only outlined card that acts as a picker trigger. Displays a [label] above
@@ -63,5 +65,29 @@ fun PickerField(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PickerFieldPreview() {
+    EspressoAppTheme {
+        PickerField(
+            label = "Country",
+            selectedLabel = "Brazil",
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PickerFieldEmptyPreview() {
+    EspressoAppTheme {
+        PickerField(
+            label = "Country",
+            selectedLabel = null,
+            onClick = {},
+        )
     }
 }

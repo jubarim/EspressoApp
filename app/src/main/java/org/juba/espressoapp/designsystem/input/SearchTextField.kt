@@ -1,4 +1,4 @@
-package org.juba.espressoapp.ui.designsystem.input
+package org.juba.espressoapp.designsystem.input
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

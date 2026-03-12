@@ -1,4 +1,4 @@
-package org.juba.espressoapp.ui.designsystem
+package org.juba.espressoapp.designsystem
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.juba.espressoapp.R
-import org.juba.espressoapp.ui.designsystem.input.SearchTextField
+import org.juba.espressoapp.designsystem.input.SearchTextField
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
 /**

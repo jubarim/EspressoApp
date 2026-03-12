@@ -30,10 +30,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Countries
-import org.juba.espressoapp.ui.designsystem.EspressoTextField
-import org.juba.espressoapp.ui.designsystem.PickerField
-import org.juba.espressoapp.ui.designsystem.SelectionBottomSheet
-import org.juba.espressoapp.ui.designsystem.SelectionOption
+import org.juba.espressoapp.designsystem.EspressoTextField
+import org.juba.espressoapp.designsystem.PickerField
+import org.juba.espressoapp.designsystem.SelectionBottomSheet
+import org.juba.espressoapp.designsystem.SelectionOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package org.juba.espressoapp.ui.designsystem
+package org.juba.espressoapp.designsystem
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
