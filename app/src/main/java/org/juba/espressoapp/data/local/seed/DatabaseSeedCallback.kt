@@ -185,6 +185,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             hasPressureGauge = true,
             purchaseDate = 1711929600000L, // 2024-04-01
             notes = "Dual manometers for pump and boiler pressure.",
+            imageUri = "https://www.ecm.de/wp-content/uploads/2025/04/ECM_Synchronika_II-frontal-768x504-1.jpg",
         ),
         espressoMachineSql(
             id = "00000000-0000-0000-0000-400000000002",
@@ -196,6 +197,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             hasPressureGauge = true,
             purchaseDate = 1724025600000L, // 2024-08-20
             notes = "Commercial saturated group. Excellent temperature stability.",
+            imageUri = "https://www.koacafes.com.br/cdn/shop/files/b2.jpg?v=1732023450&width=1445",
         ),
         espressoMachineSql(
             id = "00000000-0000-0000-0000-400000000003",
@@ -207,6 +209,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             hasPressureGauge = false,
             purchaseDate = 1739145600000L, // 2025-02-10
             notes = "Manual lever, no boiler — supply your own hot water.",
+            imageUri = "https://images.squarespace-cdn.com/content/v1/60d0e3f1becdc5075d5d6b83/f9964413-46d7-4f8c-8eab-5f6ae3e2f0c0/_MG_4775.JPG?format=2500w",
         ),
         espressoMachineSql(
             id = "00000000-0000-0000-0000-400000000004",
@@ -218,6 +221,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             hasPressureGauge = false,
             purchaseDate = 1733270400000L, // 2024-12-05
             notes = "App-controlled pressure profiling. Flow and pressure sensors built in.",
+            imageUri = "https://fast.decentespresso.com/img/acc-07.avif",
         ),
     )
 
