@@ -13,6 +13,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
         SEED_ROASTERS.forEach { db.execSQL(it) }
+        SEED_COFFEE_BEANS.forEach { db.execSQL(it) }
     }
 
     // Unix ms timestamp used for all seed rows — 2024-01-01T00:00:00Z
@@ -88,6 +89,89 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         ),
     )
 
+    private val SEED_COFFEE_BEANS = listOf(
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000001",
+            roasterId = "00000000-0000-0000-0000-000000000001", // Onyx Coffee Lab
+            name = "Southern Weather",
+            origin = "Ethiopia, Yirgacheffe",
+            process = "Washed",
+            roastLevel = "Light",
+            roastDate = 1767744000000L, // 2026-01-07
+            notes = "Jasmine, stone fruit, and sparkling citrus acidity.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000002",
+            roasterId = "00000000-0000-0000-0000-000000000002", // Tim Wendelboe
+            name = "Ethiopia Idido",
+            origin = "Ethiopia, Yirgacheffe",
+            process = "Natural",
+            roastLevel = "Light",
+            roastDate = 1770076800000L, // 2026-02-03
+            notes = "Blueberry, dark chocolate, and floral complexity.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000003",
+            roasterId = "00000000-0000-0000-0000-000000000003", // Square Mile Coffee Roasters
+            name = "Red Brick",
+            origin = "Brazil / Colombia blend",
+            process = "Washed",
+            roastLevel = "Medium",
+            roastDate = 1768780800000L, // 2026-01-19
+            notes = "Espresso blend with milk chocolate, hazelnut, and caramel sweetness.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000004",
+            roasterId = "00000000-0000-0000-0000-000000000004", // Five Elephant
+            name = "Kenya Kiambu AA",
+            origin = "Kenya, Kiambu",
+            process = "Washed",
+            roastLevel = "Light",
+            roastDate = 1771718400000L, // 2026-02-22
+            notes = "Blackcurrant, tomato, and bright malic acidity.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000005",
+            roasterId = "00000000-0000-0000-0000-000000000005", // Morgon Coffee Roasters
+            name = "Kayon Mountain",
+            origin = "Ethiopia, Guji",
+            process = "Natural",
+            roastLevel = "Light",
+            roastDate = 1769558400000L, // 2026-01-28
+            notes = "Strawberry jam, rose water, and creamy mouthfeel.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000006",
+            roasterId = "00000000-0000-0000-0000-100000000001", // Do Coado Ao Espresso
+            name = "Fazenda Recanto",
+            origin = "Brazil, Minas Gerais",
+            process = "Natural",
+            roastLevel = "Medium",
+            roastDate = 1770768000000L, // 2026-02-11
+            notes = "Dark chocolate, dried fruit, and smooth low acidity.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000007",
+            roasterId = "00000000-0000-0000-0000-100000000002", // Five Roasters
+            name = "Sítio Santa Maria",
+            origin = "Brazil, Sul de Minas",
+            process = "Pulped Natural",
+            roastLevel = "Medium",
+            roastDate = 1772668800000L, // 2026-03-05
+            notes = "Caramel, nuts, and mild fruit sweetness.",
+        ),
+        coffeeBeanSql(
+            id = "00000000-0000-0000-0000-200000000008",
+            roasterId = "00000000-0000-0000-0000-100000000003", // UTI Roast Cafés
+            name = "Colombia El Paraíso",
+            origin = "Colombia, Huila",
+            process = "Washed",
+            roastLevel = "Light",
+            roastDate = 1768348800000L, // 2026-01-14
+            notes = "Red apple, brown sugar, and balanced citric brightness.",
+        ),
+    )
+
     private fun roasterSql(
         id: String,
         name: String,
@@ -104,6 +188,28 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             VALUES
                 ('$id', ${name.toSqlValue()}, ${country.toSqlValue()}, ${city.toSqlValue()},
                  ${website.toSqlValue()}, ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
+        """.trimIndent()
+    }
+
+    private fun coffeeBeanSql(
+        id: String,
+        roasterId: String,
+        name: String,
+        origin: String?,
+        process: String?,
+        roastLevel: String?,
+        roastDate: Long?,
+        notes: String?,
+        imageUri: String? = null,
+    ): String {
+        fun String?.toSqlValue() = if (this == null) "NULL" else "'${replace("'", "''")}'"
+        fun Long?.toSqlValue() = this?.toString() ?: "NULL"
+        return """
+            INSERT OR IGNORE INTO coffee_beans
+                (id, roaster_id, name, origin, process, roast_level, roast_date, image_uri, notes, is_deleted, created_at, updated_at)
+            VALUES
+                ('$id', '$roasterId', ${name.toSqlValue()}, ${origin.toSqlValue()}, ${process.toSqlValue()},
+                 ${roastLevel.toSqlValue()}, ${roastDate.toSqlValue()}, ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
         """.trimIndent()
     }
 }
