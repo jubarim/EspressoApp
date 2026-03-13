@@ -16,6 +16,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         SEED_COFFEE_BEANS.forEach { db.execSQL(it) }
         SEED_GRINDERS.forEach { db.execSQL(it) }
         SEED_ESPRESSO_MACHINES.forEach { db.execSQL(it) }
+        SEED_FILTER_BASKETS.forEach { db.execSQL(it) }
     }
 
     // Unix ms timestamp used for all seed rows — 2024-01-01T00:00:00Z
@@ -337,6 +338,83 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             notes = "High-quality hand grinder. Great for travel espresso.",
         ),
     )
+
+    private val SEED_FILTER_BASKETS = listOf(
+        filterBasketSql(
+            id = "00000000-0000-0000-0000-500000000001",
+            brand = "IMS",
+            model = "Competition",
+            sizeGrams = "18g",
+            type = "Precision",
+            diameter = "58mm",
+            purchaseDate = 1711929600000L, // 2024-04-01
+            notes = "Precision laser-cut holes for improved flow uniformity.",
+        ),
+        filterBasketSql(
+            id = "00000000-0000-0000-0000-500000000002",
+            brand = "VST",
+            model = "Ridgeless",
+            sizeGrams = "18g",
+            type = "Ridgeless",
+            diameter = "58mm",
+            purchaseDate = 1724025600000L, // 2024-08-20
+            notes = "Industry reference for precision espresso extraction.",
+        ),
+        filterBasketSql(
+            id = "00000000-0000-0000-0000-500000000003",
+            brand = "Decent",
+            model = "Espresso Basket",
+            sizeGrams = "18g",
+            type = "Ridgeless",
+            diameter = "58mm",
+            purchaseDate = 1733270400000L, // 2024-12-05
+            notes = "Designed for the Decent DE1. Smooth ridgeless sides.",
+        ),
+        filterBasketSql(
+            id = "00000000-0000-0000-0000-500000000004",
+            brand = "La Marzocco",
+            model = "Standard",
+            sizeGrams = "14g",
+            type = "Ridged",
+            diameter = "58mm",
+            purchaseDate = 1704067200000L, // 2024-01-01
+            notes = "Stock basket shipped with Linea Mini.",
+        ),
+        filterBasketSql(
+            id = "00000000-0000-0000-0000-500000000005",
+            brand = "Graph Coffee",
+            model = "Stepped Basket 58mm to 46mm",
+            sizeGrams = "16 to 22g",
+            type = "Ridgeless",
+            diameter = "58mm",
+            purchaseDate = 1704067200000L, // 2024-01-01
+            notes = "Sweet and full-bodied espresso MOD - a basket that steps the from 58mm to 46mm. Sized for 16g-22g (though exact weights can vary depending on bean and roast level)",
+            imageUri = "https://static.wixstatic.com/media/88d502_e594f8b67ef049268ee8d811f32a4afc~mv2.jpg/v1/fill/w_980,h_551,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/88d502_e594f8b67ef049268ee8d811f32a4afc~mv2.jpg",
+        ),
+    )
+
+    private fun filterBasketSql(
+        id: String,
+        brand: String,
+        model: String?,
+        sizeGrams: String?,
+        type: String?,
+        diameter: String?,
+        purchaseDate: Long?,
+        notes: String?,
+        imageUri: String? = null,
+    ): String {
+        fun String?.toSqlValue() = if (this == null) "NULL" else "'${replace("'", "''")}'"
+        fun Long?.toSqlValue() = this?.toString() ?: "NULL"
+        return """
+            INSERT OR IGNORE INTO filter_baskets
+                (id, brand, model, size_grams, type, diameter, purchase_date, image_uri, notes, is_deleted, created_at, updated_at)
+            VALUES
+                ('$id', ${brand.toSqlValue()}, ${model.toSqlValue()}, ${sizeGrams.toSqlValue()},
+                 ${type.toSqlValue()}, ${diameter.toSqlValue()}, ${purchaseDate.toSqlValue()},
+                 ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
+        """.trimIndent()
+    }
 
     private fun coffeeBeanSql(
         id: String,
