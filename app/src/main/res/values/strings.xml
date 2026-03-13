@@ -71,6 +71,10 @@
     <string name="coffee_bean_delete_dialog_message">This coffee bean will be removed. This action cannot be undone.</string>
     <string name="coffee_bean_image_cd">%s image</string>
 
+    <!-- Common values -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <!-- Grinder list -->
     <string name="grinder_list_empty_message">No grinders yet.\nTap + to add your first one.</string>
     <string name="grinder_add">Add Grinder</string>
@@ -89,6 +93,23 @@
     <string name="grinder_delete_dialog_title">Delete grinder?</string>
     <string name="grinder_delete_dialog_message">This grinder will be removed. This action cannot be undone.</string>
     <string name="grinder_image_cd">%s image</string>
+
+    <!-- Espresso Machine list -->
+    <string name="espresso_machine_list_empty_message">No espresso machines yet.\nTap + to add your first one.</string>
+    <string name="espresso_machine_add">Add Espresso Machine</string>
+    <string name="cd_add_espresso_machine">Add espresso machine</string>
+
+    <!-- Espresso Machine form -->
+    <string name="espresso_machine_edit">Edit Espresso Machine</string>
+    <string name="field_boiler_type">Boiler Type</string>
+    <string name="field_pump_type">Pump Type</string>
+    <string name="field_group_head">Group Head</string>
+    <string name="field_has_pressure_gauge">Pressure Gauge</string>
+
+    <!-- Espresso Machine detail -->
+    <string name="espresso_machine_delete_dialog_title">Delete espresso machine?</string>
+    <string name="espresso_machine_delete_dialog_message">This espresso machine will be removed. This action cannot be undone.</string>
+    <string name="espresso_machine_image_cd">%s image</string>
 
     <!-- Common actions -->
     <string name="action_save">Save</string>
