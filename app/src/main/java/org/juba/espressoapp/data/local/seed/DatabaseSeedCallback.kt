@@ -14,6 +14,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         super.onCreate(db)
         SEED_ROASTERS.forEach { db.execSQL(it) }
         SEED_COFFEE_BEANS.forEach { db.execSQL(it) }
+        SEED_GRINDERS.forEach { db.execSQL(it) }
     }
 
     // Unix ms timestamp used for all seed rows — 2024-01-01T00:00:00Z
@@ -172,6 +173,29 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         ),
     )
 
+    private fun grinderSql(
+        id: String,
+        brand: String,
+        model: String,
+        burrType: String?,
+        burrSize: String?,
+        purchaseDate: Long?,
+        burrInstallDate: Long?,
+        notes: String?,
+        imageUri: String? = null,
+    ): String {
+        fun String?.toSqlValue() = if (this == null) "NULL" else "'${replace("'", "''")}'"
+        fun Long?.toSqlValue() = this?.toString() ?: "NULL"
+        return """
+            INSERT OR IGNORE INTO grinders
+                (id, brand, model, burr_type, burr_size, purchase_date, burr_install_date, image_uri, notes, is_deleted, created_at, updated_at)
+            VALUES
+                ('$id', ${brand.toSqlValue()}, ${model.toSqlValue()}, ${burrType.toSqlValue()},
+                 ${burrSize.toSqlValue()}, ${purchaseDate.toSqlValue()}, ${burrInstallDate.toSqlValue()},
+                 ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
+        """.trimIndent()
+    }
+
     private fun roasterSql(
         id: String,
         name: String,
@@ -190,6 +214,52 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
                  ${website.toSqlValue()}, ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
         """.trimIndent()
     }
+
+    private val SEED_GRINDERS = listOf(
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000001",
+            brand = "Niche",
+            model = "Zero",
+            burrType = "Conical",
+            burrSize = "63 mm",
+            purchaseDate = 1709251200000L, // 2024-03-01
+            burrInstallDate = 1709251200000L, // 2024-03-01
+            notes = "Single dose, zero retention. Grind ~20 for espresso.",
+            imageUri = "https://www.nichecoffee.co.uk/cdn/shop/files/In-use-espresso.jpg?v=1717485718&width=740",
+
+        ),
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000002",
+            brand = "Mahlkönig",
+            model = "EK43",
+            burrType = "Flat",
+            burrSize = "98 mm",
+            purchaseDate = 1721001600000L, // 2024-07-15
+            burrInstallDate = 1721001600000L, // 2024-07-15
+            notes = "Commercial-grade all-purpose grinder. Coarser settings for espresso.",
+            imageUri = "https://www.koacafes.com.br/cdn/shop/files/sss.png?v=1707222562&width=1445",
+        ),
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000003",
+            brand = "Eureka",
+            model = "Mignon Specialita",
+            burrType = "Flat",
+            burrSize = "55 mm",
+            purchaseDate = 1737331200000L, // 2025-01-20
+            burrInstallDate = 1737331200000L, // 2025-01-20
+            notes = "Silent grinder with stepless adjustment.",
+        ),
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000004",
+            brand = "Comandante",
+            model = "C40 MK4",
+            burrType = "Conical",
+            burrSize = "39 mm",
+            purchaseDate = 1732060800000L, // 2024-11-20
+            burrInstallDate = null,
+            notes = "High-quality hand grinder. Great for travel espresso.",
+        ),
+    )
 
     private fun coffeeBeanSql(
         id: String,
