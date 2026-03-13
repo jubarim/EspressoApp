@@ -111,6 +111,22 @@
     <string name="espresso_machine_delete_dialog_message">This espresso machine will be removed. This action cannot be undone.</string>
     <string name="espresso_machine_image_cd">%s image</string>
 
+    <!-- Filter Basket list -->
+    <string name="filter_basket_list_empty_message">No filter baskets yet.\nTap + to add your first one.</string>
+    <string name="filter_basket_add">Add Filter Basket</string>
+    <string name="cd_add_filter_basket">Add filter basket</string>
+
+    <!-- Filter Basket form -->
+    <string name="filter_basket_edit">Edit Filter Basket</string>
+    <string name="field_size">Size</string>
+    <string name="field_basket_type">Basket Type</string>
+    <string name="field_diameter">Diameter</string>
+
+    <!-- Filter Basket detail -->
+    <string name="filter_basket_delete_dialog_title">Delete filter basket?</string>
+    <string name="filter_basket_delete_dialog_message">This filter basket will be removed. This action cannot be undone.</string>
+    <string name="filter_basket_image_cd">%s image</string>
+
     <!-- Common actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
