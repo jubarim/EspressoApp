@@ -17,15 +17,21 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.CategoryListItem
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-private enum class GearCategory(@param:StringRes val labelRes: Int) {
-    GRINDERS(R.string.gear_category_grinders),
-    ESPRESSO_MACHINES(R.string.gear_category_espresso_machines),
-    FILTER_BASKETS(R.string.gear_category_filter_baskets),
+private enum class GearCategory(
+    @param:StringRes val labelRes: Int,
+    val route: String?,
+) {
+    GRINDERS(R.string.gear_category_grinders, "grinder_list"),
+    ESPRESSO_MACHINES(R.string.gear_category_espresso_machines, null),
+    FILTER_BASKETS(R.string.gear_category_filter_baskets, null),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GearScreen(modifier: Modifier = Modifier) {
+fun GearScreen(
+    modifier: Modifier = Modifier,
+    onCategoryClick: (String) -> Unit = {},
+) {
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_gear)) }) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -38,7 +44,7 @@ fun GearScreen(modifier: Modifier = Modifier) {
             items(GearCategory.entries) { category ->
                 CategoryListItem(
                     label = stringResource(category.labelRes),
-                    onClick = {},
+                    onClick = { category.route?.let { onCategoryClick(it) } },
                 )
             }
         }

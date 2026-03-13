@@ -23,6 +23,9 @@ import org.juba.espressoapp.ui.coffee.roaster.RoasterDetailScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterFormScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterListScreen
 import org.juba.espressoapp.ui.gear.GearScreen
+import org.juba.espressoapp.ui.gear.grinder.GrinderDetailScreen
+import org.juba.espressoapp.ui.gear.grinder.GrinderFormScreen
+import org.juba.espressoapp.ui.gear.grinder.GrinderListScreen
 import org.juba.espressoapp.ui.settings.SettingsScreen
 import org.juba.espressoapp.ui.shots.ShotsScreen
 
@@ -42,7 +45,8 @@ fun EspressoApp() {
         AppRoutes.ROASTER_DETAIL, AppRoutes.ROASTER_FORM,
         AppRoutes.COFFEE_BEAN_LIST, AppRoutes.COFFEE_BEAN_DETAIL,
         AppRoutes.COFFEE_BEAN_FORM -> AppDestinations.COFFEE
-        AppRoutes.GEAR -> AppDestinations.GEAR
+        AppRoutes.GEAR, AppRoutes.GRINDER_LIST,
+        AppRoutes.GRINDER_DETAIL, AppRoutes.GRINDER_FORM -> AppDestinations.GEAR
         AppRoutes.SETTINGS -> AppDestinations.SETTINGS
         else -> AppDestinations.SHOTS
     }
@@ -113,7 +117,28 @@ fun EspressoApp() {
             ) {
                 CoffeeBeanFormScreen(onDismiss = { navController.popBackStack() })
             }
-            composable(AppRoutes.GEAR) { GearScreen() }
+            composable(AppRoutes.GEAR) {
+                GearScreen(onCategoryClick = { route -> navController.navigate(route) })
+            }
+            composable(AppRoutes.GRINDER_LIST) {
+                GrinderListScreen(
+                    onBack = { navController.popBackStack() },
+                    onGrinderClick = { id -> navController.navigate("grinder_detail/$id") },
+                    onAddGrinder = { navController.navigate("grinder_form") },
+                )
+            }
+            composable(AppRoutes.GRINDER_DETAIL) {
+                GrinderDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate("grinder_form?grinderId=$id") },
+                )
+            }
+            composable(
+                AppRoutes.GRINDER_FORM,
+                arguments = listOf(navArgument("grinderId") { nullable = true; defaultValue = null }),
+            ) {
+                GrinderFormScreen(onDismiss = { navController.popBackStack() })
+            }
             composable(AppRoutes.SETTINGS) { SettingsScreen() }
         }
     }
