@@ -4,6 +4,16 @@ Project-level instructions and context for AI-assisted development sessions.
 
 ---
 
+## 0. Main instructions
+
+- The app has a design system folder (package org.juba.espressoapp.designsystem). When creating new UI, always verify it there is some
+reusable component there. If necessary, new ones can be added so they can be reused later.
+- When creating new composables files/functions, create at least one preview for the important ones, specially the ones that can be reused
+or are screens.
+
+
+---
+
 ## 1. Project Overview
 
 **App name:** The Digital Barista
