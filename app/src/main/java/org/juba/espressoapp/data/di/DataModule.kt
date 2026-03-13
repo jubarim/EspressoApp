@@ -12,12 +12,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.juba.espressoapp.BuildConfig
 import org.juba.espressoapp.data.local.dao.CoffeeBeanDao
+import org.juba.espressoapp.data.local.dao.GrinderDao
 import org.juba.espressoapp.data.local.dao.RoasterDao
 import org.juba.espressoapp.data.local.database.AppDatabase
 import org.juba.espressoapp.data.local.seed.DatabaseSeedCallback
 import org.juba.espressoapp.data.repository.CoffeeBeanRepositoryImpl
+import org.juba.espressoapp.data.repository.GrinderRepositoryImpl
 import org.juba.espressoapp.data.repository.RoasterRepositoryImpl
 import org.juba.espressoapp.domain.repository.CoffeeBeanRepository
+import org.juba.espressoapp.domain.repository.GrinderRepository
 import org.juba.espressoapp.domain.repository.RoasterRepository
 import javax.inject.Singleton
 
@@ -32,6 +35,10 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindCoffeeBeanRepository(impl: CoffeeBeanRepositoryImpl): CoffeeBeanRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGrinderRepository(impl: GrinderRepositoryImpl): GrinderRepository
 
     companion object {
 
@@ -62,6 +69,29 @@ abstract class DataModule {
             }
         }
 
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS grinders (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        brand TEXT NOT NULL,
+                        model TEXT NOT NULL,
+                        burr_type TEXT,
+                        burr_size TEXT,
+                        purchase_date INTEGER,
+                        burr_install_date INTEGER,
+                        image_uri TEXT,
+                        notes TEXT,
+                        is_deleted INTEGER NOT NULL DEFAULT 0,
+                        created_at INTEGER NOT NULL,
+                        updated_at INTEGER NOT NULL
+                    )
+                    """.trimIndent(),
+                )
+            }
+        }
+
         @Provides
         @Singleton
         fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
@@ -70,7 +100,7 @@ abstract class DataModule {
                 AppDatabase::class.java,
                 "espresso_app.db",
             ).fallbackToDestructiveMigration(true)
-                .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
                 .apply { if (BuildConfig.DEBUG) addCallback(DatabaseSeedCallback) }
                 .build()
 
@@ -79,5 +109,8 @@ abstract class DataModule {
 
         @Provides
         fun provideCoffeeBeanDao(db: AppDatabase): CoffeeBeanDao = db.coffeeBeanDao()
+
+        @Provides
+        fun provideGrinderDao(db: AppDatabase): GrinderDao = db.grinderDao()
     }
 }
