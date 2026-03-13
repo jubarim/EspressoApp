@@ -147,8 +147,11 @@ All tables use:
 | `id` | TEXT PK | UUID v4 |
 | `brand` | TEXT NOT NULL | e.g. ECM, La Marzocco, Strietman |
 | `model` | TEXT NOT NULL | e.g. Synchronika, Linea Mini, CT2 |
-| `boiler_type` | TEXT | Single / HX / Dual |
-| `has_pressure_gauge` | INTEGER | 0 / 1 |
+| `boiler_type` | TEXT | Single Boiler / HX / Dual Boiler / Thermoblock / No Boiler |
+| `pump_type` | TEXT | Vibratory / Rotary / Direct Lever / Spring Lever |
+| `group_head` | TEXT | E61 / Saturated / Semi-saturated / Commercial / Lever |
+| `has_pressure_gauge` | INTEGER | 0 / 1, default 0 |
+| `purchase_date` | INTEGER | Unix ms, nullable |
 | `image_uri` | TEXT | Optional local URI |
 | `notes` | TEXT | |
 | `is_deleted` | INTEGER | 0 / 1, default 0 |
