@@ -71,6 +71,25 @@
     <string name="coffee_bean_delete_dialog_message">This coffee bean will be removed. This action cannot be undone.</string>
     <string name="coffee_bean_image_cd">%s image</string>
 
+    <!-- Grinder list -->
+    <string name="grinder_list_empty_message">No grinders yet.\nTap + to add your first one.</string>
+    <string name="grinder_add">Add Grinder</string>
+    <string name="cd_add_grinder">Add grinder</string>
+
+    <!-- Grinder form -->
+    <string name="grinder_edit">Edit Grinder</string>
+    <string name="field_brand">Brand *</string>
+    <string name="field_model">Model *</string>
+    <string name="field_burr_type">Burr Type</string>
+    <string name="field_burr_size">Burr Size</string>
+    <string name="field_purchase_date">Purchase Date</string>
+    <string name="field_burr_install_date">Burr Install Date</string>
+
+    <!-- Grinder detail -->
+    <string name="grinder_delete_dialog_title">Delete grinder?</string>
+    <string name="grinder_delete_dialog_message">This grinder will be removed. This action cannot be undone.</string>
+    <string name="grinder_image_cd">%s image</string>
+
     <!-- Common actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
