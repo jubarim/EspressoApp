@@ -13,6 +13,9 @@ internal object AppRoutes {
     const val GRINDER_LIST = "grinder_list"
     const val GRINDER_DETAIL = "grinder_detail/{grinderId}"
     const val GRINDER_FORM = "grinder_form?grinderId={grinderId}"
+    const val ESPRESSO_MACHINE_LIST = "espresso_machine_list"
+    const val ESPRESSO_MACHINE_DETAIL = "espresso_machine_detail/{machineId}"
+    const val ESPRESSO_MACHINE_FORM = "espresso_machine_form?machineId={machineId}"
     const val SETTINGS = "settings"
 }
 
@@ -26,5 +29,6 @@ internal val showBottomNavBar = setOf(
     AppRoutes.COFFEE_BEAN_LIST,
     AppRoutes.GEAR,
     AppRoutes.GRINDER_LIST,
+    AppRoutes.ESPRESSO_MACHINE_LIST,
     AppRoutes.SETTINGS,
 )

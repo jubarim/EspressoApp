@@ -23,6 +23,9 @@ import org.juba.espressoapp.ui.coffee.roaster.RoasterDetailScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterFormScreen
 import org.juba.espressoapp.ui.coffee.roaster.RoasterListScreen
 import org.juba.espressoapp.ui.gear.GearScreen
+import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineDetailScreen
+import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineFormScreen
+import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineListScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderDetailScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderFormScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderListScreen
@@ -46,7 +49,9 @@ fun EspressoApp() {
         AppRoutes.COFFEE_BEAN_LIST, AppRoutes.COFFEE_BEAN_DETAIL,
         AppRoutes.COFFEE_BEAN_FORM -> AppDestinations.COFFEE
         AppRoutes.GEAR, AppRoutes.GRINDER_LIST,
-        AppRoutes.GRINDER_DETAIL, AppRoutes.GRINDER_FORM -> AppDestinations.GEAR
+        AppRoutes.GRINDER_DETAIL, AppRoutes.GRINDER_FORM,
+        AppRoutes.ESPRESSO_MACHINE_LIST, AppRoutes.ESPRESSO_MACHINE_DETAIL,
+        AppRoutes.ESPRESSO_MACHINE_FORM -> AppDestinations.GEAR
         AppRoutes.SETTINGS -> AppDestinations.SETTINGS
         else -> AppDestinations.SHOTS
     }
@@ -138,6 +143,25 @@ fun EspressoApp() {
                 arguments = listOf(navArgument("grinderId") { nullable = true; defaultValue = null }),
             ) {
                 GrinderFormScreen(onDismiss = { navController.popBackStack() })
+            }
+            composable(AppRoutes.ESPRESSO_MACHINE_LIST) {
+                EspressoMachineListScreen(
+                    onBack = { navController.popBackStack() },
+                    onMachineClick = { id -> navController.navigate("espresso_machine_detail/$id") },
+                    onAddMachine = { navController.navigate("espresso_machine_form") },
+                )
+            }
+            composable(AppRoutes.ESPRESSO_MACHINE_DETAIL) {
+                EspressoMachineDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate("espresso_machine_form?machineId=$id") },
+                )
+            }
+            composable(
+                AppRoutes.ESPRESSO_MACHINE_FORM,
+                arguments = listOf(navArgument("machineId") { nullable = true; defaultValue = null }),
+            ) {
+                EspressoMachineFormScreen(onDismiss = { navController.popBackStack() })
             }
             composable(AppRoutes.SETTINGS) { SettingsScreen() }
         }

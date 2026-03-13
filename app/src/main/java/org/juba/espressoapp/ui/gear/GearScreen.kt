@@ -22,7 +22,7 @@ private enum class GearCategory(
     val route: String?,
 ) {
     GRINDERS(R.string.gear_category_grinders, "grinder_list"),
-    ESPRESSO_MACHINES(R.string.gear_category_espresso_machines, null),
+    ESPRESSO_MACHINES(R.string.gear_category_espresso_machines, "espresso_machine_list"),
     FILTER_BASKETS(R.string.gear_category_filter_baskets, null),
 }
 
