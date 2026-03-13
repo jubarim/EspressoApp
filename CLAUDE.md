@@ -292,14 +292,15 @@ Full CRUD vertical slice is complete and establishes patterns for all subsequent
 - **Logo:** URL text field; loaded with Coil 3 (`AsyncImage`); INTERNET permission added
 - **Tests:** `RoasterMapperTest`, `RoasterRepositoryTest` (Robolectric + in-memory Room)
 
-### Phase 2 — Remaining equipment entities ← next
+### ✅ Phase 2 — Remaining equipment entities
 Follow the same vertical slice pattern for:
 1. ✅ **Coffee Beans** (FK → roasters, additional fields)
-2. **Grinders** (brand + model required)
-3. **Espresso Machines** (brand + model required)
-4. **Filter Baskets** (brand required)
+2. ✅ **Grinders** (brand + model required)
+3. ✅ **Espresso Machines** (brand + model required)
+4. ✅ **Filter Baskets** (brand required; size_grams TEXT, diameter dropdown, type dropdown, purchase_date)
 
 Each new entity needs a Room DB version bump and migration script.
+AppDatabase is now at version 6 (filter_baskets added in MIGRATION_5_6).
 
 ### Phase 3 — Shot Log module
 The most complex module. Depends on all equipment entities being queryable.
