@@ -23,7 +23,7 @@ private enum class GearCategory(
 ) {
     GRINDERS(R.string.gear_category_grinders, "grinder_list"),
     ESPRESSO_MACHINES(R.string.gear_category_espresso_machines, "espresso_machine_list"),
-    FILTER_BASKETS(R.string.gear_category_filter_baskets, null),
+    FILTER_BASKETS(R.string.gear_category_filter_baskets, "filter_basket_list"),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

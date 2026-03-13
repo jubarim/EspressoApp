@@ -16,6 +16,9 @@ internal object AppRoutes {
     const val ESPRESSO_MACHINE_LIST = "espresso_machine_list"
     const val ESPRESSO_MACHINE_DETAIL = "espresso_machine_detail/{machineId}"
     const val ESPRESSO_MACHINE_FORM = "espresso_machine_form?machineId={machineId}"
+    const val FILTER_BASKET_LIST = "filter_basket_list"
+    const val FILTER_BASKET_DETAIL = "filter_basket_detail/{basketId}"
+    const val FILTER_BASKET_FORM = "filter_basket_form?basketId={basketId}"
     const val SETTINGS = "settings"
 }
 
@@ -30,5 +33,6 @@ internal val showBottomNavBar = setOf(
     AppRoutes.GEAR,
     AppRoutes.GRINDER_LIST,
     AppRoutes.ESPRESSO_MACHINE_LIST,
+    AppRoutes.FILTER_BASKET_LIST,
     AppRoutes.SETTINGS,
 )

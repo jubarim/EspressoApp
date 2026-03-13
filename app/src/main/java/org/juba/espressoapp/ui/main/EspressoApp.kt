@@ -26,6 +26,9 @@ import org.juba.espressoapp.ui.gear.GearScreen
 import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineDetailScreen
 import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineFormScreen
 import org.juba.espressoapp.ui.gear.espressomachine.EspressoMachineListScreen
+import org.juba.espressoapp.ui.gear.filterbasket.FilterBasketDetailScreen
+import org.juba.espressoapp.ui.gear.filterbasket.FilterBasketFormScreen
+import org.juba.espressoapp.ui.gear.filterbasket.FilterBasketListScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderDetailScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderFormScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderListScreen
@@ -51,7 +54,9 @@ fun EspressoApp() {
         AppRoutes.GEAR, AppRoutes.GRINDER_LIST,
         AppRoutes.GRINDER_DETAIL, AppRoutes.GRINDER_FORM,
         AppRoutes.ESPRESSO_MACHINE_LIST, AppRoutes.ESPRESSO_MACHINE_DETAIL,
-        AppRoutes.ESPRESSO_MACHINE_FORM -> AppDestinations.GEAR
+        AppRoutes.ESPRESSO_MACHINE_FORM,
+        AppRoutes.FILTER_BASKET_LIST, AppRoutes.FILTER_BASKET_DETAIL,
+        AppRoutes.FILTER_BASKET_FORM -> AppDestinations.GEAR
         AppRoutes.SETTINGS -> AppDestinations.SETTINGS
         else -> AppDestinations.SHOTS
     }
@@ -162,6 +167,25 @@ fun EspressoApp() {
                 arguments = listOf(navArgument("machineId") { nullable = true; defaultValue = null }),
             ) {
                 EspressoMachineFormScreen(onDismiss = { navController.popBackStack() })
+            }
+            composable(AppRoutes.FILTER_BASKET_LIST) {
+                FilterBasketListScreen(
+                    onBack = { navController.popBackStack() },
+                    onBasketClick = { id -> navController.navigate("filter_basket_detail/$id") },
+                    onAddBasket = { navController.navigate("filter_basket_form") },
+                )
+            }
+            composable(AppRoutes.FILTER_BASKET_DETAIL) {
+                FilterBasketDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate("filter_basket_form?basketId=$id") },
+                )
+            }
+            composable(
+                AppRoutes.FILTER_BASKET_FORM,
+                arguments = listOf(navArgument("basketId") { nullable = true; defaultValue = null }),
+            ) {
+                FilterBasketFormScreen(onDismiss = { navController.popBackStack() })
             }
             composable(AppRoutes.SETTINGS) { SettingsScreen() }
         }
