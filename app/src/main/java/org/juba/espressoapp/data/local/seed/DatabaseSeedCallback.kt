@@ -15,6 +15,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         SEED_ROASTERS.forEach { db.execSQL(it) }
         SEED_COFFEE_BEANS.forEach { db.execSQL(it) }
         SEED_GRINDERS.forEach { db.execSQL(it) }
+        SEED_ESPRESSO_MACHINES.forEach { db.execSQL(it) }
     }
 
     // Unix ms timestamp used for all seed rows — 2024-01-01T00:00:00Z
@@ -172,6 +173,78 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             notes = "Red apple, brown sugar, and balanced citric brightness.",
         ),
     )
+
+    private val SEED_ESPRESSO_MACHINES = listOf(
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000001",
+            brand = "ECM",
+            model = "Synchronika",
+            boilerType = "HX",
+            pumpType = "Rotary",
+            groupHead = "E61",
+            hasPressureGauge = true,
+            purchaseDate = 1711929600000L, // 2024-04-01
+            notes = "Dual manometers for pump and boiler pressure.",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000002",
+            brand = "La Marzocco",
+            model = "Linea Mini",
+            boilerType = "Dual Boiler",
+            pumpType = "Rotary",
+            groupHead = "Saturated",
+            hasPressureGauge = true,
+            purchaseDate = 1724025600000L, // 2024-08-20
+            notes = "Commercial saturated group. Excellent temperature stability.",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000003",
+            brand = "Strietman",
+            model = "CT2",
+            boilerType = "No Boiler",
+            pumpType = "Direct Lever",
+            groupHead = "Lever",
+            hasPressureGauge = false,
+            purchaseDate = 1739145600000L, // 2025-02-10
+            notes = "Manual lever, no boiler — supply your own hot water.",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000004",
+            brand = "Decent",
+            model = "DE1",
+            boilerType = "Thermoblock",
+            pumpType = "Vibratory",
+            groupHead = "Commercial",
+            hasPressureGauge = false,
+            purchaseDate = 1733270400000L, // 2024-12-05
+            notes = "App-controlled pressure profiling. Flow and pressure sensors built in.",
+        ),
+    )
+
+    private fun espressoMachineSql(
+        id: String,
+        brand: String,
+        model: String,
+        boilerType: String?,
+        pumpType: String?,
+        groupHead: String?,
+        hasPressureGauge: Boolean,
+        purchaseDate: Long?,
+        notes: String?,
+        imageUri: String? = null,
+    ): String {
+        fun String?.toSqlValue() = if (this == null) "NULL" else "'${replace("'", "''")}'"
+        fun Long?.toSqlValue() = this?.toString() ?: "NULL"
+        val gaugeValue = if (hasPressureGauge) "1" else "0"
+        return """
+            INSERT OR IGNORE INTO espresso_machines
+                (id, brand, model, boiler_type, pump_type, group_head, has_pressure_gauge, purchase_date, image_uri, notes, is_deleted, created_at, updated_at)
+            VALUES
+                ('$id', ${brand.toSqlValue()}, ${model.toSqlValue()}, ${boilerType.toSqlValue()},
+                 ${pumpType.toSqlValue()}, ${groupHead.toSqlValue()}, $gaugeValue,
+                 ${purchaseDate.toSqlValue()}, ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
+        """.trimIndent()
+    }
 
     private fun grinderSql(
         id: String,
