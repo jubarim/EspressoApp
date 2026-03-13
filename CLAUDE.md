@@ -131,8 +131,10 @@ All tables use:
 | `id` | TEXT PK | UUID v4 |
 | `brand` | TEXT NOT NULL | e.g. Niche, Mahlkönig, Eureka |
 | `model` | TEXT NOT NULL | e.g. Zero, EK43, Mignon |
-| `burr_type` | TEXT | Flat / Conical |
-| `burr_size_mm` | REAL | nullable |
+| `burr_type` | TEXT | Flat / Conical / Hybrid |
+| `burr_size` | TEXT | Free text, e.g. "63 mm" |
+| `purchase_date` | INTEGER | Unix ms, nullable |
+| `burr_install_date` | INTEGER | Unix ms, nullable |
 | `image_uri` | TEXT | Optional local URI |
 | `notes` | TEXT | |
 | `is_deleted` | INTEGER | 0 / 1, default 0 |
@@ -289,7 +291,7 @@ Full CRUD vertical slice is complete and establishes patterns for all subsequent
 
 ### Phase 2 — Remaining equipment entities ← next
 Follow the same vertical slice pattern for:
-1. **Coffee Beans** (FK → roasters, additional fields: origin, process, roast\_level, roast\_date)
+1. ✅ **Coffee Beans** (FK → roasters, additional fields)
 2. **Grinders** (brand + model required)
 3. **Espresso Machines** (brand + model required)
 4. **Filter Baskets** (brand required)
@@ -324,6 +326,9 @@ Design principles to apply now so that sync is possible later:
 - **Auto-push on reconnect:** use `ConnectivityManager` callback or `WorkManager` to trigger
   pending sync when connectivity is restored.
 - Do not add any Firebase dependencies until Phase 3+ is complete — just keep the interfaces clean.
+- If no firebase is to be implemented, enable back the project's automatic backup that google
+  provides.
+
 
 ---
 
