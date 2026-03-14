@@ -63,7 +63,7 @@ fun FilterBasketFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = if (viewModel.uiState.value.brand.isEmpty()) {
+                    val title = if (uiState.brand.isEmpty()) {
                         stringResource(R.string.filter_basket_add)
                     } else {
                         stringResource(R.string.filter_basket_edit)

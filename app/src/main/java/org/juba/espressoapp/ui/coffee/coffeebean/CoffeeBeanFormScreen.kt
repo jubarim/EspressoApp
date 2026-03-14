@@ -65,7 +65,7 @@ fun CoffeeBeanFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = if (viewModel.uiState.value.name.isEmpty()) {
+                    val title = if (uiState.name.isEmpty()) {
                         stringResource(R.string.coffee_bean_add)
                     } else {
                         stringResource(R.string.coffee_bean_edit)

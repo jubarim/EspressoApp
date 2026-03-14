@@ -70,7 +70,7 @@ fun EspressoMachineFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = if (viewModel.uiState.value.brand.isEmpty()) {
+                    val title = if (uiState.brand.isEmpty()) {
                         stringResource(R.string.espresso_machine_add)
                     } else {
                         stringResource(R.string.espresso_machine_edit)

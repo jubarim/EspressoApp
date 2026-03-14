@@ -54,7 +54,7 @@ fun RoasterFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = if (viewModel.uiState.value.name.isEmpty()) {
+                    val title = if (uiState.name.isEmpty()) {
                         stringResource(R.string.roaster_add)
                     } else {
                         stringResource(R.string.roaster_edit)

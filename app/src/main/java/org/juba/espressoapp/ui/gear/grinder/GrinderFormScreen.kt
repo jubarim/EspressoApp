@@ -62,7 +62,7 @@ fun GrinderFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = if (viewModel.uiState.value.brand.isEmpty()) {
+                    val title = if (uiState.brand.isEmpty()) {
                         stringResource(R.string.grinder_add)
                     } else {
                         stringResource(R.string.grinder_edit)
