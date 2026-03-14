@@ -132,6 +132,7 @@ fun RoasterFormScreen(
             onConfirm = { keys -> viewModel.onCountryChange(keys.firstOrNull() ?: "") },
             onDismiss = { showCountrySheet = false },
             multiSelect = false,
+            skipPartiallyExpanded = true,
         )
     }
 }

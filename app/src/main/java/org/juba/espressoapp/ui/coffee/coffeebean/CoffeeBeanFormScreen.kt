@@ -14,6 +14,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -109,8 +110,8 @@ fun CoffeeBeanFormScreen(
             uiState.roasterError?.let {
                 Text(
                     text = it,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.error,
-                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 16.dp),
                 )
             }

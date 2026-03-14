@@ -41,6 +41,7 @@ import org.juba.espressoapp.ui.theme.EspressoAppTheme
  * @param onConfirm Called with the final set of selected keys.
  * @param onDismiss Called to close the sheet (both on selection and on dismiss gesture).
  * @param multiSelect When true, checkboxes are shown and a Confirm button is required.
+ * @param skipPartiallyExpanded When true the bottom sheet will expand to the maximum height.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,8 +53,11 @@ fun SelectionBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     multiSelect: Boolean = false,
+    skipPartiallyExpanded: Boolean = false,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
