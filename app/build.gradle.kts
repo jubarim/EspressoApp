@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.compose.material.icons)
+    implementation(libs.compose.material.icons.extended)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

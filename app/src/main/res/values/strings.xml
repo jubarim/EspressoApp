@@ -46,6 +46,7 @@
     <string name="cd_close">Close</string>
     <string name="cd_edit">Edit</string>
     <string name="cd_delete">Delete</string>
+    <string name="cd_copy">Copy</string>
 
     <!-- Selection bottom sheet / picker -->
     <string name="picker_search_placeholder">Search…</string>

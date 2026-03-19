@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +39,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Roaster
+import org.juba.espressoapp.designsystem.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoasterDetailScreen(
     onBack: () -> Unit,
@@ -91,22 +88,16 @@ fun RoasterDetailScreen(
             }
 
             if (uiState is RoasterDetailUiState.Success) {
-                HorizontalFloatingToolbar(
-                    expanded = true,
+                DetailActionsToolbar(
+                    onEdit = {
+                        (uiState as? RoasterDetailUiState.Success)?.roaster?.id
+                            ?.let { onEdit(it) }
+                    },
+                    onDelete = { showDeleteDialog = true },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 24.dp),
-                ) {
-                    IconButton(onClick = {
-                        (uiState as? RoasterDetailUiState.Success)?.roaster?.id
-                            ?.let { onEdit(it) }
-                    }) {
-                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.cd_edit))
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cd_delete))
-                    }
-                }
+                )
             }
         }
     }
