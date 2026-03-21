@@ -8,7 +8,7 @@ internal object AppRoutes {
     const val ROASTER_FORM = "roaster_form?roasterId={roasterId}"
     const val COFFEE_BEAN_LIST = "coffee_bean_list"
     const val COFFEE_BEAN_DETAIL = "coffee_bean_detail/{beanId}"
-    const val COFFEE_BEAN_FORM = "coffee_bean_form?beanId={beanId}"
+    const val COFFEE_BEAN_FORM = "coffee_bean_form?beanId={beanId}&sourceBeanId={sourceBeanId}"
     const val GEAR = "gear"
     const val GRINDER_LIST = "grinder_list"
     const val GRINDER_DETAIL = "grinder_detail/{grinderId}"

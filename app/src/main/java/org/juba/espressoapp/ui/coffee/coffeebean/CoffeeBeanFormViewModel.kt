@@ -25,6 +25,7 @@ class CoffeeBeanFormViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val beanId: String? = savedStateHandle[BEAN_ID]
+    private val sourceBeanId: String? = savedStateHandle[SOURCE_BEAN_ID]
 
     private val _uiState = MutableStateFlow(CoffeeBeanFormUiState())
     val uiState: StateFlow<CoffeeBeanFormUiState> = _uiState.asStateFlow()
@@ -32,6 +33,14 @@ class CoffeeBeanFormViewModel @Inject constructor(
     init {
         loadRoasters()
         beanId?.let { loadBean(it) }
+
+        if (beanId == null) {
+            sourceBeanId?.let { id ->
+                viewModelScope.launch {
+                    coffeeBeanRepository.getById(id)?.let { bean -> populateFromBean(bean) }
+                }
+            }
+        }
     }
 
     private fun loadRoasters() {
@@ -42,21 +51,23 @@ class CoffeeBeanFormViewModel @Inject constructor(
 
     private fun loadBean(id: String) {
         viewModelScope.launch {
-            coffeeBeanRepository.getById(id)?.let { bean ->
-                _uiState.update {
-                    it.copy(
-                        name = bean.name,
-                        roasterId = bean.roasterId,
-                        roasterName = bean.roasterName ?: "",
-                        origin = bean.origin ?: "",
-                        process = bean.process ?: "",
-                        roastLevel = bean.roastLevel ?: "",
-                        roastDate = bean.roastDate,
-                        imageUrl = bean.imageUri ?: "",
-                        notes = bean.notes ?: "",
-                    )
-                }
-            }
+            coffeeBeanRepository.getById(id)?.let { bean -> populateFromBean(bean) }
+        }
+    }
+
+    private fun populateFromBean(bean: CoffeeBean) {
+        _uiState.update {
+            it.copy(
+                name = bean.name,
+                roasterId = bean.roasterId,
+                roasterName = bean.roasterName ?: "",
+                origin = bean.origin ?: "",
+                process = bean.process ?: "",
+                roastLevel = bean.roastLevel ?: "",
+                roastDate = bean.roastDate,
+                imageUrl = bean.imageUri ?: "",
+                notes = bean.notes ?: "",
+            )
         }
     }
 
@@ -121,5 +132,6 @@ class CoffeeBeanFormViewModel @Inject constructor(
 
     companion object {
         const val BEAN_ID = "beanId"
+        const val SOURCE_BEAN_ID = "sourceBeanId"
     }
 }
