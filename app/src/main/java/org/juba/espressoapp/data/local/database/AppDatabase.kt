@@ -7,11 +7,13 @@ import org.juba.espressoapp.data.local.dao.EspressoMachineDao
 import org.juba.espressoapp.data.local.dao.FilterBasketDao
 import org.juba.espressoapp.data.local.dao.GrinderDao
 import org.juba.espressoapp.data.local.dao.RoasterDao
+import org.juba.espressoapp.data.local.dao.ShotLogDao
 import org.juba.espressoapp.data.local.entity.CoffeeBeanEntity
 import org.juba.espressoapp.data.local.entity.EspressoMachineEntity
 import org.juba.espressoapp.data.local.entity.FilterBasketEntity
 import org.juba.espressoapp.data.local.entity.GrinderEntity
 import org.juba.espressoapp.data.local.entity.RoasterEntity
+import org.juba.espressoapp.data.local.entity.ShotLogEntity
 
 @Database(
     entities = [
@@ -20,8 +22,9 @@ import org.juba.espressoapp.data.local.entity.RoasterEntity
         GrinderEntity::class,
         EspressoMachineEntity::class,
         FilterBasketEntity::class,
+        ShotLogEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -30,4 +33,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun grinderDao(): GrinderDao
     abstract fun espressoMachineDao(): EspressoMachineDao
     abstract fun filterBasketDao(): FilterBasketDao
+    abstract fun shotLogDao(): ShotLogDao
 }

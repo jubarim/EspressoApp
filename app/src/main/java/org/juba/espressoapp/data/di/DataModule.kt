@@ -16,6 +16,7 @@ import org.juba.espressoapp.data.local.dao.EspressoMachineDao
 import org.juba.espressoapp.data.local.dao.FilterBasketDao
 import org.juba.espressoapp.data.local.dao.GrinderDao
 import org.juba.espressoapp.data.local.dao.RoasterDao
+import org.juba.espressoapp.data.local.dao.ShotLogDao
 import org.juba.espressoapp.data.local.database.AppDatabase
 import org.juba.espressoapp.data.local.seed.DatabaseSeedCallback
 import org.juba.espressoapp.data.repository.CoffeeBeanRepositoryImpl
@@ -23,11 +24,13 @@ import org.juba.espressoapp.data.repository.EspressoMachineRepositoryImpl
 import org.juba.espressoapp.data.repository.FilterBasketRepositoryImpl
 import org.juba.espressoapp.data.repository.GrinderRepositoryImpl
 import org.juba.espressoapp.data.repository.RoasterRepositoryImpl
+import org.juba.espressoapp.data.repository.ShotLogRepositoryImpl
 import org.juba.espressoapp.domain.repository.CoffeeBeanRepository
 import org.juba.espressoapp.domain.repository.EspressoMachineRepository
 import org.juba.espressoapp.domain.repository.FilterBasketRepository
 import org.juba.espressoapp.domain.repository.GrinderRepository
 import org.juba.espressoapp.domain.repository.RoasterRepository
+import org.juba.espressoapp.domain.repository.ShotLogRepository
 import javax.inject.Singleton
 
 @Module
@@ -53,6 +56,10 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindFilterBasketRepository(impl: FilterBasketRepositoryImpl): FilterBasketRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindShotLogRepository(impl: ShotLogRepositoryImpl): ShotLogRepository
 
     companion object {
 
@@ -154,6 +161,43 @@ abstract class DataModule {
             }
         }
 
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `shot_logs` (
+                        `id` TEXT NOT NULL,
+                        `coffee_bean_id` TEXT NOT NULL,
+                        `grinder_id` TEXT NOT NULL,
+                        `machine_id` TEXT NOT NULL,
+                        `basket_id` TEXT NOT NULL,
+                        `grind_setting` TEXT,
+                        `dose_grams` REAL NOT NULL,
+                        `yield_grams` REAL NOT NULL,
+                        `extraction_time_seconds` INTEGER,
+                        `brew_temperature_celsius` REAL,
+                        `pre_infusion_seconds` INTEGER,
+                        `rating` INTEGER,
+                        `notes` TEXT,
+                        `shot_at` INTEGER NOT NULL,
+                        `is_deleted` INTEGER NOT NULL DEFAULT 0,
+                        `created_at` INTEGER NOT NULL,
+                        `updated_at` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`),
+                        FOREIGN KEY(`coffee_bean_id`) REFERENCES `coffee_beans`(`id`) ON DELETE RESTRICT,
+                        FOREIGN KEY(`grinder_id`) REFERENCES `grinders`(`id`) ON DELETE RESTRICT,
+                        FOREIGN KEY(`machine_id`) REFERENCES `espresso_machines`(`id`) ON DELETE RESTRICT,
+                        FOREIGN KEY(`basket_id`) REFERENCES `filter_baskets`(`id`) ON DELETE RESTRICT
+                    )
+                    """.trimIndent(),
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_shot_logs_coffee_bean_id` ON `shot_logs`(`coffee_bean_id`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_shot_logs_grinder_id` ON `shot_logs`(`grinder_id`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_shot_logs_machine_id` ON `shot_logs`(`machine_id`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_shot_logs_basket_id` ON `shot_logs`(`basket_id`)")
+            }
+        }
+
         @Provides
         @Singleton
         fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
@@ -162,7 +206,7 @@ abstract class DataModule {
                 AppDatabase::class.java,
                 "espresso_app.db",
             ).fallbackToDestructiveMigration(true)
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                 .apply { if (BuildConfig.DEBUG) addCallback(DatabaseSeedCallback) }
                 .build()
 
@@ -180,5 +224,8 @@ abstract class DataModule {
 
         @Provides
         fun provideFilterBasketDao(db: AppDatabase): FilterBasketDao = db.filterBasketDao()
+
+        @Provides
+        fun provideShotLogDao(db: AppDatabase): ShotLogDao = db.shotLogDao()
     }
 }
