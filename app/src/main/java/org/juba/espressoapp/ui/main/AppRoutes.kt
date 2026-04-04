@@ -2,6 +2,8 @@ package org.juba.espressoapp.ui.main
 
 internal object AppRoutes {
     const val SHOTS = "shots"
+    const val SHOT_DETAIL = "shot_detail/{shotId}"
+    const val SHOT_FORM = "shot_form?shotId={shotId}"
     const val COFFEE_HOME = "coffee_home"
     const val ROASTER_LIST = "roaster_list"
     const val ROASTER_DETAIL = "roaster_detail/{roasterId}"
@@ -24,6 +26,7 @@ internal object AppRoutes {
 
 /**
  * Only routes in this set will show the bottom navigation bar.
+ * Shot detail and form routes are intentionally excluded so the nav bar is hidden.
  */
 internal val showBottomNavBar = setOf(
     AppRoutes.SHOTS,

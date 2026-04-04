@@ -41,6 +41,8 @@ import org.juba.espressoapp.ui.gear.grinder.GrinderDetailScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderFormScreen
 import org.juba.espressoapp.ui.gear.grinder.GrinderListScreen
 import org.juba.espressoapp.ui.settings.SettingsScreen
+import org.juba.espressoapp.ui.shots.ShotLogDetailScreen
+import org.juba.espressoapp.ui.shots.ShotLogFormScreen
 import org.juba.espressoapp.ui.shots.ShotsScreen
 
 @PreviewScreenSizes
@@ -54,7 +56,8 @@ fun EspressoApp() {
     val showNavBar = currentRoute in showBottomNavBar
 
     val selectedDestination = when (currentRoute) {
-        AppRoutes.SHOTS -> AppDestinations.SHOTS
+        AppRoutes.SHOTS,
+        AppRoutes.SHOT_DETAIL, AppRoutes.SHOT_FORM -> AppDestinations.SHOTS
         AppRoutes.COFFEE_HOME, AppRoutes.ROASTER_LIST,
         AppRoutes.ROASTER_DETAIL, AppRoutes.ROASTER_FORM,
         AppRoutes.COFFEE_BEAN_LIST, AppRoutes.COFFEE_BEAN_DETAIL,
@@ -97,7 +100,31 @@ fun EspressoApp() {
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 NavHost(navController = navController, startDestination = AppRoutes.SHOTS) {
-                    composable(AppRoutes.SHOTS) { ShotsScreen() }
+                    composable(AppRoutes.SHOTS) {
+                        ShotsScreen(
+                            onShotClick = { id -> navController.navigate("shot_detail/$id") },
+                            onAddShot = { navController.navigate("shot_form") },
+                            onNavigateToGear = {
+                                navController.navigate(AppDestinations.GEAR.startRoute) {
+                                    popUpTo(AppRoutes.SHOTS) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
+                    }
+                    composable(AppRoutes.SHOT_DETAIL) {
+                        ShotLogDetailScreen(
+                            onBack = { navController.popBackStack() },
+                            onEdit = { id -> navController.navigate("shot_form?shotId=$id") },
+                        )
+                    }
+                    composable(
+                        AppRoutes.SHOT_FORM,
+                        arguments = listOf(navArgument("shotId") { nullable = true; defaultValue = null }),
+                    ) {
+                        ShotLogFormScreen(onDismiss = { navController.popBackStack() })
+                    }
                     composable(AppRoutes.COFFEE_HOME) {
                         CoffeeHomeScreen(onCategoryClick = { route -> navController.navigate(route) })
                     }
