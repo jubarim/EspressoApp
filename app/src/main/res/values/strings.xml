@@ -128,6 +128,48 @@
     <string name="filter_basket_delete_dialog_message">This filter basket will be removed. This action cannot be undone.</string>
     <string name="filter_basket_image_cd">%s image</string>
 
+    <!-- Shot log list -->
+    <string name="shot_log_list_empty_no_gear">Set up your gear first.\nGo to the Gear tab to add your equipment before logging a shot.</string>
+    <string name="shot_log_list_empty_no_shots">No shots logged yet.\nTap + to log your first shot.</string>
+    <string name="shot_log_add">Log Shot</string>
+    <string name="cd_add_shot">Log a shot</string>
+    <string name="go_to_gear">Go to Gear</string>
+
+    <!-- Shot log form -->
+    <string name="shot_log_form_add">Log Shot</string>
+    <string name="shot_log_form_edit">Edit Shot</string>
+    <string name="field_coffee_bean">Coffee Bean *</string>
+    <string name="field_grinder">Grinder *</string>
+    <string name="field_machine">Espresso Machine *</string>
+    <string name="field_basket">Filter Basket *</string>
+    <string name="field_dose_grams">Dose (g) *</string>
+    <string name="field_yield_grams">Yield (g) *</string>
+    <string name="field_grind_setting">Grind Setting</string>
+    <string name="field_extraction_time_seconds">Extraction Time (s)</string>
+    <string name="field_brew_temperature_celsius">Brew Temperature (°C)</string>
+    <string name="field_pre_infusion_seconds">Pre-Infusion (s)</string>
+    <string name="field_rating">Rating</string>
+    <string name="field_shot_date">Shot Date</string>
+
+    <!-- Shot log detail -->
+    <string name="shot_log_delete_dialog_title">Delete shot?</string>
+    <string name="shot_log_delete_dialog_message">This shot log will be removed. This action cannot be undone.</string>
+    <string name="shot_label_ratio">Ratio</string>
+    <string name="shot_label_dose">Dose</string>
+    <string name="shot_label_yield">Yield</string>
+    <string name="shot_label_coffee_bean">Coffee Bean</string>
+    <string name="shot_label_roaster">Roaster</string>
+    <string name="shot_label_grinder">Grinder</string>
+    <string name="shot_label_machine">Machine</string>
+    <string name="shot_label_basket">Basket</string>
+    <string name="shot_label_grind_setting">Grind Setting</string>
+    <string name="shot_label_extraction_time">Extraction Time</string>
+    <string name="shot_label_brew_temperature">Brew Temperature</string>
+    <string name="shot_label_pre_infusion">Pre-Infusion</string>
+    <string name="shot_label_rating">Rating</string>
+    <string name="shot_label_notes">Notes</string>
+    <string name="shot_label_shot_date">Shot Date</string>
+
     <!-- Common actions -->
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
