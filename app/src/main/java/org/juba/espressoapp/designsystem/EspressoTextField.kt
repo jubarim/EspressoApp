@@ -3,6 +3,7 @@ package org.juba.espressoapp.designsystem
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +15,8 @@ import org.juba.espressoapp.ui.theme.EspressoAppTheme
 /**
  * Styled [OutlinedTextField] with a consistent label and optional error message.
  * Use for all entity form screens to ensure a uniform look across the app.
+ *
+ * @param keyboardOptions Controls the keyboard type (e.g. decimal, number). Defaults to [KeyboardOptions.Default].
  */
 @Composable
 fun EspressoTextField(
@@ -23,6 +26,7 @@ fun EspressoTextField(
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
     singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     OutlinedTextField(
         value = value,
@@ -35,6 +39,7 @@ fun EspressoTextField(
             null
         },
         singleLine = singleLine,
+        keyboardOptions = keyboardOptions,
         modifier = modifier.fillMaxWidth(),
     )
 }

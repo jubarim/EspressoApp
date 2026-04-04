@@ -24,6 +24,8 @@ import org.juba.espressoapp.ui.theme.EspressoAppTheme
  * Read-only outlined card that acts as a picker trigger. Displays a [label] above
  * the currently selected value (or a placeholder) and a trailing arrow icon.
  * Tap to invoke [onClick] and open the associated picker UI (e.g. [SelectionBottomSheet]).
+ *
+ * @param errorMessage When non-null, renders the card border in error color and shows the message below.
  */
 @Composable
 fun PickerField(
@@ -31,38 +33,55 @@ fun PickerField(
     selectedLabel: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    errorMessage: String? = null,
 ) {
-    OutlinedCard(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+    Column(modifier = modifier.fillMaxWidth()) {
+        OutlinedCard(
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.outlinedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+            border = if (errorMessage != null) {
+                androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+            } else {
+                CardDefaults.outlinedCardBorder()
+            },
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = selectedLabel ?: stringResource(R.string.picker_no_selection),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedLabel != null) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (errorMessage != null) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = selectedLabel ?: stringResource(R.string.picker_no_selection),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selectedLabel != null) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        }
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )
         }
     }
@@ -88,6 +107,19 @@ private fun PickerFieldEmptyPreview() {
             label = "Country",
             selectedLabel = null,
             onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PickerFieldErrorPreview() {
+    EspressoAppTheme {
+        PickerField(
+            label = "Country",
+            selectedLabel = null,
+            onClick = {},
+            errorMessage = "Enter a valid country"
         )
     }
 }
