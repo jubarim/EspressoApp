@@ -52,6 +52,7 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.domain.model.CoffeeBean
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -235,7 +236,7 @@ private fun CopyDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    selectedDate = datePickerState.selectedDateMillis
+                    selectedDate = datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor()
                     showDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },

@@ -39,6 +39,7 @@ import org.juba.espressoapp.designsystem.SelectionBottomSheet
 import org.juba.espressoapp.designsystem.SelectionOption
 import org.juba.espressoapp.domain.model.BeanProcess
 import org.juba.espressoapp.domain.model.RoastLevel
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -202,7 +203,7 @@ fun CoffeeBeanFormScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onRoastDateChange(datePickerState.selectedDateMillis)
+                    viewModel.onRoastDateChange(datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor())
                     showDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },

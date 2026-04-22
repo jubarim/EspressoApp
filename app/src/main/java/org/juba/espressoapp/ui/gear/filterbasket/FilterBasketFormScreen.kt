@@ -37,6 +37,7 @@ import org.juba.espressoapp.designsystem.PickerField
 import org.juba.espressoapp.designsystem.SelectionBottomSheet
 import org.juba.espressoapp.domain.model.FilterBasketDiameter
 import org.juba.espressoapp.domain.model.FilterBasketType
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -172,7 +173,7 @@ fun FilterBasketFormScreen(
             onDismissRequest = { showPurchaseDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis)
+                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor())
                     showPurchaseDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },

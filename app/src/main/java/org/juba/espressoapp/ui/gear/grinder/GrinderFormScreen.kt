@@ -36,6 +36,7 @@ import org.juba.espressoapp.designsystem.EspressoTextField
 import org.juba.espressoapp.designsystem.PickerField
 import org.juba.espressoapp.designsystem.SelectionBottomSheet
 import org.juba.espressoapp.domain.model.BurrType
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -164,7 +165,7 @@ fun GrinderFormScreen(
             onDismissRequest = { showPurchaseDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis)
+                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor())
                     showPurchaseDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },
@@ -186,7 +187,7 @@ fun GrinderFormScreen(
             onDismissRequest = { showBurrInstallDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onBurrInstallDateChange(datePickerState.selectedDateMillis)
+                    viewModel.onBurrInstallDateChange(datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor())
                     showBurrInstallDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },

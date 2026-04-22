@@ -37,6 +37,7 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.EspressoTextField
 import org.juba.espressoapp.designsystem.PickerField
 import org.juba.espressoapp.designsystem.SelectionBottomSheet
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -292,13 +293,18 @@ private fun ShotLogFormContent(
 
     if (showShotDatePicker) {
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = uiState.shotAt)
+
         DatePickerDialog(
             onDismissRequest = { showShotDatePicker = false },
             confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { onShotAtChange(it) }
-                    showShotDatePicker = false
-                }) { Text(stringResource(R.string.picker_confirm)) }
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor()?.let { onShotAtChange(it) }
+                        showShotDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.picker_confirm))
+                }
             },
             dismissButton = {
                 TextButton(onClick = { showShotDatePicker = false }) {

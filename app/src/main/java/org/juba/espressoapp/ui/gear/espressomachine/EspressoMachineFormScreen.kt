@@ -43,6 +43,7 @@ import org.juba.espressoapp.designsystem.SelectionBottomSheet
 import org.juba.espressoapp.domain.model.BoilerType
 import org.juba.espressoapp.domain.model.GroupHead
 import org.juba.espressoapp.domain.model.PumpType
+import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -207,7 +208,7 @@ fun EspressoMachineFormScreen(
             onDismissRequest = { showPurchaseDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis)
+                    viewModel.onPurchaseDateChange(datePickerState.selectedDateMillis?.epochToLocalTimeZoneConvertor())
                     showPurchaseDatePicker = false
                 }) { Text(stringResource(R.string.picker_confirm)) }
             },
