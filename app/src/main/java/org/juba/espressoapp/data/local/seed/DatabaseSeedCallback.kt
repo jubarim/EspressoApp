@@ -23,23 +23,24 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
     private const val SEED_TS = 1704067200000L
 
     private val SEED_ROASTERS = listOf(
+        // ── Brazilian ──────────────────────────────────────────────────────────
         roasterSql(
             id = "00000000-0000-0000-0000-100000000001",
-            name = "Do Coado Ao Espresso",
+            name = "Do Coado ao Espresso",
             country = "BR",
-            city = "Bahia",
-            website = "https://docoadoaoespresso.com.br/",
-            imageUri = "https://static.wikia.nocookie.net/starwars/images/9/9b/Princessleiaheadwithgun.jpg/revision/latest?cb=20240522043127",
-            notes = "Award-winning specialty roaster from Arkansas.",
+            city = "Lauro de Freitas",
+            website = "https://docoadoaoespresso.com.br",
+            imageUri = "https://acdn-us.mitiendanube.com/stores/002/074/422/themes/common/logo-1233672698-1717031155-029973e23b9c59a29c7581f4d3199a531717031155-480-0.webp",
+            notes = "Champion of the World Roasting Championship. Specialty roaster from Bahia.",
         ),
         roasterSql(
             id = "00000000-0000-0000-0000-100000000002",
             name = "Five Roasters",
             country = "BR",
             city = "Rio de Janeiro",
-            website = "https://fiveroasters.com.br/",
+            website = "https://fiveroasters.com.br",
             imageUri = "https://acdn-us.mitiendanube.com/stores/001/226/985/themes/common/logo-2026287311-1592445488-5a01b6f319e5eec0b8520ca0ac3fdf471592445488-480-0.webp",
-            notes = "Boa torra do Rio",
+            notes = "Specialty roaster with the greatest diversity of coffees in Brazil.",
         ),
         roasterSql(
             id = "00000000-0000-0000-0000-100000000003",
@@ -47,9 +48,52 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             country = "BR",
             city = "Campinas",
             website = "https://www.instagram.com/utiroastcafes/",
-            imageUri = "https://scontent-gru1-1.cdninstagram.com/v/t51.2885-19/89221577_141719977153396_8459604951864180736_n.jpg?efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby40NzEuYzIifQ&_nc_ht=scontent-gru1-1.cdninstagram.com&_nc_cat=104&_nc_oc=Q6cZ2QE8YhliR03UNGb8_1c4lU6BM3xOh_05J9q9UiLhRacAybQFzGMAfo2rmkKl1NYkbAU&_nc_ohc=8XpG4bUfBMsQ7kNvwErsOhm&_nc_gid=B1PqmEi2x7yWz4hoWNx2_g&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfyXwgje9JVa_CCrVcH8o08yrdI1WmtB_aMpP1uVwvY3vg&oe=69B24EFA&_nc_sid=7a9f4b",
-            notes = "Melhor torra de Campinas",
+            notes = null,
         ),
+        roasterSql(
+            id = "00000000-0000-0000-0000-100000000004",
+            name = "Roast Cafés",
+            country = "BR",
+            city = "São Paulo",
+            website = "https://roastcafes.com",
+            imageUri = "https://roastcafes.com/wp-content/uploads/2018/01/logo-roast-2-e1517364676282.png.webp",
+            notes = "Micro roastery of specialty coffees founded in 2017.",
+        ),
+        roasterSql(
+            id = "00000000-0000-0000-0000-100000000005",
+            name = "Moinho de Ouro",
+            country = "BR",
+            city = "Montes Claros",
+            website = "https://www.instagram.com/cafemoinhodeouro/",
+            notes = "Specialty roaster from northern Minas Gerais; traceable and sustainable.",
+        ),
+        roasterSql(
+            id = "00000000-0000-0000-0000-100000000006",
+            name = "Coffee Lab",
+            country = "BR",
+            city = "São Paulo",
+            website = "https://coffeelab.com.br",
+            imageUri = "https://images.squarespace-cdn.com/content/v1/5f52e377d6a3865a30a9ca83/1621941358507-OAK3H3GPASES25Z47VIX/LOGO+-+Principal.png?format=1500w",
+            notes = "Founded by Isabela Raposeiras. Roasting lab, barista school and specialty café in Vila Madalena.",
+        ),
+        roasterSql(
+            id = "00000000-0000-0000-0000-100000000007",
+            name = "Garagem do Café",
+            country = "BR",
+            city = "São Paulo",
+            website = "https://garagemdocafe.com.br",
+            imageUri = "https://garagemdocafe.com.br/wp-content/uploads/2025/10/cropped-logo-garagem-16-10-25-1-118x163.jpg",
+            notes = "Co-roasting space roasting over 7 tons per month.",
+        ),
+        roasterSql(
+            id = "00000000-0000-0000-0000-100000000008",
+            name = "Torra Fresca Cafés",
+            country = "BR",
+            city = "São Paulo",
+            website = "https://torrafrescacafes.com.br",
+            notes = "Fresh-roast specialty coffees sourced from family farms in south-eastern Minas Gerais.",
+        ),
+        // ── International ─────────────────────────────────────────────────────
         roasterSql(
             id = "00000000-0000-0000-0000-000000000001",
             name = "Onyx Coffee Lab",
@@ -64,6 +108,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             country = "NO",
             city = "Oslo",
             website = "https://timwendelboe.no",
+            imageUri = "https://timwendelboe.no/cdn/shop/files/timwendelboeLogo.png?v=1756719442&width=170",
             notes = "World Barista Champion; focuses on light Nordic-style roasts.",
         ),
         roasterSql(
@@ -71,50 +116,33 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             name = "Square Mile Coffee Roasters",
             country = "GB",
             city = "London",
-            website = "https://squaremilecoffee.com",
+            website = "https://shop.squaremilecoffee.com",
+            imageUri = "https://shop.squaremilecoffee.com/cdn/shop/files/SQM_Logos_1.svg?v=1700495500&width=50",
             notes = "Co-founded by James Hoffmann; known for transparent sourcing.",
         ),
         roasterSql(
             id = "00000000-0000-0000-0000-000000000004",
-            name = "Five Elephant",
-            country = "DE",
-            city = "Berlin",
-            website = "https://fiveelephant.com",
-            notes = "Specialty roaster and café in Kreuzberg.",
+            name = "Illy",
+            country = "IT",
+            city = "Trieste",
+            website = "https://illy.com",
+            imageUri = "https://www.illy.com/on/demandware.static/Sites-illy_Global_SFRA-Site/-/default/dw79b4ff5e/images/logo-illy.svg",
+            notes = "Italian icon; blends of 9 Arabica origins.",
         ),
         roasterSql(
             id = "00000000-0000-0000-0000-000000000005",
-            name = "Morgon Coffee Roasters",
-            country = "SE",
-            city = "Gothenburg",
-            website = "https://morgon.coffee",
-            notes = "Scandinavian roaster with a focus on single-origins.",
+            name = "Nomad Coffee",
+            country = "ES",
+            city = "Barcelona",
+            website = "https://nomadcoffee.es",
+            imageUri = "https://cdn.shopify.com/s/files/1/0772/5485/2893/files/LOGO_NOMAD_COFFEE-03_copia_200x60@2x.jpg?v=1695650679",
+            notes = "Specialty roaster and café in Barcelona.",
         ),
     )
 
     private val SEED_COFFEE_BEANS = listOf(
         coffeeBeanSql(
             id = "00000000-0000-0000-0000-200000000001",
-            roasterId = "00000000-0000-0000-0000-000000000001", // Onyx Coffee Lab
-            name = "Southern Weather",
-            origin = "Ethiopia, Yirgacheffe",
-            process = "Washed",
-            roastLevel = "Light",
-            roastDate = 1767744000000L, // 2026-01-07
-            notes = "Jasmine, stone fruit, and sparkling citrus acidity.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000002",
-            roasterId = "00000000-0000-0000-0000-000000000002", // Tim Wendelboe
-            name = "Ethiopia Idido",
-            origin = "Ethiopia, Yirgacheffe",
-            process = "Natural",
-            roastLevel = "Light",
-            roastDate = 1770076800000L, // 2026-02-03
-            notes = "Blueberry, dark chocolate, and floral complexity.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000003",
             roasterId = "00000000-0000-0000-0000-000000000003", // Square Mile Coffee Roasters
             name = "Red Brick",
             origin = "Brazil / Colombia blend",
@@ -122,57 +150,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             roastLevel = "Medium",
             roastDate = 1768780800000L, // 2026-01-19
             notes = "Espresso blend with milk chocolate, hazelnut, and caramel sweetness.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000004",
-            roasterId = "00000000-0000-0000-0000-000000000004", // Five Elephant
-            name = "Kenya Kiambu AA",
-            origin = "Kenya, Kiambu",
-            process = "Washed",
-            roastLevel = "Light",
-            roastDate = 1771718400000L, // 2026-02-22
-            notes = "Blackcurrant, tomato, and bright malic acidity.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000005",
-            roasterId = "00000000-0000-0000-0000-000000000005", // Morgon Coffee Roasters
-            name = "Kayon Mountain",
-            origin = "Ethiopia, Guji",
-            process = "Natural",
-            roastLevel = "Light",
-            roastDate = 1769558400000L, // 2026-01-28
-            notes = "Strawberry jam, rose water, and creamy mouthfeel.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000006",
-            roasterId = "00000000-0000-0000-0000-100000000001", // Do Coado Ao Espresso
-            name = "Fazenda Recanto",
-            origin = "Brazil, Minas Gerais",
-            process = "Natural",
-            roastLevel = "Medium",
-            roastDate = 1770768000000L, // 2026-02-11
-            notes = "Dark chocolate, dried fruit, and smooth low acidity.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000007",
-            roasterId = "00000000-0000-0000-0000-100000000002", // Five Roasters
-            name = "Sítio Santa Maria",
-            origin = "Brazil, Sul de Minas",
-            process = "Pulped Natural",
-            roastLevel = "Medium",
-            roastDate = 1772668800000L, // 2026-03-05
-            notes = "Caramel, nuts, and mild fruit sweetness.",
-        ),
-        coffeeBeanSql(
-            id = "00000000-0000-0000-0000-200000000008",
-            roasterId = "00000000-0000-0000-0000-100000000003", // UTI Roast Cafés
-            name = "Colombia El Paraíso",
-            origin = "Colombia, Huila",
-            process = "Washed",
-            roastLevel = "Light",
-            roastDate = 1768348800000L, // 2026-01-14
-            notes = "Red apple, brown sugar, and balanced citric brightness.",
-        ),
+        )
     )
 
     private val SEED_ESPRESSO_MACHINES = listOf(
@@ -223,6 +201,78 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             purchaseDate = 1733270400000L, // 2024-12-05
             notes = "App-controlled pressure profiling. Flow and pressure sensors built in.",
             imageUri = "https://fast.decentespresso.com/img/acc-07.avif",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000005",
+            brand = "Rocket",
+            model = "Evoluzione Giotto v2",
+            boilerType = "HX",
+            pumpType = "Rotatory",
+            groupHead = "E61",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "HX machine with E61 group. Classic Italian prosumer design.",
+            imageUri = "https://i.ytimg.com/vi/k03Pfbtk9hw/hq720.jpg",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000006",
+            brand = "Rocket",
+            model = "R Nine One",
+            boilerType = "Dual Boiler",
+            pumpType = "Rotary",
+            groupHead = "E61",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "Dual boiler flagship from Rocket. Independent brew and steam temperature control.",
+            imageUri = "https://cdn.sanity.io/images/zhlpxy7s/production/fd2257e9be8882e3d20656c535e7eb4b66f7161a-2000x1125.webp?q=65&auto=format",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000007",
+            brand = "Rocket",
+            model = "Giotto Cronometro R",
+            boilerType = "HX",
+            pumpType = "Rotary",
+            groupHead = "E61",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "HX with rotary pump and built-in shot timer.",
+            imageUri = "https://pasqualimaquinas.fbitsstatic.net/img/p/giotto-cronometro-r-inox-220v-70330/256768-1.jpg?w=935&h=800&v=202602071743&qs=ignore",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000008",
+            brand = "ECM",
+            model = "Classika II PID",
+            boilerType = "Single Boiler",
+            pumpType = "Vibratory",
+            groupHead = "E61",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "Single boiler with PID and E61 group. Compact prosumer machine.",
+            imageUri = "https://cdn.shopify.com/s/files/1/0564/3288/5835/files/ecm-case-on-3.jpg?v=1710609269",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000009",
+            brand = "Flair",
+            model = "58 Plus",
+            boilerType = "No Boiler",
+            pumpType = "Direct Lever",
+            groupHead = "Lever",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "Manual lever with 58mm portafilter and built-in pressure gauge. Supply your own hot water.",
+            imageUri = "https://cafino.com.br/cdn/shop/files/58_V2Main_065e1c6f-9320-4436-97e2-cadd7abdcb63.jpg?v=1734393107&width=1200",
+        ),
+        espressoMachineSql(
+            id = "00000000-0000-0000-0000-400000000010",
+            brand = "La Spaziale",
+            model = "Mini Vivaldi S1",
+            boilerType = "Dual Boiler",
+            pumpType = "Vibratory",
+            groupHead = "Commercial",
+            hasPressureGauge = true,
+            purchaseDate = null,
+            notes = "Compact dual boiler with independent temperature control for brew and steam.",
+            imageUri = "https://img.archiexpo.com/pt/images_ae/photo-mg/49369-20334982.jpg",
         ),
     )
 
@@ -337,6 +387,28 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             burrInstallDate = null,
             notes = "High-quality hand grinder. Great for travel espresso.",
         ),
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000005",
+            brand = "Timemore",
+            model = "Sculptor 064S",
+            burrType = "Flat",
+            burrSize = "64 mm",
+            purchaseDate = null,
+            burrInstallDate = null,
+            notes = "Single dose flat burr with stepless adjustment and low retention.",
+            imageUri = "https://img.kavosdraugas.lt/5692603a-b44a-47df-8be5-a28ba7437b18/1000x1000/tmsculptor064swhtupd5png.jpg",
+        ),
+        grinderSql(
+            id = "00000000-0000-0000-0000-300000000006",
+            brand = "Turin",
+            model = "DF64",
+            burrType = "Flat",
+            burrSize = "64 mm",
+            purchaseDate = null,
+            burrInstallDate = null,
+            notes = "Single dose 64mm flat burr. Popular budget-friendly option with alignment adjustment.",
+            imageUri = "https://espressooutlet.com/cdn/shop/files/DSC01351.jpg?v=1714658176&width=1080",
+        ),
     )
 
     private val SEED_FILTER_BASKETS = listOf(
@@ -362,16 +434,6 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         ),
         filterBasketSql(
             id = "00000000-0000-0000-0000-500000000003",
-            brand = "Decent",
-            model = "Espresso Basket",
-            sizeGrams = "18g",
-            type = "Ridgeless",
-            diameter = "58mm",
-            purchaseDate = 1733270400000L, // 2024-12-05
-            notes = "Designed for the Decent DE1. Smooth ridgeless sides.",
-        ),
-        filterBasketSql(
-            id = "00000000-0000-0000-0000-500000000004",
             brand = "La Marzocco",
             model = "Standard",
             sizeGrams = "14g",
@@ -381,15 +443,15 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             notes = "Stock basket shipped with Linea Mini.",
         ),
         filterBasketSql(
-            id = "00000000-0000-0000-0000-500000000005",
+            id = "00000000-0000-0000-0000-500000000004",
             brand = "Graph Coffee",
-            model = "Stepped Basket 58mm to 46mm",
+            model = "58mm to 46mm",
             sizeGrams = "16 to 22g",
             type = "Ridgeless",
             diameter = "58mm",
             purchaseDate = 1704067200000L, // 2024-01-01
             notes = "Sweet and full-bodied espresso MOD - a basket that steps the from 58mm to 46mm. Sized for 16g-22g (though exact weights can vary depending on bean and roast level)",
-            imageUri = "https://static.wixstatic.com/media/88d502_e594f8b67ef049268ee8d811f32a4afc~mv2.jpg/v1/fill/w_980,h_551,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/88d502_e594f8b67ef049268ee8d811f32a4afc~mv2.jpg",
+            imageUri = "https://static.wixstatic.com/media/88d502_216cf7e8a073424c8114a29c0557aeb0~mv2.jpg",
         ),
     )
 
