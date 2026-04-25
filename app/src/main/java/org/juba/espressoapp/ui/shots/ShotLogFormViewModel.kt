@@ -18,6 +18,7 @@ import org.juba.espressoapp.domain.repository.EspressoMachineRepository
 import org.juba.espressoapp.domain.repository.FilterBasketRepository
 import org.juba.espressoapp.domain.repository.GrinderRepository
 import org.juba.espressoapp.domain.repository.ShotLogRepository
+import org.juba.espressoapp.extensions.normalizeDecimal
 import java.util.UUID
 import javax.inject.Inject
 
@@ -240,4 +241,3 @@ class ShotLogFormViewModel @Inject constructor(
     }
 }
 
-private fun String.normalizeDecimal(): String = replace(',', '.')
