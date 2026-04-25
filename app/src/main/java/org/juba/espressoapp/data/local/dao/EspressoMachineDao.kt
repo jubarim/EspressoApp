@@ -25,4 +25,10 @@ interface EspressoMachineDao {
 
     @Query("UPDATE espresso_machines SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
+
+    @Query("DELETE FROM espresso_machines")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<EspressoMachineEntity>)
 }

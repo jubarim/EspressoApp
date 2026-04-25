@@ -19,12 +19,14 @@ import org.juba.espressoapp.data.local.dao.RoasterDao
 import org.juba.espressoapp.data.local.dao.ShotLogDao
 import org.juba.espressoapp.data.local.database.AppDatabase
 import org.juba.espressoapp.data.local.seed.DatabaseSeedCallback
+import org.juba.espressoapp.data.repository.BackupRepositoryImpl
 import org.juba.espressoapp.data.repository.CoffeeBeanRepositoryImpl
 import org.juba.espressoapp.data.repository.EspressoMachineRepositoryImpl
 import org.juba.espressoapp.data.repository.FilterBasketRepositoryImpl
 import org.juba.espressoapp.data.repository.GrinderRepositoryImpl
 import org.juba.espressoapp.data.repository.RoasterRepositoryImpl
 import org.juba.espressoapp.data.repository.ShotLogRepositoryImpl
+import org.juba.espressoapp.domain.repository.BackupRepository
 import org.juba.espressoapp.domain.repository.CoffeeBeanRepository
 import org.juba.espressoapp.domain.repository.EspressoMachineRepository
 import org.juba.espressoapp.domain.repository.FilterBasketRepository
@@ -60,6 +62,10 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindShotLogRepository(impl: ShotLogRepositoryImpl): ShotLogRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBackupRepository(impl: BackupRepositoryImpl): BackupRepository
 
     companion object {
 

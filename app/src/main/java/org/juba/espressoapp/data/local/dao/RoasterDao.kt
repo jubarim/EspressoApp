@@ -25,4 +25,10 @@ interface RoasterDao {
 
     @Query("UPDATE roasters SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
+
+    @Query("DELETE FROM roasters")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<RoasterEntity>)
 }

@@ -42,4 +42,13 @@ interface CoffeeBeanDao {
 
     @Query("UPDATE coffee_beans SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
+
+    @Query("SELECT * FROM coffee_beans WHERE is_deleted = 0")
+    fun getAllEntities(): Flow<List<CoffeeBeanEntity>>
+
+    @Query("DELETE FROM coffee_beans")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<CoffeeBeanEntity>)
 }

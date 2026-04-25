@@ -60,4 +60,13 @@ interface ShotLogDao {
 
     @Query("UPDATE shot_logs SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
+
+    @Query("SELECT * FROM shot_logs WHERE is_deleted = 0")
+    fun getAllEntities(): Flow<List<ShotLogEntity>>
+
+    @Query("DELETE FROM shot_logs")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<ShotLogEntity>)
 }

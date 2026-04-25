@@ -25,4 +25,10 @@ interface GrinderDao {
 
     @Query("UPDATE grinders SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
+
+    @Query("DELETE FROM grinders")
+    suspend fun deleteAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<GrinderEntity>)
 }

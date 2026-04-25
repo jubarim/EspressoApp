@@ -12,6 +12,16 @@
 
     <!-- Settings screen -->
     <string name="settings_coming_soon">Settings — coming soon.</string>
+    <string name="settings_backup_section_title">Data Backup</string>
+    <string name="settings_export_button">Export Backup</string>
+    <string name="settings_import_button">Import Backup</string>
+    <string name="settings_export_success">Backup exported successfully</string>
+    <string name="settings_export_error">Export failed: %s</string>
+    <string name="settings_import_success">Data restored from backup</string>
+    <string name="settings_import_error">Import failed: %s</string>
+    <string name="settings_import_confirm_title">Replace all data?</string>
+    <string name="settings_import_confirm_message">Your current espresso data will be permanently replaced with the contents of the backup file. This cannot be undone.</string>
+    <string name="settings_import_confirm_action">Replace</string>
 
     <!-- Gear screen categories -->
     <string name="gear_category_grinders">Grinders</string>
