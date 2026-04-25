@@ -43,7 +43,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterBasketFormScreen(
     onDismiss: () -> Unit,
@@ -60,88 +59,20 @@ fun FilterBasketFormScreen(
         if (uiState.isSaved) onDismiss()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    val title = if (uiState.brand.isEmpty()) {
-                        stringResource(R.string.filter_basket_add)
-                    } else {
-                        stringResource(R.string.filter_basket_edit)
-                    }
-                    Text(title)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
-                    }
-                },
-                actions = {
-                    TextButton(
-                        onClick = viewModel::save,
-                        enabled = !uiState.isSaving,
-                    ) { Text(stringResource(R.string.action_save)) }
-                },
-            )
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    FilterBasketFormContent(
+        uiState = uiState,
+        onDismiss = onDismiss,
+        onSave = viewModel::save,
+        onBrandChange = viewModel::onBrandChange,
+        onModelChange = viewModel::onModelChange,
+        onSizeGramsChange = viewModel::onSizeGramsChange,
+        onImageUrlChange = viewModel::onImageUrlChange,
+        onNotesChange = viewModel::onNotesChange,
+        onShowTypeSheet = { showTypeSheet = true },
+        onShowDiameterSheet = { showDiameterSheet = true },
+        onShowPurchaseDatePicker = { showPurchaseDatePicker = true },
         modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            EspressoTextField(
-                value = uiState.brand,
-                onValueChange = viewModel::onBrandChange,
-                label = stringResource(R.string.field_brand),
-                errorMessage = uiState.brandError,
-            )
-            EspressoTextField(
-                value = uiState.model,
-                onValueChange = viewModel::onModelChange,
-                label = stringResource(R.string.field_model),
-            )
-            EspressoTextField(
-                value = uiState.sizeGrams,
-                onValueChange = viewModel::onSizeGramsChange,
-                label = stringResource(R.string.field_size),
-            )
-            PickerField(
-                label = stringResource(R.string.field_basket_type),
-                selectedLabel = uiState.type.ifBlank { null },
-                onClick = { showTypeSheet = true },
-            )
-            PickerField(
-                label = stringResource(R.string.field_diameter),
-                selectedLabel = uiState.diameter.ifBlank { null },
-                onClick = { showDiameterSheet = true },
-            )
-            val purchaseDateDisplay = uiState.purchaseDate?.let {
-                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
-            }
-            PickerField(
-                label = stringResource(R.string.field_purchase_date),
-                selectedLabel = purchaseDateDisplay,
-                onClick = { showPurchaseDatePicker = true },
-            )
-            EspressoTextField(
-                value = uiState.imageUrl,
-                onValueChange = viewModel::onImageUrlChange,
-                label = stringResource(R.string.field_image_url),
-            )
-            EspressoTextField(
-                value = uiState.notes,
-                onValueChange = viewModel::onNotesChange,
-                label = stringResource(R.string.field_notes),
-                singleLine = false,
-            )
-        }
-    }
+    )
 
     if (showTypeSheet) {
         SelectionBottomSheet(
@@ -188,10 +119,122 @@ fun FilterBasketFormScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FilterBasketFormContent(
+    uiState: FilterBasketFormUiState,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    onBrandChange: (String) -> Unit,
+    onModelChange: (String) -> Unit,
+    onSizeGramsChange: (String) -> Unit,
+    onImageUrlChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit,
+    onShowTypeSheet: () -> Unit,
+    onShowDiameterSheet: () -> Unit,
+    onShowPurchaseDatePicker: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    val title = if (uiState.brand.isEmpty()) {
+                        stringResource(R.string.filter_basket_add)
+                    } else {
+                        stringResource(R.string.filter_basket_edit)
+                    }
+                    Text(title)
+                },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = onSave,
+                        enabled = !uiState.isSaving,
+                    ) { Text(stringResource(R.string.action_save)) }
+                },
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier,
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            EspressoTextField(
+                value = uiState.brand,
+                onValueChange = onBrandChange,
+                label = stringResource(R.string.field_brand),
+                errorMessage = uiState.brandError,
+            )
+            EspressoTextField(
+                value = uiState.model,
+                onValueChange = onModelChange,
+                label = stringResource(R.string.field_model),
+            )
+            EspressoTextField(
+                value = uiState.sizeGrams,
+                onValueChange = onSizeGramsChange,
+                label = stringResource(R.string.field_size),
+            )
+            PickerField(
+                label = stringResource(R.string.field_basket_type),
+                selectedLabel = uiState.type.ifBlank { null },
+                onClick = onShowTypeSheet,
+            )
+            PickerField(
+                label = stringResource(R.string.field_diameter),
+                selectedLabel = uiState.diameter.ifBlank { null },
+                onClick = onShowDiameterSheet,
+            )
+            val purchaseDateDisplay = uiState.purchaseDate?.let {
+                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
+            }
+            PickerField(
+                label = stringResource(R.string.field_purchase_date),
+                selectedLabel = purchaseDateDisplay,
+                onClick = onShowPurchaseDatePicker,
+            )
+            EspressoTextField(
+                value = uiState.imageUrl,
+                onValueChange = onImageUrlChange,
+                label = stringResource(R.string.field_image_url),
+            )
+            EspressoTextField(
+                value = uiState.notes,
+                onValueChange = onNotesChange,
+                label = stringResource(R.string.field_notes),
+                singleLine = false,
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun FilterBasketFormScreenPreview() {
     EspressoAppTheme {
-        FilterBasketFormScreen(onDismiss = {})
+        FilterBasketFormContent(
+            uiState = FilterBasketFormUiState(),
+            onDismiss = {},
+            onSave = {},
+            onBrandChange = {},
+            onModelChange = {},
+            onSizeGramsChange = {},
+            onImageUrlChange = {},
+            onNotesChange = {},
+            onShowTypeSheet = {},
+            onShowDiameterSheet = {},
+            onShowPurchaseDatePicker = {},
+        )
     }
 }

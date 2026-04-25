@@ -49,7 +49,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EspressoMachineFormScreen(
     onDismiss: () -> Unit,
@@ -67,105 +66,21 @@ fun EspressoMachineFormScreen(
         if (uiState.isSaved) onDismiss()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    val title = if (uiState.brand.isEmpty()) {
-                        stringResource(R.string.espresso_machine_add)
-                    } else {
-                        stringResource(R.string.espresso_machine_edit)
-                    }
-                    Text(title)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
-                    }
-                },
-                actions = {
-                    TextButton(
-                        onClick = viewModel::save,
-                        enabled = !uiState.isSaving,
-                    ) { Text(stringResource(R.string.action_save)) }
-                },
-            )
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    EspressoMachineFormContent(
+        uiState = uiState,
+        onDismiss = onDismiss,
+        onSave = viewModel::save,
+        onBrandChange = viewModel::onBrandChange,
+        onModelChange = viewModel::onModelChange,
+        onHasPressureGaugeChange = viewModel::onHasPressureGaugeChange,
+        onImageUrlChange = viewModel::onImageUrlChange,
+        onNotesChange = viewModel::onNotesChange,
+        onShowBoilerTypeSheet = { showBoilerTypeSheet = true },
+        onShowPumpTypeSheet = { showPumpTypeSheet = true },
+        onShowGroupHeadSheet = { showGroupHeadSheet = true },
+        onShowPurchaseDatePicker = { showPurchaseDatePicker = true },
         modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            EspressoTextField(
-                value = uiState.brand,
-                onValueChange = viewModel::onBrandChange,
-                label = stringResource(R.string.field_brand),
-                errorMessage = uiState.brandError,
-            )
-            EspressoTextField(
-                value = uiState.model,
-                onValueChange = viewModel::onModelChange,
-                label = stringResource(R.string.field_model),
-                errorMessage = uiState.modelError,
-            )
-            PickerField(
-                label = stringResource(R.string.field_boiler_type),
-                selectedLabel = uiState.boilerType.ifBlank { null },
-                onClick = { showBoilerTypeSheet = true },
-            )
-            PickerField(
-                label = stringResource(R.string.field_pump_type),
-                selectedLabel = uiState.pumpType.ifBlank { null },
-                onClick = { showPumpTypeSheet = true },
-            )
-            PickerField(
-                label = stringResource(R.string.field_group_head),
-                selectedLabel = uiState.groupHead.ifBlank { null },
-                onClick = { showGroupHeadSheet = true },
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = stringResource(R.string.field_has_pressure_gauge),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                Switch(
-                    checked = uiState.hasPressureGauge,
-                    onCheckedChange = viewModel::onHasPressureGaugeChange,
-                )
-            }
-            val purchaseDateDisplay = uiState.purchaseDate?.let {
-                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
-            }
-            PickerField(
-                label = stringResource(R.string.field_purchase_date),
-                selectedLabel = purchaseDateDisplay,
-                onClick = { showPurchaseDatePicker = true },
-            )
-            EspressoTextField(
-                value = uiState.imageUrl,
-                onValueChange = viewModel::onImageUrlChange,
-                label = stringResource(R.string.field_image_url),
-            )
-            EspressoTextField(
-                value = uiState.notes,
-                onValueChange = viewModel::onNotesChange,
-                label = stringResource(R.string.field_notes),
-                singleLine = false,
-            )
-        }
-    }
+    )
 
     if (showBoilerTypeSheet) {
         SelectionBottomSheet(
@@ -223,10 +138,141 @@ fun EspressoMachineFormScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EspressoMachineFormContent(
+    uiState: EspressoMachineFormUiState,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    onBrandChange: (String) -> Unit,
+    onModelChange: (String) -> Unit,
+    onHasPressureGaugeChange: (Boolean) -> Unit,
+    onImageUrlChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit,
+    onShowBoilerTypeSheet: () -> Unit,
+    onShowPumpTypeSheet: () -> Unit,
+    onShowGroupHeadSheet: () -> Unit,
+    onShowPurchaseDatePicker: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    val title = if (uiState.brand.isEmpty()) {
+                        stringResource(R.string.espresso_machine_add)
+                    } else {
+                        stringResource(R.string.espresso_machine_edit)
+                    }
+                    Text(title)
+                },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = onSave,
+                        enabled = !uiState.isSaving,
+                    ) { Text(stringResource(R.string.action_save)) }
+                },
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier,
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            EspressoTextField(
+                value = uiState.brand,
+                onValueChange = onBrandChange,
+                label = stringResource(R.string.field_brand),
+                errorMessage = uiState.brandError,
+            )
+            EspressoTextField(
+                value = uiState.model,
+                onValueChange = onModelChange,
+                label = stringResource(R.string.field_model),
+                errorMessage = uiState.modelError,
+            )
+            PickerField(
+                label = stringResource(R.string.field_boiler_type),
+                selectedLabel = uiState.boilerType.ifBlank { null },
+                onClick = onShowBoilerTypeSheet,
+            )
+            PickerField(
+                label = stringResource(R.string.field_pump_type),
+                selectedLabel = uiState.pumpType.ifBlank { null },
+                onClick = onShowPumpTypeSheet,
+            )
+            PickerField(
+                label = stringResource(R.string.field_group_head),
+                selectedLabel = uiState.groupHead.ifBlank { null },
+                onClick = onShowGroupHeadSheet,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = stringResource(R.string.field_has_pressure_gauge),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Switch(
+                    checked = uiState.hasPressureGauge,
+                    onCheckedChange = onHasPressureGaugeChange,
+                )
+            }
+            val purchaseDateDisplay = uiState.purchaseDate?.let {
+                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
+            }
+            PickerField(
+                label = stringResource(R.string.field_purchase_date),
+                selectedLabel = purchaseDateDisplay,
+                onClick = onShowPurchaseDatePicker,
+            )
+            EspressoTextField(
+                value = uiState.imageUrl,
+                onValueChange = onImageUrlChange,
+                label = stringResource(R.string.field_image_url),
+            )
+            EspressoTextField(
+                value = uiState.notes,
+                onValueChange = onNotesChange,
+                label = stringResource(R.string.field_notes),
+                singleLine = false,
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun EspressoMachineFormScreenPreview() {
     EspressoAppTheme {
-        EspressoMachineFormScreen(onDismiss = {})
+        EspressoMachineFormContent(
+            uiState = EspressoMachineFormUiState(),
+            onDismiss = {},
+            onSave = {},
+            onBrandChange = {},
+            onModelChange = {},
+            onHasPressureGaugeChange = {},
+            onImageUrlChange = {},
+            onNotesChange = {},
+            onShowBoilerTypeSheet = {},
+            onShowPumpTypeSheet = {},
+            onShowGroupHeadSheet = {},
+            onShowPurchaseDatePicker = {},
+        )
     }
 }

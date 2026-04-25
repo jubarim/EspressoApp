@@ -44,7 +44,6 @@ import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.domain.model.Grinder
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GrinderListScreen(
     onBack: () -> Unit,
@@ -54,7 +53,24 @@ fun GrinderListScreen(
     viewModel: GrinderListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    GrinderListContent(
+        uiState = uiState,
+        onBack = onBack,
+        onGrinderClick = onGrinderClick,
+        onAddGrinder = onAddGrinder,
+        modifier = modifier,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GrinderListContent(
+    uiState: GrinderListUiState,
+    onBack: () -> Unit,
+    onGrinderClick: (String) -> Unit,
+    onAddGrinder: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -148,7 +164,8 @@ private fun GrinderAvatar(grinder: Grinder) {
 @Composable
 private fun GrinderListScreenEmptyPreview() {
     EspressoAppTheme {
-        GrinderListScreen(
+        GrinderListContent(
+            uiState = GrinderListUiState.Success(emptyList()),
             onBack = {},
             onGrinderClick = {},
             onAddGrinder = {},

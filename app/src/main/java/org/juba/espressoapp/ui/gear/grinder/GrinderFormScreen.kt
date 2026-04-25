@@ -42,7 +42,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GrinderFormScreen(
     onDismiss: () -> Unit,
@@ -59,92 +58,20 @@ fun GrinderFormScreen(
         if (uiState.isSaved) onDismiss()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    val title = if (uiState.brand.isEmpty()) {
-                        stringResource(R.string.grinder_add)
-                    } else {
-                        stringResource(R.string.grinder_edit)
-                    }
-                    Text(title)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
-                    }
-                },
-                actions = {
-                    TextButton(
-                        onClick = viewModel::save,
-                        enabled = !uiState.isSaving,
-                    ) { Text(stringResource(R.string.action_save)) }
-                },
-            )
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    GrinderFormContent(
+        uiState = uiState,
+        onDismiss = onDismiss,
+        onSave = viewModel::save,
+        onBrandChange = viewModel::onBrandChange,
+        onModelChange = viewModel::onModelChange,
+        onBurrSizeChange = viewModel::onBurrSizeChange,
+        onImageUrlChange = viewModel::onImageUrlChange,
+        onNotesChange = viewModel::onNotesChange,
+        onShowBurrTypeSheet = { showBurrTypeSheet = true },
+        onShowPurchaseDatePicker = { showPurchaseDatePicker = true },
+        onShowBurrInstallDatePicker = { showBurrInstallDatePicker = true },
         modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            EspressoTextField(
-                value = uiState.brand,
-                onValueChange = viewModel::onBrandChange,
-                label = stringResource(R.string.field_brand),
-                errorMessage = uiState.brandError,
-            )
-            EspressoTextField(
-                value = uiState.model,
-                onValueChange = viewModel::onModelChange,
-                label = stringResource(R.string.field_model),
-                errorMessage = uiState.modelError,
-            )
-            PickerField(
-                label = stringResource(R.string.field_burr_type),
-                selectedLabel = uiState.burrType.ifBlank { null },
-                onClick = { showBurrTypeSheet = true },
-            )
-            EspressoTextField(
-                value = uiState.burrSize,
-                onValueChange = viewModel::onBurrSizeChange,
-                label = stringResource(R.string.field_burr_size),
-            )
-            val purchaseDateDisplay = uiState.purchaseDate?.let {
-                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
-            }
-            PickerField(
-                label = stringResource(R.string.field_purchase_date),
-                selectedLabel = purchaseDateDisplay,
-                onClick = { showPurchaseDatePicker = true },
-            )
-            val burrInstallDateDisplay = uiState.burrInstallDate?.let {
-                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
-            }
-            PickerField(
-                label = stringResource(R.string.field_burr_install_date),
-                selectedLabel = burrInstallDateDisplay,
-                onClick = { showBurrInstallDatePicker = true },
-            )
-            EspressoTextField(
-                value = uiState.imageUrl,
-                onValueChange = viewModel::onImageUrlChange,
-                label = stringResource(R.string.field_image_url),
-            )
-            EspressoTextField(
-                value = uiState.notes,
-                onValueChange = viewModel::onNotesChange,
-                label = stringResource(R.string.field_notes),
-                singleLine = false,
-            )
-        }
-    }
+    )
 
     if (showBurrTypeSheet) {
         SelectionBottomSheet(
@@ -202,10 +129,126 @@ fun GrinderFormScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun GrinderFormContent(
+    uiState: GrinderFormUiState,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    onBrandChange: (String) -> Unit,
+    onModelChange: (String) -> Unit,
+    onBurrSizeChange: (String) -> Unit,
+    onImageUrlChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit,
+    onShowBurrTypeSheet: () -> Unit,
+    onShowPurchaseDatePicker: () -> Unit,
+    onShowBurrInstallDatePicker: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    val title = if (uiState.brand.isEmpty()) {
+                        stringResource(R.string.grinder_add)
+                    } else {
+                        stringResource(R.string.grinder_edit)
+                    }
+                    Text(title)
+                },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = onSave,
+                        enabled = !uiState.isSaving,
+                    ) { Text(stringResource(R.string.action_save)) }
+                },
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier,
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            EspressoTextField(
+                value = uiState.brand,
+                onValueChange = onBrandChange,
+                label = stringResource(R.string.field_brand),
+                errorMessage = uiState.brandError,
+            )
+            EspressoTextField(
+                value = uiState.model,
+                onValueChange = onModelChange,
+                label = stringResource(R.string.field_model),
+                errorMessage = uiState.modelError,
+            )
+            PickerField(
+                label = stringResource(R.string.field_burr_type),
+                selectedLabel = uiState.burrType.ifBlank { null },
+                onClick = onShowBurrTypeSheet,
+            )
+            EspressoTextField(
+                value = uiState.burrSize,
+                onValueChange = onBurrSizeChange,
+                label = stringResource(R.string.field_burr_size),
+            )
+            val purchaseDateDisplay = uiState.purchaseDate?.let {
+                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
+            }
+            PickerField(
+                label = stringResource(R.string.field_purchase_date),
+                selectedLabel = purchaseDateDisplay,
+                onClick = onShowPurchaseDatePicker,
+            )
+            val burrInstallDateDisplay = uiState.burrInstallDate?.let {
+                SimpleDateFormat("MMM dd, yyyy", Locale.US).format(Date(it))
+            }
+            PickerField(
+                label = stringResource(R.string.field_burr_install_date),
+                selectedLabel = burrInstallDateDisplay,
+                onClick = onShowBurrInstallDatePicker,
+            )
+            EspressoTextField(
+                value = uiState.imageUrl,
+                onValueChange = onImageUrlChange,
+                label = stringResource(R.string.field_image_url),
+            )
+            EspressoTextField(
+                value = uiState.notes,
+                onValueChange = onNotesChange,
+                label = stringResource(R.string.field_notes),
+                singleLine = false,
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun GrinderFormScreenPreview() {
     EspressoAppTheme {
-        GrinderFormScreen(onDismiss = {})
+        GrinderFormContent(
+            uiState = GrinderFormUiState(),
+            onDismiss = {},
+            onSave = {},
+            onBrandChange = {},
+            onModelChange = {},
+            onBurrSizeChange = {},
+            onImageUrlChange = {},
+            onNotesChange = {},
+            onShowBurrTypeSheet = {},
+            onShowPurchaseDatePicker = {},
+            onShowBurrInstallDatePicker = {},
+        )
     }
 }

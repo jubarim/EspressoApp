@@ -44,7 +44,6 @@ import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.domain.model.EspressoMachine
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EspressoMachineListScreen(
     onBack: () -> Unit,
@@ -54,7 +53,24 @@ fun EspressoMachineListScreen(
     viewModel: EspressoMachineListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    EspressoMachineListContent(
+        uiState = uiState,
+        onBack = onBack,
+        onMachineClick = onMachineClick,
+        onAddMachine = onAddMachine,
+        modifier = modifier,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EspressoMachineListContent(
+    uiState: EspressoMachineListUiState,
+    onBack: () -> Unit,
+    onMachineClick: (String) -> Unit,
+    onAddMachine: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -148,7 +164,8 @@ private fun EspressoMachineAvatar(machine: EspressoMachine) {
 @Composable
 private fun EspressoMachineListScreenEmptyPreview() {
     EspressoAppTheme {
-        EspressoMachineListScreen(
+        EspressoMachineListContent(
+            uiState = EspressoMachineListUiState.Success(emptyList()),
             onBack = {},
             onMachineClick = {},
             onAddMachine = {},

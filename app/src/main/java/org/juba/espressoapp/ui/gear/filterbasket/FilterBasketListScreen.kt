@@ -44,7 +44,6 @@ import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.domain.model.FilterBasket
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterBasketListScreen(
     onBack: () -> Unit,
@@ -54,7 +53,24 @@ fun FilterBasketListScreen(
     viewModel: FilterBasketListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    FilterBasketListContent(
+        uiState = uiState,
+        onBack = onBack,
+        onBasketClick = onBasketClick,
+        onAddBasket = onAddBasket,
+        modifier = modifier,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FilterBasketListContent(
+    uiState: FilterBasketListUiState,
+    onBack: () -> Unit,
+    onBasketClick: (String) -> Unit,
+    onAddBasket: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -151,7 +167,8 @@ private fun FilterBasketAvatar(basket: FilterBasket) {
 @Composable
 private fun FilterBasketListScreenEmptyPreview() {
     EspressoAppTheme {
-        FilterBasketListScreen(
+        FilterBasketListContent(
+            uiState = FilterBasketListUiState.Success(emptyList()),
             onBack = {},
             onBasketClick = {},
             onAddBasket = {},
