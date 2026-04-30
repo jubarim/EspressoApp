@@ -3,7 +3,7 @@ package org.juba.espressoapp.ui.main
 internal object AppRoutes {
     const val SHOTS = "shots"
     const val SHOT_DETAIL = "shot_detail/{shotId}"
-    const val SHOT_FORM = "shot_form?shotId={shotId}"
+    const val SHOT_FORM = "shot_form?shotId={shotId}&sourceShotId={sourceShotId}"
     const val COFFEE_HOME = "coffee_home"
     const val ROASTER_LIST = "roaster_list"
     const val ROASTER_DETAIL = "roaster_detail/{roasterId}"

@@ -33,6 +33,7 @@ class ShotLogFormViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val shotId: String? = savedStateHandle[SHOT_ID]
+    private val sourceShotId: String? = savedStateHandle[SOURCE_SHOT_ID]
 
     private val _uiState = MutableStateFlow(ShotLogFormUiState())
     val uiState: StateFlow<ShotLogFormUiState> = _uiState.asStateFlow()
@@ -93,6 +94,7 @@ class ShotLogFormViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         shotId?.let { loadShot(it) }
+        if (shotId == null) sourceShotId?.let { loadShot(it) }
     }
 
     private fun loadShot(id: String) {
@@ -229,6 +231,7 @@ class ShotLogFormViewModel @Inject constructor(
 
     companion object {
         const val SHOT_ID = "shotId"
+        const val SOURCE_SHOT_ID = "sourceShotId"
 
         /** Rating options for the picker (key = Int string, label = display text). */
         val ratingOptions = listOf(

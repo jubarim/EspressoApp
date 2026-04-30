@@ -117,11 +117,16 @@ fun EspressoApp() {
                         ShotLogDetailScreen(
                             onBack = { navController.popBackStack() },
                             onEdit = { id -> navController.navigate("shot_form?shotId=$id") },
+                            onCopyCreated = { id -> navController.navigate("shot_detail/$id") },
+                            onCopyCustomize = { id -> navController.navigate("shot_form?sourceShotId=$id") },
                         )
                     }
                     composable(
                         AppRoutes.SHOT_FORM,
-                        arguments = listOf(navArgument("shotId") { nullable = true; defaultValue = null }),
+                        arguments = listOf(
+                            navArgument("shotId") { nullable = true; defaultValue = null },
+                            navArgument("sourceShotId") { nullable = true; defaultValue = null },
+                        ),
                     ) {
                         ShotLogFormScreen(onDismiss = { navController.popBackStack() })
                     }

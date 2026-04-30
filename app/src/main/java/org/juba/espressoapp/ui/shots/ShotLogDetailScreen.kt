@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,10 +40,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
+import org.juba.espressoapp.designsystem.QuickCopyDialog
 import org.juba.espressoapp.domain.model.ShotLog
+import org.juba.espressoapp.ui.main.LocalSnackbarHostState
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -53,14 +57,27 @@ import java.util.Locale
 fun ShotLogDetailScreen(
     onBack: () -> Unit,
     onEdit: (String) -> Unit,
+    onCopyCreated: (String) -> Unit,
+    onCopyCustomize: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShotLogDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var showCopyDialog by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = LocalSnackbarHostState.current
+    val scope = rememberCoroutineScope()
+    val copiedMessage = stringResource(R.string.copy_shot_success)
 
     LaunchedEffect(uiState) {
         if (uiState is ShotLogDetailUiState.Deleted) onBack()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.copyEvent.collect { newShotId ->
+            scope.launch { snackbarHostState.showSnackbar(copiedMessage) }
+            onCopyCreated(newShotId)
+        }
     }
 
     Scaffold(
@@ -97,6 +114,7 @@ fun ShotLogDetailScreen(
                         (uiState as? ShotLogDetailUiState.Success)?.shot?.id?.let { onEdit(it) }
                     },
                     onDelete = { showDeleteDialog = true },
+                    onCopy = { showCopyDialog = true },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 24.dp),
@@ -122,6 +140,28 @@ fun ShotLogDetailScreen(
                 }
             },
         )
+    }
+
+    if (showCopyDialog) {
+        val shot = (uiState as? ShotLogDetailUiState.Success)?.shot
+        if (shot != null) {
+            QuickCopyDialog(
+                title = stringResource(R.string.copy_shot_dialog_title),
+                dateFieldLabel = stringResource(R.string.copy_shot_dialog_date_label),
+                noDatePlaceholder = "",
+                initialDate = null,
+                defaultPickerDate = System.currentTimeMillis(),
+                onDismiss = { showCopyDialog = false },
+                onCustomize = {
+                    showCopyDialog = false
+                    onCopyCustomize(shot.id)
+                },
+                onCreate = { newDate ->
+                    showCopyDialog = false
+                    viewModel.copyShot(newDate ?: System.currentTimeMillis())
+                },
+            )
+        }
     }
 }
 

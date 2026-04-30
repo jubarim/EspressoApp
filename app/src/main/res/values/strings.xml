@@ -192,4 +192,9 @@
     <string name="copy_bean_dialog_roast_date_label">Roast date</string>
     <string name="copy_bean_dialog_no_date">No roast date set</string>
     <string name="copy_bean_success">Coffee bean copied</string>
+
+    <!-- Copy shot dialog -->
+    <string name="copy_shot_dialog_title">Copy Shot</string>
+    <string name="copy_shot_dialog_date_label">Shot date</string>
+    <string name="copy_shot_success">Shot copied</string>
 </resources>
