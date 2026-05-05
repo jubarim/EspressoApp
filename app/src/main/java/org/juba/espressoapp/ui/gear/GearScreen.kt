@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.CategoryListItem
+import org.juba.espressoapp.ui.main.LocalNavBarPadding
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
 private enum class GearCategory(
@@ -34,7 +35,7 @@ fun GearScreen(
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_gear)) }) },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(bottom = LocalNavBarPadding.current),
         modifier = modifier,
     ) { innerPadding ->
         LazyColumn(

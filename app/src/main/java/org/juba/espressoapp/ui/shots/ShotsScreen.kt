@@ -36,6 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.EmptyStateContent
+import org.juba.espressoapp.ui.main.LocalNavBarPadding
 import org.juba.espressoapp.domain.model.ShotLog
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
@@ -79,7 +80,7 @@ private fun ShotsScreenContent(
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(bottom = LocalNavBarPadding.current),
         modifier = modifier,
     ) { innerPadding ->
         when (uiState) {

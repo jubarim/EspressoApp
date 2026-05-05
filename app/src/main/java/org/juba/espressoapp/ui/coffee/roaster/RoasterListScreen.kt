@@ -41,6 +41,7 @@ import coil3.request.crossfade
 import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.Roaster
 import org.juba.espressoapp.designsystem.EmptyStateContent
+import org.juba.espressoapp.ui.main.LocalNavBarPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +70,7 @@ fun RoasterListScreen(
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add_roaster))
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(bottom = LocalNavBarPadding.current),
         modifier = modifier,
     ) { innerPadding ->
         when (val state = uiState) {

@@ -40,6 +40,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.EmptyStateContent
+import org.juba.espressoapp.ui.main.LocalNavBarPadding
 import org.juba.espressoapp.domain.model.CoffeeBean
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +70,7 @@ fun CoffeeBeanListScreen(
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add_coffee_bean))
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(bottom = LocalNavBarPadding.current),
         modifier = modifier,
     ) { innerPadding ->
         when (val state = uiState) {

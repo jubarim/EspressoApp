@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.CategoryListItem
+import org.juba.espressoapp.ui.main.LocalNavBarPadding
 
 private enum class CoffeeCategory(@param:StringRes val labelRes: Int, val route: String) {
     ROASTERS(R.string.coffee_category_roasters, "roaster_list"),
@@ -28,7 +29,7 @@ fun CoffeeHomeScreen(
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.tab_coffee)) }) },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets(bottom = LocalNavBarPadding.current),
         modifier = modifier,
     ) { innerPadding ->
         LazyColumn(
