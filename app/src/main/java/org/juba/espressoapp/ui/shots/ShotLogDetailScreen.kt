@@ -42,7 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.juba.espressoapp.R
-import org.juba.espressoapp.designsystem.DetailActionsToolbar
+import org.juba.espressoapp.designsystem.toolbar.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.designsystem.QuickCopyDialog
 import org.juba.espressoapp.domain.model.ShotLog
