@@ -28,8 +28,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import org.juba.espressoapp.designsystem.FloatingNavItem
-import org.juba.espressoapp.designsystem.FloatingNavigationBar
+import org.juba.espressoapp.designsystem.toolbar.FloatingNavItem
+import org.juba.espressoapp.designsystem.toolbar.FloatingNavigationBar
 import org.juba.espressoapp.ui.coffee.CoffeeHomeScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanDetailScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanFormScreen
@@ -82,8 +82,16 @@ fun EspressoApp() {
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val navItems: List<FloatingNavItem> = AppDestinations.entries.map { FloatingNavItem(it.icon, it.labelRes) }
     val selectedIndex = AppDestinations.entries.indexOf(selectedDestination)
+    val navItems: List<FloatingNavItem> = AppDestinations.entries.map { dest ->
+        FloatingNavItem(dest.icon, dest.labelRes, onClick = {
+            navController.navigate(dest.startRoute) {
+                popUpTo(AppRoutes.SHOTS) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        })
+    }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
         Scaffold(
@@ -105,13 +113,6 @@ fun EspressoApp() {
                         FloatingNavigationBar(
                             items = navItems,
                             selectedIndex = selectedIndex,
-                            onItemSelected = { index: Int ->
-                                navController.navigate(AppDestinations.entries[index].startRoute) {
-                                    popUpTo(AppRoutes.SHOTS) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
                         )
                     }
                 }
