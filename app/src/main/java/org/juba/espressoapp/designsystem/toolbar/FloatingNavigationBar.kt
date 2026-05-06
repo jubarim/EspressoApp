@@ -1,4 +1,4 @@
-package org.juba.espressoapp.designsystem
+package org.juba.espressoapp.designsystem.toolbar
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Build
@@ -23,11 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.juba.espressoapp.R
+import org.juba.espressoapp.designsystem.FloatingToolbarDefaults
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
 data class FloatingNavItem(
@@ -45,11 +47,14 @@ fun FloatingNavigationBar(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    shape: Shape = FloatingToolbarDefaults.shape,
+    containerColor: Color = FloatingToolbarDefaults.containerColor(),
+    shadowElevation: Dp = FloatingToolbarDefaults.shadowElevation,
 ) {
     Surface(
-        shape = RoundedCornerShape(32.dp),
-        tonalElevation = 3.dp,
-        shadowElevation = 6.dp,
+        shape = shape,
+        color = containerColor,
+        shadowElevation = shadowElevation,
         modifier = modifier,
     ) {
         Row(
