@@ -1,10 +1,7 @@
 package org.juba.espressoapp.designsystem.toolbar
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,52 +20,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.juba.espressoapp.R
-import org.juba.espressoapp.designsystem.FloatingToolbarDefaults
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 
-data class FloatingNavItem(
-    val icon: ImageVector,
-    @param:StringRes val labelRes: Int,
-)
-
 /**
- * A floating pill-shaped navigation bar with always-visible icon + label for each item.
- * The selected item is highlighted with a pill-shaped background.
+ * A floating pill-shaped navigation bar. Each item carries its own [FloatingNavItem.onClick]
+ * callback; the selected item is highlighted with a pill-shaped background.
+ *
+ * @param items Items to display as navigation destinations.
+ * @param selectedIndex Index of the currently selected item.
+ * @param modifier Modifier applied to the toolbar container.
+ * @param shape Shape of the toolbar container.
+ * @param containerColor Background color of the toolbar container.
+ * @param shadowElevation Elevation of the drop shadow.
  */
 @Composable
 fun FloatingNavigationBar(
     items: List<FloatingNavItem>,
     selectedIndex: Int,
-    onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = FloatingToolbarDefaults.shape,
     containerColor: Color = FloatingToolbarDefaults.containerColor(),
     shadowElevation: Dp = FloatingToolbarDefaults.shadowElevation,
 ) {
-    Surface(
-        shape = shape,
-        color = containerColor,
-        shadowElevation = shadowElevation,
+    FloatingToolbar(
         modifier = modifier,
+        shape = shape,
+        containerColor = containerColor,
+        shadowElevation = shadowElevation,
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            items.forEachIndexed { index, item ->
-                FloatingNavItemView(
-                    item = item,
-                    selected = index == selectedIndex,
-                    onClick = { onItemSelected(index) },
-                )
-            }
+        items.forEachIndexed { index, item ->
+            FloatingNavItemView(
+                item = item,
+                selected = index == selectedIndex,
+            )
         }
     }
 }
@@ -77,7 +66,6 @@ fun FloatingNavigationBar(
 private fun FloatingNavItemView(
     item: FloatingNavItem,
     selected: Boolean,
-    onClick: () -> Unit,
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
@@ -93,7 +81,7 @@ private fun FloatingNavItemView(
     )
 
     Surface(
-        onClick = onClick,
+        onClick = item.onClick,
         shape = CircleShape,
         color = backgroundColor,
     ) {
@@ -128,7 +116,6 @@ private fun FloatingNavigationBarFirstSelectedPreview() {
                 FloatingNavItem(Icons.Default.Settings, R.string.tab_settings),
             ),
             selectedIndex = 0,
-            onItemSelected = {},
         )
     }
 }
@@ -145,7 +132,6 @@ private fun FloatingNavigationBarSecondSelectedPreview() {
                 FloatingNavItem(Icons.Default.Settings, R.string.tab_settings),
             ),
             selectedIndex = 1,
-            onItemSelected = {},
         )
     }
 }
