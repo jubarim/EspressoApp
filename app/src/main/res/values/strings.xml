@@ -209,4 +209,8 @@
     <string name="auth_sign_in_button">Sign in with Passkey</string>
     <string name="auth_register_button">Create Passkey</string>
     <string name="auth_name_empty_error">Please enter your name</string>
+    <string name="auth_returning_hello">Hello, %1$s</string>
+    <string name="auth_returning_subtitle">Tap to sign in with your passkey</string>
+    <string name="auth_fingerprint_content_desc">Sign in with passkey</string>
+    <string name="auth_switch_account">Switch Account</string>
 </resources>
