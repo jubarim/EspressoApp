@@ -9,12 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.juba.espressoapp.domain.repository.AuthRepository
 import org.juba.espressoapp.domain.repository.BackupRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val backupRepository: BackupRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -48,4 +50,9 @@ class SettingsViewModel @Inject constructor(
 
     fun clearExportState() = _uiState.update { it.copy(exportState = BackupOperation.Idle) }
     fun clearImportState() = _uiState.update { it.copy(importState = BackupOperation.Idle) }
+
+    /** Signs the user out. The app-level auth state observer handles navigation to the auth screen. */
+    fun signOut() {
+        viewModelScope.launch { authRepository.signOut() }
+    }
 }
