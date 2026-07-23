@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
@@ -116,6 +117,7 @@ fun SettingsScreen(
             showImportConfirmDialog = false
             pendingImportUri = null
         },
+        onSignOutClick = { viewModel.signOut() },
         modifier = modifier,
     )
 }
@@ -129,6 +131,7 @@ private fun SettingsContent(
     onImportClick: () -> Unit,
     onImportConfirm: () -> Unit,
     onImportDismiss: () -> Unit,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (showImportConfirmDialog) {
@@ -204,6 +207,30 @@ private fun SettingsContent(
                     Text(stringResource(R.string.settings_import_button))
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.settings_account_section_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(4.dp))
+
+            OutlinedButton(
+                onClick = onSignOutClick,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.settings_sign_out_button))
+                }
+            }
         }
     }
 }
@@ -227,6 +254,7 @@ private fun SettingsContentPreview() {
             onImportClick = {},
             onImportConfirm = {},
             onImportDismiss = {},
+            onSignOutClick = {},
         )
     }
 }
@@ -242,6 +270,7 @@ private fun SettingsContentInProgressPreview() {
             onImportClick = {},
             onImportConfirm = {},
             onImportDismiss = {},
+            onSignOutClick = {},
         )
     }
 }

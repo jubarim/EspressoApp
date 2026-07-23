@@ -1,6 +1,7 @@
 package org.juba.espressoapp.ui.main
 
 internal object AppRoutes {
+    const val AUTH = "auth"
     const val SHOTS = "shots"
     const val SHOT_DETAIL = "shot_detail/{shotId}"
     const val SHOT_FORM = "shot_form?shotId={shotId}&sourceShotId={sourceShotId}"

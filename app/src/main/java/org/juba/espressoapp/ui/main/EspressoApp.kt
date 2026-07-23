@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,8 +29,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import org.juba.espressoapp.designsystem.toolbar.FloatingNavItem
 import org.juba.espressoapp.designsystem.toolbar.FloatingNavigationBar
+import org.juba.espressoapp.ui.auth.AuthScreen
 import org.juba.espressoapp.ui.coffee.CoffeeHomeScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanDetailScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanFormScreen
@@ -58,6 +63,21 @@ fun EspressoApp() {
     val navController = rememberNavController()
     val currentEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentEntry?.destination?.route
+
+    // Navigate to auth when the Firebase session is cleared at runtime (e.g. after sign-out).
+    LaunchedEffect(Unit) {
+        callbackFlow {
+            val listener = FirebaseAuth.AuthStateListener { auth -> trySend(auth.currentUser) }
+            FirebaseAuth.getInstance().addAuthStateListener(listener)
+            awaitClose { FirebaseAuth.getInstance().removeAuthStateListener(listener) }
+        }.collect { user ->
+            if (user == null && currentRoute != AppRoutes.AUTH) {
+                navController.navigate(AppRoutes.AUTH) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        }
+    }
 
     val showNavBar = currentRoute in showBottomNavBar
 
@@ -123,7 +143,21 @@ fun EspressoApp() {
                 Box(modifier = Modifier
                     .padding(top = innerPadding.calculateTopPadding())
                     .fillMaxSize()) {
-                    NavHost(navController = navController, startDestination = AppRoutes.SHOTS) {
+                    val startDestination = if (FirebaseAuth.getInstance().currentUser != null) {
+                            AppRoutes.SHOTS
+                        } else {
+                            AppRoutes.AUTH
+                        }
+                NavHost(navController = navController, startDestination = startDestination) {
+                        composable(AppRoutes.AUTH) {
+                            AuthScreen(
+                                onAuthSuccess = {
+                                    navController.navigate(AppRoutes.SHOTS) {
+                                        popUpTo(AppRoutes.AUTH) { inclusive = true }
+                                    }
+                                },
+                            )
+                        }
                         composable(AppRoutes.SHOTS) {
                             ShotsScreen(
                                 onShotClick = { id -> navController.navigate("shot_detail/$id") },

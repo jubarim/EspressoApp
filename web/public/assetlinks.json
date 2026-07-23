@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.get_login_creds"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.juba.espressoapp",
+    "sha256_cert_fingerprints": [
+      "84:74:8F:B9:78:21:8A:81:08:B0:6D:F8:1B:DB:70:11:92:E9:BB:A1:59:5F:3C:8F:D8:F2:03:79:31:1A:15:B6"
+    ]
+  }
+}]
