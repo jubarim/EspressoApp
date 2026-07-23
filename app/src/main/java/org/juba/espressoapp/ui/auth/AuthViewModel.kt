@@ -16,9 +16,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.juba.espressoapp.domain.repository.AuthRepository
 import javax.inject.Inject
@@ -41,6 +43,10 @@ class AuthViewModel @Inject constructor(
     private val _events = MutableSharedFlow<AuthEvent>()
     val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
 
+    /** Emits the locally persisted display name; null means no returning user is known. */
+    val savedDisplayName: StateFlow<String?> = authRepository.getSavedDisplayName()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     /** Registers a new passkey for [displayName], using [activity] to anchor the system UI. */
     fun register(displayName: String, activity: Activity) {
         if (!validate(displayName)) return
@@ -60,6 +66,7 @@ class AuthViewModel @Inject constructor(
                 }
                 .onSuccess {
                     Log.d(TAG, "register: registration successful")
+                    authRepository.saveDisplayName(displayName)
                     onAuthSuccess()
                 }
                 .onFailure {
@@ -89,6 +96,7 @@ class AuthViewModel @Inject constructor(
                 }
                 .onSuccess {
                     Log.d(TAG, "signIn: sign-in successful")
+                    authRepository.saveDisplayName(displayName)
                     onAuthSuccess()
                 }
                 .onFailure {
@@ -96,6 +104,11 @@ class AuthViewModel @Inject constructor(
                     _uiState.value = AuthUiState.Error(it.toUserMessage())
                 }
         }
+    }
+
+    /** Clears the persisted user so the new-user screen is shown on the next visit. */
+    fun clearSavedUser() {
+        viewModelScope.launch { authRepository.clearSavedDisplayName() }
     }
 
     private fun validate(displayName: String): Boolean {
