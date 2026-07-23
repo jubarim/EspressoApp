@@ -3,17 +3,24 @@ package org.juba.espressoapp.ui.auth
 import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +46,7 @@ fun AuthScreen(
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val savedDisplayName by viewModel.savedDisplayName.collectAsStateWithLifecycle()
     val activity = LocalActivity.current as Activity
 
     LaunchedEffect(Unit) {
@@ -50,16 +57,103 @@ fun AuthScreen(
         }
     }
 
-    AuthScreenContent(
-        uiState = uiState,
-        onRegister = { displayName -> viewModel.register(displayName, activity) },
-        onSignIn = { displayName -> viewModel.signIn(displayName, activity) },
-        modifier = modifier,
-    )
+    val savedName = savedDisplayName
+    if (savedName != null) {
+        ReturningUserContent(
+            displayName = savedName,
+            uiState = uiState,
+            onSignIn = { viewModel.signIn(savedName, activity) },
+            onSwitchAccount = { viewModel.clearSavedUser() },
+            modifier = modifier,
+        )
+    } else {
+        NewUserContent(
+            uiState = uiState,
+            onRegister = { name -> viewModel.register(name, activity) },
+            onSignIn = { name -> viewModel.signIn(name, activity) },
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
-private fun AuthScreenContent(
+private fun ReturningUserContent(
+    displayName: String,
+    uiState: AuthUiState,
+    onSignIn: () -> Unit,
+    onSwitchAccount: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isLoading = uiState is AuthUiState.Loading
+
+    Scaffold(modifier = modifier) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.auth_returning_hello, displayName),
+                    style = MaterialTheme.typography.displaySmall,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(64.dp))
+                } else {
+                    FilledTonalIconButton(
+                        onClick = onSignIn,
+                        modifier = Modifier.size(72.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Fingerprint,
+                            contentDescription = stringResource(R.string.auth_fingerprint_content_desc),
+                            modifier = Modifier.size(40.dp),
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.auth_returning_subtitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                if (uiState is AuthUiState.Error) {
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = uiState.message,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = onSwitchAccount,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp),
+            ) {
+                Text(stringResource(R.string.auth_switch_account))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewUserContent(
     uiState: AuthUiState,
     onRegister: (String) -> Unit,
     onSignIn: (String) -> Unit,
@@ -133,9 +227,35 @@ private fun AuthScreenContent(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun AuthScreenIdlePreview() {
+private fun ReturningUserIdlePreview() {
     EspressoAppTheme {
-        AuthScreenContent(
+        ReturningUserContent(
+            displayName = "Manu",
+            uiState = AuthUiState.Idle,
+            onSignIn = {},
+            onSwitchAccount = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun ReturningUserErrorPreview() {
+    EspressoAppTheme {
+        ReturningUserContent(
+            displayName = "Manu",
+            uiState = AuthUiState.Error("Sign-in cancelled"),
+            onSignIn = {},
+            onSwitchAccount = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun NewUserIdlePreview() {
+    EspressoAppTheme {
+        NewUserContent(
             uiState = AuthUiState.Idle,
             onRegister = {},
             onSignIn = {},
@@ -145,9 +265,9 @@ private fun AuthScreenIdlePreview() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun AuthScreenErrorPreview() {
+private fun NewUserErrorPreview() {
     EspressoAppTheme {
-        AuthScreenContent(
+        NewUserContent(
             uiState = AuthUiState.Error("Sign-in cancelled"),
             onRegister = {},
             onSignIn = {},
