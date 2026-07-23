@@ -24,6 +24,7 @@ fun EspressoTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     errorMessage: String? = null,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -32,6 +33,7 @@ fun EspressoTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        enabled = enabled,
         isError = errorMessage != null,
         supportingText = if (errorMessage != null) {
             { Text(errorMessage) }
