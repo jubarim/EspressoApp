@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "espresso-app-89866"
+  },
+  "targets": {},
+  "etags": {
+    "espresso-app-89866": {
+      "extensionInstances": {
+        "firebase-web-authn": "d46a67a152e03be66b8583fa6402bb3a3248efed8082e6d87af26843aa174465"
+      }
+    }
+  }
+}
