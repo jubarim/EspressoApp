@@ -197,4 +197,16 @@
     <string name="copy_shot_dialog_title">Copy Shot</string>
     <string name="copy_shot_dialog_date_label">Shot date</string>
     <string name="copy_shot_success">Shot copied</string>
+
+    <!-- Settings — account section -->
+    <string name="settings_account_section_title">Account</string>
+    <string name="settings_sign_out_button">Sign Out</string>
+
+    <!-- Auth screen -->
+    <string name="auth_title">Welcome</string>
+    <string name="auth_subtitle">Sign in with your passkey to continue, or create one if this is your first time.</string>
+    <string name="auth_display_name_label">Your name</string>
+    <string name="auth_sign_in_button">Sign in with Passkey</string>
+    <string name="auth_register_button">Create Passkey</string>
+    <string name="auth_name_empty_error">Please enter your name</string>
 </resources>
