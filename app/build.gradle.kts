@@ -71,6 +71,7 @@ dependencies {
 
     implementation(libs.androidx.credentials)
     implementation(libs.credentials.play.services)
+    implementation(libs.datastore.preferences)
 
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
