@@ -1,11 +1,16 @@
 package org.juba.espressoapp.data.repository
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import org.juba.espressoapp.domain.model.AuthUser
 import org.juba.espressoapp.domain.repository.AuthRepository
@@ -15,10 +20,12 @@ import javax.inject.Inject
 
 private const val TAG = "jm_PasskeyAuth"
 private const val FN_NAME = "ext-firebase-web-authn-api"
+private val DISPLAY_NAME_KEY = stringPreferencesKey("display_name")
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val functions: FirebaseFunctions,
+    private val dataStore: DataStore<Preferences>,
 ) : AuthRepository {
 
     override suspend fun prepareRegistration(displayName: String): Result<String> = runCatching {
@@ -109,6 +116,16 @@ class AuthRepositoryImpl @Inject constructor(
         Log.d(TAG, "signOut: clearing Firebase session")
         firebaseAuth.signOut()
         Log.d(TAG, "signOut: done")
+    }
+
+    override suspend fun saveDisplayName(name: String) {
+        dataStore.edit { it[DISPLAY_NAME_KEY] = name }
+    }
+
+    override fun getSavedDisplayName(): Flow<String?> = dataStore.data.map { it[DISPLAY_NAME_KEY] }
+
+    override suspend fun clearSavedDisplayName() {
+        dataStore.edit { it.remove(DISPLAY_NAME_KEY) }
     }
 
     override fun currentUser(): Flow<AuthUser?> = callbackFlow {
