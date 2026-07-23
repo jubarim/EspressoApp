@@ -2,6 +2,9 @@ package org.juba.espressoapp.data.di
 
 import android.content.Context
 import androidx.credentials.CredentialManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import dagger.Binds
@@ -13,6 +16,10 @@ import dagger.hilt.components.SingletonComponent
 import org.juba.espressoapp.data.repository.AuthRepositoryImpl
 import org.juba.espressoapp.domain.repository.AuthRepository
 import javax.inject.Singleton
+
+private val Context.userPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "user_prefs",
+)
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -36,5 +43,10 @@ abstract class AuthModule {
         @Provides
         @Singleton
         fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance()
+
+        @Provides
+        @Singleton
+        fun provideUserPreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+            context.userPreferencesDataStore
     }
 }
