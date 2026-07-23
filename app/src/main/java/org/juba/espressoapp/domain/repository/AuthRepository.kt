@@ -33,4 +33,16 @@ interface AuthRepository {
 
     /** Emits the currently authenticated user, or null when signed out. */
     fun currentUser(): Flow<AuthUser?>
+
+    /** Persists [name] locally so the auth screen can greet the user on return visits. */
+    suspend fun saveDisplayName(name: String)
+
+    /**
+     * Emits the locally persisted display name, or null if none has been saved yet.
+     * Used to decide which auth screen variant to show.
+     */
+    fun getSavedDisplayName(): Flow<String?>
+
+    /** Removes the locally persisted display name, showing the new-user screen on next launch. */
+    suspend fun clearSavedDisplayName()
 }
