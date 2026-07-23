@@ -1,0 +1,814 @@
+diff --git a/dist/libs/extension/extension.yaml b/dist/libs/extension/extension.yaml
+index a088a53..45a378a 100644
+--- a/dist/libs/extension/extension.yaml
++++ b/dist/libs/extension/extension.yaml
+@@ -143,3 +143,12 @@ params:
+         value: discouraged
+     required:    true
+     type:        select
++  - param:       ALLOWED_ORIGINS
++    description: >-
++                 Optional comma-separated list of additional origins to accept during WebAuthn verification.
++                 Required for native clients such as Android apps, whose origin is in the format
++                 `android:apk-key-hash:<base64-sha256-of-signing-cert>`.
++                 Example: `android:apk-key-hash:abc123`
++    label:       Allowed Origins
++    required:    false
++    type:        string
+diff --git a/dist/libs/extension/meta.json b/dist/libs/extension/meta.json
+index 25f22a1..633738e 100644
+--- a/dist/libs/extension/meta.json
++++ b/dist/libs/extension/meta.json
+@@ -1,7 +1,7 @@
+ {
+   "inputs": {
+     "libs/api/src/lib/interfaces/lib/FirebaseWebAuthnConfig.ts": {
+-      "bytes": 2717,
++      "bytes": 3059,
+       "imports": [],
+       "format": "esm"
+     },
+@@ -147,7 +147,7 @@
+       "format": "esm"
+     },
+     "libs/api/src/lib/operations/lib/verifyAuthentication.ts": {
+-      "bytes": 13387,
++      "bytes": 13398,
+       "imports": [
+         {
+           "path": "@firebase-web-authn/types",
+@@ -178,7 +178,7 @@
+       "format": "esm"
+     },
+     "libs/api/src/lib/operations/lib/verifyReauthentication.ts": {
+-      "bytes": 9887,
++      "bytes": 9898,
+       "imports": [
+         {
+           "path": "@firebase-web-authn/types",
+@@ -209,7 +209,7 @@
+       "format": "esm"
+     },
+     "libs/api/src/lib/operations/lib/verifyRegistration.ts": {
+-      "bytes": 7297,
++      "bytes": 7308,
+       "imports": [
+         {
+           "path": "@firebase-web-authn/types",
+@@ -286,7 +286,7 @@
+       "format": "esm"
+     },
+     "libs/api/src/lib/getFirebaseWebAuthnApi.ts": {
+-      "bytes": 11349,
++      "bytes": 11505,
+       "imports": [
+         {
+           "path": "@firebase-web-authn/types",
+@@ -348,7 +348,7 @@
+       "format": "esm"
+     },
+     "libs/extension/src/lib/api.ts": {
+-      "bytes": 1332,
++      "bytes": 1498,
+       "imports": [
+         {
+           "path": "libs/api/src/index.ts",
+@@ -535,7 +535,7 @@
+           "bytesInOutput": 0
+         },
+         "libs/api/src/lib/getFirebaseWebAuthnApi.ts": {
+-          "bytesInOutput": 4346
++          "bytesInOutput": 4424
+         },
+         "libs/api/src/lib/operations/lib/clearChallenge.ts": {
+           "bytesInOutput": 648
+@@ -565,13 +565,13 @@
+           "bytesInOutput": 2971
+         },
+         "libs/extension/src/lib/api.ts": {
+-          "bytesInOutput": 411
++          "bytesInOutput": 533
+         },
+         "libs/extension/src/index.ts": {
+           "bytesInOutput": 0
+         }
+       },
+-      "bytes": 22216
++      "bytes": 22416
+     }
+   }
+ }
+\ No newline at end of file
+diff --git a/dist/libs/extension/package-lock.json b/dist/libs/extension/package-lock.json
+index 6fbd8a8..40b960d 100644
+--- a/dist/libs/extension/package-lock.json
++++ b/dist/libs/extension/package-lock.json
+@@ -129,9 +129,9 @@
+       }
+     },
+     "node_modules/@google-cloud/firestore": {
+-      "version": "8.6.0",
+-      "resolved": "https://registry.npmjs.org/@google-cloud/firestore/-/firestore-8.6.0.tgz",
+-      "integrity": "sha512-TdvZHfwQj5B5CSDEgDqyrhdVqtOSupmBXDQPasMAJiC64tjsGvyMooNiC43fdk1TsUHeklyoZ6/vQ1TjWKVMbg==",
++      "version": "8.7.0",
++      "resolved": "https://registry.npmjs.org/@google-cloud/firestore/-/firestore-8.7.0.tgz",
++      "integrity": "sha512-EvMpZQUXkTRdweSvOu6VL6EEQwHjHAgWz2UYZR+Mj6Ao52S+TWieHbSn15jiNnEw8F8RhbZj7IGXZ1PFB1eA+A==",
+       "license": "Apache-2.0",
+       "optional": true,
+       "dependencies": {
+@@ -2325,9 +2325,9 @@
+       }
+     },
+     "node_modules/jose": {
+-      "version": "6.2.3",
+-      "resolved": "https://registry.npmjs.org/jose/-/jose-6.2.3.tgz",
+-      "integrity": "sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==",
++      "version": "6.2.4",
++      "resolved": "https://registry.npmjs.org/jose/-/jose-6.2.4.tgz",
++      "integrity": "sha512-N8acGzVsQy6M/fjFcxtysNc4Q379TcM5dM/qKkNtsHFji88yANnXTr7BLeP75iPnFwBfQzM/jg2BZ9+HZrHCZA==",
+       "license": "MIT",
+       "funding": {
+         "url": "https://github.com/sponsors/panva"
+diff --git a/dist/libs/extension/src/main.js b/dist/libs/extension/src/main.js
+index 59fca62..cf09470 100644
+--- a/dist/libs/extension/src/main.js
++++ b/dist/libs/extension/src/main.js
+@@ -2,4 +2,4 @@
+  * Copyright © 2026 Gavin William Sawyer. All rights reserved.
+  */
+ 
+-import{getApps as M,initializeApp as Y}from"firebase-admin/app";import{isoBase64URL as J}from"@simplewebauthn/server/helpers";import{getAuth as I}from"firebase-admin/auth";import{getFirestore as T}from"firebase-admin/firestore";import{onCall as H}from"firebase-functions/https";import{FieldValue as x}from"firebase-admin/firestore";function R(e){let r=e.firestore.collection("users").doc(e.userId);return r.get().then(t=>(async n=>n?n.challenge?(n.credentials?r.update({challenge:x.delete()}):r.delete()).then(()=>({operation:"clear challenge",success:!0}),i=>({code:i.code,message:i.message,operation:"clear challenge",success:!1})):{code:"no-op",message:"No operation is needed.",operation:"clear challenge",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"clear challenge",success:!1})(t.data()),t=>({code:t.code,message:t.message,operation:"clear challenge",success:!1}))}import{FieldValue as N}from"firebase-admin/firestore";var F=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t&&t.credentials?.[e.clearingCredential||"first"]?e.webAuthnUserDocumentReference.update({["credentials."+(e.clearingCredential||"first")]:N.delete()}).then(()=>({clearingCredential:e.clearingCredential,operation:"clear credential",success:!0}),n=>({code:n.code,message:n.message,operation:"clear credential",success:!1})):{code:"no-op",message:"No operation is needed.",operation:"clear credential",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"clear credential",success:!1}));import{generateAuthenticationOptions as S}from"@simplewebauthn/server";import{FieldValue as k}from"firebase-admin/firestore";var y=e=>S(e.authenticationOptions).then(r=>e.webAuthnUserDocumentReference.set({challenge:{process:"authentication",processingCredential:e.authenticatingCredential||k.delete(),value:r.challenge}},{merge:!0}).then(()=>({authenticatingCredential:e.authenticatingCredential,operation:"create authentication challenge",requestOptions:r,success:!0}),t=>({code:t.code,message:t.message,operation:"create authentication challenge",success:!1})));import{generateAuthenticationOptions as q}from"@simplewebauthn/server";import{isoBase64URL as l}from"@simplewebauthn/server/helpers";import{FieldValue as E}from"firebase-admin/firestore";var A=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?(e.reauthenticatingCredentialFactor==="second"?t.credentials?.second:t.credentials?.first)?q({...e.authenticationOptions,allowCredentials:e.reauthenticatingCredentialFactor?[{id:l.fromBuffer(t.credentials?.[e.reauthenticatingCredentialFactor]?.id||new Uint8Array)}]:t.credentials?.second?[{id:l.fromBuffer(t.credentials.first.id)},{id:l.fromBuffer(t.credentials.second.id)}]:[{id:l.fromBuffer(t.credentials?.first.id||new Uint8Array)}]}).then(n=>e.webAuthnUserDocumentReference.set({challenge:{process:"reauthentication",processingCredential:e.reauthenticatingCredentialFactor||E.delete(),value:n.challenge}},{merge:!0}).then(()=>({operation:"create reauthentication challenge",reauthenticatingCredential:e.reauthenticatingCredentialFactor,requestOptions:n,success:!0}),i=>({code:i.code,message:i.message,operation:"create reauthentication challenge",success:!1}))):{code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"create reauthentication challenge",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"create reauthentication challenge",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"create reauthentication challenge",success:!1}));import{generateRegistrationOptions as W}from"@simplewebauthn/server";import{isoBase64URL as B,isoUint8Array as K}from"@simplewebauthn/server/helpers";var U=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>(e.registeringCredentialFactor==="second"?!t?.credentials?.second:!t?.credentials?.first)?e.registeringCredentialFactor!=="second"||t&&t.credentials?.first?W({...e.registrationOptions,attestationType:e.registrationOptions.attestationConveyancePreference!=="indirect"?e.registrationOptions.attestationConveyancePreference:"none",excludeCredentials:e.registeringCredentialFactor==="second"?[{id:B.fromBuffer(t?.credentials?.first.id||new Uint8Array)}]:void 0,userID:K.fromUTF8String(e.registrationOptions.userId)}).then(n=>e.webAuthnUserDocumentReference.set({challenge:{process:"registration",processingCredential:e.registeringCredentialFactor,value:n.challenge}},{merge:!0}).then(()=>({creationOptions:n,operation:"create registration challenge",registeringCredential:e.registeringCredentialFactor,success:!0}),i=>({code:i.code,message:i.message,operation:"create registration challenge",success:!1}))):{code:"missing-primary",message:"No primary passkey was found in Firestore.",operation:"create registration challenge",success:!1}:{code:"no-op",message:"No operation is needed.",operation:"create registration challenge",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"create registration challenge",success:!1}));import{verifyAuthenticationResponse as C}from"@simplewebauthn/server";import{isoBase64URL as m}from"@simplewebauthn/server/helpers";import{FieldValue as u,Timestamp as d}from"firebase-admin/firestore";var v=e=>(r=>r!==e.userId?e.webAuthnUserDocumentReferenceTarget.get().then(t=>(async n=>n?e.webAuthnUserDocumentReference.get().then(i=>(async s=>s?s.challenge&&s.challenge.process==="authentication"?n.credentials?.[s.challenge?.processingCredential||"first"]?C({...e.authenticationOptions,credential:{counter:n.credentials[s.challenge.processingCredential||"first"]?.counter||0,id:m.fromBuffer(n.credentials[s.challenge.processingCredential||"first"]?.id||new Uint8Array),publicKey:n.credentials[s.challenge.processingCredential||"first"]?.publicKey||new Uint8Array},expectedChallenge:s.challenge.value,requireUserVerification:(s.challenge.processingCredential==="second"&&e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged"}).then(o=>(s.lastPresent?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>o.verified?e.createCustomToken(r).then(a=>e.webAuthnUserDocumentReferenceTarget.update({challenge:u.delete(),[s.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{...n.credentials?.[s.challenge?.processingCredential||"first"],authenticatorAttachment:o.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:o.authenticationInfo.credentialBackedUp},lastCredentialUsed:"first",lastPresent:d.fromDate(new Date),lastVerified:o.authenticationInfo.userVerified?d.fromDate(new Date):n.lastVerified||u.delete(),lastWebAuthnProcess:"authentication"}).then(()=>({authenticatedCredential:s.challenge?.processingCredential||"first",customToken:a,operation:"verify authentication",success:!0}),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1})),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1})):s.challenge?.processingCredential===void 0&&n.credentials?.second?C({...e.authenticationOptions,credential:{counter:n.credentials.second.counter,id:m.fromBuffer(n.credentials.second.id),publicKey:n.credentials.second.publicKey},expectedChallenge:s.challenge?.value||""}).then(a=>a.verified?e.createCustomToken(r).then(c=>e.webAuthnUserDocumentReferenceTarget.update({challenge:u.delete(),"credentials.second":{...n.credentials?.second,authenticatorAttachment:a.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:a.authenticationInfo.credentialBackedUp},lastCredentialUsed:"second",lastPresent:d.fromDate(new Date),lastVerified:a.authenticationInfo.userVerified?d.fromDate(new Date):n.lastVerified||u.delete(),lastWebAuthnProcess:"authentication"}).then(()=>({authenticatedCredential:"second",customToken:c,operation:"verify authentication",success:!0}),g=>({code:g.code,message:g.message,operation:"verify authentication",success:!1})),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1})):(s.credentials?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1}))):(s.credentials?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1})),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:u.delete()}).then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify authentication",success:!1}),o=>({code:o.code,message:o.message,operation:"verify authentication",success:!1})):s.credentials?{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify authentication",success:!1}:e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify authentication",success:!1}),o=>({code:o.code,message:o.message,operation:"verify authentication",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify authentication",success:!1})(i.data()),i=>({code:i.code,message:i.message,operation:"verify authentication",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify authentication",success:!1})(t.data()),t=>({code:t.code,message:t.message,operation:"verify authentication",success:!1})):e.webAuthnUserDocumentReference.update({challenge:u.delete()}).then(()=>({code:"no-op",message:"No operation is needed.",operation:"verify authentication",success:!1}),t=>({code:t.code,message:t.message,operation:"verify authentication",success:!1})))(e.authenticationOptions.response.response.userHandle?m.toUTF8String(e.authenticationOptions.response.response.userHandle):e.userId);import{verifyAuthenticationResponse as D}from"@simplewebauthn/server";import{isoBase64URL as P}from"@simplewebauthn/server/helpers";import{FieldValue as p,Timestamp as h}from"firebase-admin/firestore";var O=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?t.challenge&&t.challenge.process==="reauthentication"?t.credentials?.[t.challenge?.processingCredential||"first"]?D({...e.authenticationOptions,credential:{counter:t?.credentials[t.challenge.processingCredential||"first"]?.counter||0,id:P.fromBuffer(t?.credentials[t.challenge.processingCredential||"first"]?.id||new Uint8Array),publicKey:t?.credentials[t.challenge.processingCredential||"first"]?.publicKey||new Uint8Array},expectedChallenge:t.challenge.value,requireUserVerification:(t.challenge.processingCredential==="second"&&e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement==="required"}).then(n=>n.verified?e.createCustomToken().then(i=>e.webAuthnUserDocumentReference.update({challenge:p.delete(),[t.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{...t.credentials?.[t.challenge?.processingCredential||"first"],authenticatorAttachment:n.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:n.authenticationInfo.credentialBackedUp},lastCredentialUsed:t.challenge?.processingCredential||"first",lastPresent:h.fromDate(new Date),lastVerified:n.authenticationInfo.userVerified?h.fromDate(new Date):t.lastVerified||p.delete(),lastWebAuthnProcess:"reauthentication"}).then(()=>({reauthenticatedCredential:t.challenge?.processingCredential||"first",customToken:i,operation:"verify reauthentication",success:!0}),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1})),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1})):t.challenge?.processingCredential===void 0&&t.credentials?.second?D({...e.authenticationOptions,credential:{counter:t.credentials.second.counter,id:P.fromBuffer(t.credentials.second.id),publicKey:t.credentials.second.publicKey},expectedChallenge:t.challenge?.value||""}).then(i=>i.verified?e.createCustomToken().then(s=>e.webAuthnUserDocumentReference.update({challenge:p.delete(),"credentials.second":{...t.credentials?.second,authenticatorAttachment:i.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:i.authenticationInfo.credentialBackedUp},lastCredentialUsed:"second",lastPresent:h.fromDate(new Date),lastVerified:i.authenticationInfo.userVerified?h.fromDate(new Date):t.lastVerified||p.delete(),lastWebAuthnProcess:"reauthentication"}).then(()=>({reauthenticatedCredential:"second",customToken:s,operation:"verify reauthentication",success:!0}),o=>({code:o.code,message:o.message,operation:"verify reauthentication",success:!1})),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1})):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"not-verified",message:"User not verified. 2",operation:"verify reauthentication",success:!1}),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify reauthentication",success:!1}),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify reauthentication",success:!1}),n=>({code:n.code,message:n.message,operation:"verify reauthentication",success:!1})):{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify reauthentication",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify reauthentication",success:!1})(r.data()));import{verifyRegistrationResponse as _}from"@simplewebauthn/server";import{isoBase64URL as L}from"@simplewebauthn/server/helpers";import{FieldValue as f,Timestamp as w}from"firebase-admin/firestore";var V=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?t.challenge&&t.challenge.process==="registration"?t.challenge.processingCredential!=="second"||t.credentials?.first?_({...e.registrationOptions,expectedChallenge:t.challenge.value,requireUserVerification:(t.challenge.processingCredential==="second"?e.authenticatorAttachment2FA==="platform":e.authenticatorAttachment==="platform")&&e.userVerificationRequirement==="required"}).then(n=>n.verified?e.createCustomToken().then(i=>e.webAuthnUserDocumentReference.update({challenge:f.delete(),[t.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{authenticatorAttachment:n.registrationInfo?.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:n.registrationInfo?.credentialBackedUp,counter:n.registrationInfo?.credential.counter,id:L.toBuffer(n.registrationInfo?.credential.id),publicKey:n.registrationInfo?.credential.publicKey||new Uint8Array},lastCredentialUsed:t.challenge?.processingCredential||"first",lastPresent:w.fromDate(new Date),lastVerified:n.registrationInfo?.userVerified?w.fromDate(new Date):t.lastVerified||f.delete(),lastWebAuthnProcess:"registration"}).then(()=>({registeredCredential:t.challenge?.processingCredential||"first",customToken:i,operation:"verify registration",success:!0}),s=>({code:s.code,message:s.message,operation:"verify registration",success:!1})),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1})):(t.credentials?e.webAuthnUserDocumentReference.update({challenge:f.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),i=>({code:i.code,message:i.message,operation:"verify authentication",success:!1}))):e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify registration",success:!1}),n=>({code:n.code,message:n.message,operation:"verify registration",success:!1})):t.credentials?.first?{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify registration",success:!1}:e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify registration",success:!1}),n=>({code:n.code,message:n.message,operation:"verify registration",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify registration",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"verify registration",success:!1}));function b(e,r){return H({enforceAppCheck:!0,ingressSettings:"ALLOW_ALL"},async t=>{if(t.auth){let n=r?I(r):I(),i=r?T(r,"ext-firebase-web-authn"):T("ext-firebase-web-authn"),s=t.auth.uid,o=i.collection("users").doc(s),a=i.collection("users").doc(t.data.operation==="verify authentication"&&t.data.authenticationResponse.response.userHandle?J.toUTF8String(t.data.authenticationResponse.response.userHandle):s);switch(t.data.operation){case"clear challenge":return R({firestore:i,userId:s});case"clear credential":return F({clearingCredential:t.data.clearingCredential,webAuthnUserDocumentReference:o});case"create authentication challenge":return y({authenticatingCredential:t.data.authenticatingCredential,authenticationOptions:{attestationType:"indirect",rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",supportedAlgorithmIDs:[-7,-8,-257]},webAuthnUserDocumentReference:o});case"create reauthentication challenge":return A({authenticationOptions:{attestationType:"indirect",rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",supportedAlgorithmIDs:[-7,-8,-257]},reauthenticatingCredentialFactor:t.data.reauthenticatingCredential,webAuthnUserDocumentReference:o});case"create registration challenge":return U({registeringCredentialFactor:t.data.registeringCredential,registrationOptions:{attestationConveyancePreference:"indirect",authenticatorSelection:t.data.registeringCredential==="second"&&e.authenticatorAttachment2FA?{authenticatorAttachment:e.authenticatorAttachment2FA,residentKey:"preferred",userVerification:e.authenticatorAttachment2FA==="platform"&&e.userVerificationRequirement!=="discouraged"?e.userVerificationRequirement:"preferred"}:e.authenticatorAttachment?{authenticatorAttachment:e.authenticatorAttachment,residentKey:"preferred",userVerification:e.authenticatorAttachment==="platform"&&e.userVerificationRequirement!=="discouraged"?e.userVerificationRequirement:"preferred"}:{residentKey:"preferred",userVerification:"preferred"},rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",rpName:e.relyingPartyName,supportedAlgorithmIDs:[-7,-8,-257],userId:s,userName:t.data.name},webAuthnUserDocumentReference:o});case"verify authentication":return v({authenticationOptions:{expectedOrigin:t.rawRequest.headers.origin||"",expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",requireUserVerification:(e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged",response:t.data.authenticationResponse},authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:c=>n.createCustomToken(c),userId:s,userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o,webAuthnUserDocumentReferenceTarget:a});case"verify reauthentication":return O({authenticationOptions:{expectedOrigin:t.rawRequest.headers.origin||"",expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",requireUserVerification:(e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged",response:t.data.authenticationResponse},authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:()=>n.createCustomToken(s),userId:s,userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o});case"verify registration":return V({authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:()=>n.createCustomToken(s),registrationOptions:{expectedOrigin:t.rawRequest.headers.origin||"",expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",response:t.data.registrationResponse},userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o})}}else return{code:"missing-auth",message:"No user is signed in.",operation:t.data.operation,success:!1}})}var Be=b({authenticatorAttachment:process.env.AUTHENTICATOR_ATTACHMENT==="any"?void 0:process.env.AUTHENTICATOR_ATTACHMENT,authenticatorAttachment2FA:process.env.AUTHENTICATOR_ATTACHMENT_2FA==="any"?void 0:process.env.AUTHENTICATOR_ATTACHMENT_2FA,relyingPartyName:process.env.RELYING_PARTY_NAME,relyingPartyID:process.env.RELYING_PARTY_ID,userVerificationRequirement:process.env.USER_VERIFICATION_REQUIREMENT});M().length===0&&Y();export{Be as api};
++import{getApps as M,initializeApp as G}from"firebase-admin/app";import{isoBase64URL as J}from"@simplewebauthn/server/helpers";import{getAuth as V}from"firebase-admin/auth";import{getFirestore as T}from"firebase-admin/firestore";import{onCall as H}from"firebase-functions/https";import{FieldValue as b}from"firebase-admin/firestore";function R(e){let r=e.firestore.collection("users").doc(e.userId);return r.get().then(t=>(async n=>n?n.challenge?(n.credentials?r.update({challenge:b.delete()}):r.delete()).then(()=>({operation:"clear challenge",success:!0}),i=>({code:i.code,message:i.message,operation:"clear challenge",success:!1})):{code:"no-op",message:"No operation is needed.",operation:"clear challenge",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"clear challenge",success:!1})(t.data()),t=>({code:t.code,message:t.message,operation:"clear challenge",success:!1}))}import{FieldValue as x}from"firebase-admin/firestore";var F=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t&&t.credentials?.[e.clearingCredential||"first"]?e.webAuthnUserDocumentReference.update({["credentials."+(e.clearingCredential||"first")]:x.delete()}).then(()=>({clearingCredential:e.clearingCredential,operation:"clear credential",success:!0}),n=>({code:n.code,message:n.message,operation:"clear credential",success:!1})):{code:"no-op",message:"No operation is needed.",operation:"clear credential",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"clear credential",success:!1}));import{generateAuthenticationOptions as S}from"@simplewebauthn/server";import{FieldValue as k}from"firebase-admin/firestore";var y=e=>S(e.authenticationOptions).then(r=>e.webAuthnUserDocumentReference.set({challenge:{process:"authentication",processingCredential:e.authenticatingCredential||k.delete(),value:r.challenge}},{merge:!0}).then(()=>({authenticatingCredential:e.authenticatingCredential,operation:"create authentication challenge",requestOptions:r,success:!0}),t=>({code:t.code,message:t.message,operation:"create authentication challenge",success:!1})));import{generateAuthenticationOptions as q}from"@simplewebauthn/server";import{isoBase64URL as l}from"@simplewebauthn/server/helpers";import{FieldValue as E}from"firebase-admin/firestore";var A=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?(e.reauthenticatingCredentialFactor==="second"?t.credentials?.second:t.credentials?.first)?q({...e.authenticationOptions,allowCredentials:e.reauthenticatingCredentialFactor?[{id:l.fromBuffer(t.credentials?.[e.reauthenticatingCredentialFactor]?.id||new Uint8Array)}]:t.credentials?.second?[{id:l.fromBuffer(t.credentials.first.id)},{id:l.fromBuffer(t.credentials.second.id)}]:[{id:l.fromBuffer(t.credentials?.first.id||new Uint8Array)}]}).then(n=>e.webAuthnUserDocumentReference.set({challenge:{process:"reauthentication",processingCredential:e.reauthenticatingCredentialFactor||E.delete(),value:n.challenge}},{merge:!0}).then(()=>({operation:"create reauthentication challenge",reauthenticatingCredential:e.reauthenticatingCredentialFactor,requestOptions:n,success:!0}),i=>({code:i.code,message:i.message,operation:"create reauthentication challenge",success:!1}))):{code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"create reauthentication challenge",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"create reauthentication challenge",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"create reauthentication challenge",success:!1}));import{generateRegistrationOptions as W}from"@simplewebauthn/server";import{isoBase64URL as B,isoUint8Array as K}from"@simplewebauthn/server/helpers";var U=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>(e.registeringCredentialFactor==="second"?!t?.credentials?.second:!t?.credentials?.first)?e.registeringCredentialFactor!=="second"||t&&t.credentials?.first?W({...e.registrationOptions,attestationType:e.registrationOptions.attestationConveyancePreference!=="indirect"?e.registrationOptions.attestationConveyancePreference:"none",excludeCredentials:e.registeringCredentialFactor==="second"?[{id:B.fromBuffer(t?.credentials?.first.id||new Uint8Array)}]:void 0,userID:K.fromUTF8String(e.registrationOptions.userId)}).then(n=>e.webAuthnUserDocumentReference.set({challenge:{process:"registration",processingCredential:e.registeringCredentialFactor,value:n.challenge}},{merge:!0}).then(()=>({creationOptions:n,operation:"create registration challenge",registeringCredential:e.registeringCredentialFactor,success:!0}),i=>({code:i.code,message:i.message,operation:"create registration challenge",success:!1}))):{code:"missing-primary",message:"No primary passkey was found in Firestore.",operation:"create registration challenge",success:!1}:{code:"no-op",message:"No operation is needed.",operation:"create registration challenge",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"create registration challenge",success:!1}));import{verifyAuthenticationResponse as C}from"@simplewebauthn/server";import{isoBase64URL as h}from"@simplewebauthn/server/helpers";import{FieldValue as u,Timestamp as d}from"firebase-admin/firestore";var v=e=>(r=>r!==e.userId?e.webAuthnUserDocumentReferenceTarget.get().then(t=>(async n=>n?e.webAuthnUserDocumentReference.get().then(i=>(async s=>s?s.challenge&&s.challenge.process==="authentication"?n.credentials?.[s.challenge?.processingCredential||"first"]?C({...e.authenticationOptions,credential:{counter:n.credentials[s.challenge.processingCredential||"first"]?.counter||0,id:h.fromBuffer(n.credentials[s.challenge.processingCredential||"first"]?.id||new Uint8Array),publicKey:n.credentials[s.challenge.processingCredential||"first"]?.publicKey||new Uint8Array},expectedChallenge:s.challenge.value,requireUserVerification:(s.challenge.processingCredential==="second"&&e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged"}).then(o=>(s.lastPresent?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>o.verified?e.createCustomToken(r).then(a=>e.webAuthnUserDocumentReferenceTarget.update({challenge:u.delete(),[s.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{...n.credentials?.[s.challenge?.processingCredential||"first"],authenticatorAttachment:o.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:o.authenticationInfo.credentialBackedUp},lastCredentialUsed:"first",lastPresent:d.fromDate(new Date),lastVerified:o.authenticationInfo.userVerified?d.fromDate(new Date):n.lastVerified||u.delete(),lastWebAuthnProcess:"authentication"}).then(()=>({authenticatedCredential:s.challenge?.processingCredential||"first",customToken:a,operation:"verify authentication",success:!0}),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1})),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1})):s.challenge?.processingCredential===void 0&&n.credentials?.second?C({...e.authenticationOptions,credential:{counter:n.credentials.second.counter,id:h.fromBuffer(n.credentials.second.id),publicKey:n.credentials.second.publicKey},expectedChallenge:s.challenge?.value||""}).then(a=>a.verified?e.createCustomToken(r).then(c=>e.webAuthnUserDocumentReferenceTarget.update({challenge:u.delete(),"credentials.second":{...n.credentials?.second,authenticatorAttachment:a.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:a.authenticationInfo.credentialBackedUp},lastCredentialUsed:"second",lastPresent:d.fromDate(new Date),lastVerified:a.authenticationInfo.userVerified?d.fromDate(new Date):n.lastVerified||u.delete(),lastWebAuthnProcess:"authentication"}).then(()=>({authenticatedCredential:"second",customToken:c,operation:"verify authentication",success:!0}),f=>({code:f.code,message:f.message,operation:"verify authentication",success:!1})),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1})):(s.credentials?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),c=>({code:c.code,message:c.message,operation:"verify authentication",success:!1}))):(s.credentials?e.webAuthnUserDocumentReference.update({challenge:u.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1})),a=>({code:a.code,message:a.message,operation:"verify authentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:u.delete()}).then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify authentication",success:!1}),o=>({code:o.code,message:o.message,operation:"verify authentication",success:!1})):s.credentials?{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify authentication",success:!1}:e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify authentication",success:!1}),o=>({code:o.code,message:o.message,operation:"verify authentication",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify authentication",success:!1})(i.data()),i=>({code:i.code,message:i.message,operation:"verify authentication",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify authentication",success:!1})(t.data()),t=>({code:t.code,message:t.message,operation:"verify authentication",success:!1})):e.webAuthnUserDocumentReference.update({challenge:u.delete()}).then(()=>({code:"no-op",message:"No operation is needed.",operation:"verify authentication",success:!1}),t=>({code:t.code,message:t.message,operation:"verify authentication",success:!1})))(e.authenticationOptions.response.response.userHandle?h.toUTF8String(e.authenticationOptions.response.response.userHandle):e.userId);import{verifyAuthenticationResponse as D}from"@simplewebauthn/server";import{isoBase64URL as P}from"@simplewebauthn/server/helpers";import{FieldValue as p,Timestamp as m}from"firebase-admin/firestore";var O=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?t.challenge&&t.challenge.process==="reauthentication"?t.credentials?.[t.challenge?.processingCredential||"first"]?D({...e.authenticationOptions,credential:{counter:t?.credentials[t.challenge.processingCredential||"first"]?.counter||0,id:P.fromBuffer(t?.credentials[t.challenge.processingCredential||"first"]?.id||new Uint8Array),publicKey:t?.credentials[t.challenge.processingCredential||"first"]?.publicKey||new Uint8Array},expectedChallenge:t.challenge.value,requireUserVerification:(t.challenge.processingCredential==="second"&&e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement==="required"}).then(n=>n.verified?e.createCustomToken().then(i=>e.webAuthnUserDocumentReference.update({challenge:p.delete(),[t.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{...t.credentials?.[t.challenge?.processingCredential||"first"],authenticatorAttachment:n.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:n.authenticationInfo.credentialBackedUp},lastCredentialUsed:t.challenge?.processingCredential||"first",lastPresent:m.fromDate(new Date),lastVerified:n.authenticationInfo.userVerified?m.fromDate(new Date):t.lastVerified||p.delete(),lastWebAuthnProcess:"reauthentication"}).then(()=>({reauthenticatedCredential:t.challenge?.processingCredential||"first",customToken:i,operation:"verify reauthentication",success:!0}),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1})),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1})):t.challenge?.processingCredential===void 0&&t.credentials?.second?D({...e.authenticationOptions,credential:{counter:t.credentials.second.counter,id:P.fromBuffer(t.credentials.second.id),publicKey:t.credentials.second.publicKey},expectedChallenge:t.challenge?.value||""}).then(i=>i.verified?e.createCustomToken().then(s=>e.webAuthnUserDocumentReference.update({challenge:p.delete(),"credentials.second":{...t.credentials?.second,authenticatorAttachment:i.authenticationInfo.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:i.authenticationInfo.credentialBackedUp},lastCredentialUsed:"second",lastPresent:m.fromDate(new Date),lastVerified:i.authenticationInfo.userVerified?m.fromDate(new Date):t.lastVerified||p.delete(),lastWebAuthnProcess:"reauthentication"}).then(()=>({reauthenticatedCredential:"second",customToken:s,operation:"verify reauthentication",success:!0}),o=>({code:o.code,message:o.message,operation:"verify reauthentication",success:!1})),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1})):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"not-verified",message:"User not verified. 2",operation:"verify reauthentication",success:!1}),s=>({code:s.code,message:s.message,operation:"verify reauthentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify reauthentication",success:!1}),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1}))):e.webAuthnUserDocumentReference.update({challenge:p.delete()}).then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify reauthentication",success:!1}),n=>({code:n.code,message:n.message,operation:"verify reauthentication",success:!1})):{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify reauthentication",success:!1}:{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify reauthentication",success:!1})(r.data()));import{verifyRegistrationResponse as L}from"@simplewebauthn/server";import{isoBase64URL as _}from"@simplewebauthn/server/helpers";import{FieldValue as g,Timestamp as w}from"firebase-admin/firestore";var I=e=>e.webAuthnUserDocumentReference.get().then(r=>(async t=>t?t.challenge&&t.challenge.process==="registration"?t.challenge.processingCredential!=="second"||t.credentials?.first?L({...e.registrationOptions,expectedChallenge:t.challenge.value,requireUserVerification:(t.challenge.processingCredential==="second"?e.authenticatorAttachment2FA==="platform":e.authenticatorAttachment==="platform")&&e.userVerificationRequirement==="required"}).then(n=>n.verified?e.createCustomToken().then(i=>e.webAuthnUserDocumentReference.update({challenge:g.delete(),[t.challenge?.processingCredential==="second"?"credentials.second":"credentials.first"]:{authenticatorAttachment:n.registrationInfo?.credentialDeviceType==="multiDevice"?"platform":"cross-platform",backedUp:n.registrationInfo?.credentialBackedUp,counter:n.registrationInfo?.credential.counter,id:_.toBuffer(n.registrationInfo?.credential.id),publicKey:n.registrationInfo?.credential.publicKey||new Uint8Array},lastCredentialUsed:t.challenge?.processingCredential||"first",lastPresent:w.fromDate(new Date),lastVerified:n.registrationInfo?.userVerified?w.fromDate(new Date):t.lastVerified||g.delete(),lastWebAuthnProcess:"registration"}).then(()=>({registeredCredential:t.challenge?.processingCredential||"first",customToken:i,operation:"verify registration",success:!0}),s=>({code:s.code,message:s.message,operation:"verify registration",success:!1})),i=>({code:i.code,message:i.message,operation:"verify reauthentication",success:!1})):(t.credentials?e.webAuthnUserDocumentReference.update({challenge:g.delete()}):e.webAuthnUserDocumentReference.delete()).then(()=>({code:"not-verified",message:"User not verified.",operation:"verify authentication",success:!1}),i=>({code:i.code,message:i.message,operation:"verify authentication",success:!1}))):e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-passkey-fields",message:"User document is missing passkey fields from prior operation.",operation:"verify registration",success:!1}),n=>({code:n.code,message:n.message,operation:"verify registration",success:!1})):t.credentials?.first?{code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify registration",success:!1}:e.webAuthnUserDocumentReference.delete().then(()=>({code:"user-doc-missing-challenge-field",message:"User document is missing challenge field from prior operation.",operation:"verify registration",success:!1}),n=>({code:n.code,message:n.message,operation:"verify registration",success:!1})):{code:"missing-user-doc",message:"No user document was found in Firestore.",operation:"verify registration",success:!1})(r.data()),r=>({code:r.code,message:r.message,operation:"verify registration",success:!1}));function N(e,r){return H({enforceAppCheck:!0,ingressSettings:"ALLOW_ALL"},async t=>{if(t.auth){let n=r?V(r):V(),i=r?T(r,"ext-firebase-web-authn"):T("ext-firebase-web-authn"),s=t.auth.uid,o=i.collection("users").doc(s),a=i.collection("users").doc(t.data.operation==="verify authentication"&&t.data.authenticationResponse.response.userHandle?J.toUTF8String(t.data.authenticationResponse.response.userHandle):s);switch(t.data.operation){case"clear challenge":return R({firestore:i,userId:s});case"clear credential":return F({clearingCredential:t.data.clearingCredential,webAuthnUserDocumentReference:o});case"create authentication challenge":return y({authenticatingCredential:t.data.authenticatingCredential,authenticationOptions:{attestationType:"indirect",rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",supportedAlgorithmIDs:[-7,-8,-257]},webAuthnUserDocumentReference:o});case"create reauthentication challenge":return A({authenticationOptions:{attestationType:"indirect",rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",supportedAlgorithmIDs:[-7,-8,-257]},reauthenticatingCredentialFactor:t.data.reauthenticatingCredential,webAuthnUserDocumentReference:o});case"create registration challenge":return U({registeringCredentialFactor:t.data.registeringCredential,registrationOptions:{attestationConveyancePreference:"indirect",authenticatorSelection:t.data.registeringCredential==="second"&&e.authenticatorAttachment2FA?{authenticatorAttachment:e.authenticatorAttachment2FA,residentKey:"preferred",userVerification:e.authenticatorAttachment2FA==="platform"&&e.userVerificationRequirement!=="discouraged"?e.userVerificationRequirement:"preferred"}:e.authenticatorAttachment?{authenticatorAttachment:e.authenticatorAttachment,residentKey:"preferred",userVerification:e.authenticatorAttachment==="platform"&&e.userVerificationRequirement!=="discouraged"?e.userVerificationRequirement:"preferred"}:{residentKey:"preferred",userVerification:"preferred"},rpID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",rpName:e.relyingPartyName,supportedAlgorithmIDs:[-7,-8,-257],userId:s,userName:t.data.name},webAuthnUserDocumentReference:o});case"verify authentication":return v({authenticationOptions:{expectedOrigin:[t.rawRequest.headers.origin||"",...e.allowedOrigins||[]],expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",requireUserVerification:(e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged",response:t.data.authenticationResponse},authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:c=>n.createCustomToken(c),userId:s,userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o,webAuthnUserDocumentReferenceTarget:a});case"verify reauthentication":return O({authenticationOptions:{expectedOrigin:[t.rawRequest.headers.origin||"",...e.allowedOrigins||[]],expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",requireUserVerification:(e.authenticatorAttachment2FA||e.authenticatorAttachment)==="platform"&&e.userVerificationRequirement!=="discouraged",response:t.data.authenticationResponse},authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:()=>n.createCustomToken(s),userId:s,userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o});case"verify registration":return I({authenticatorAttachment:e.authenticatorAttachment,authenticatorAttachment2FA:e.authenticatorAttachment2FA,createCustomToken:()=>n.createCustomToken(s),registrationOptions:{expectedOrigin:[t.rawRequest.headers.origin||"",...e.allowedOrigins||[]],expectedRPID:e.relyingPartyID||t.rawRequest.headers.origin?.split("://")[1].split(":")[0]||"",response:t.data.registrationResponse},userVerificationRequirement:e.userVerificationRequirement,webAuthnUserDocumentReference:o})}}else return{code:"missing-auth",message:"No user is signed in.",operation:t.data.operation,success:!1}})}var Be=N({authenticatorAttachment:process.env.AUTHENTICATOR_ATTACHMENT==="any"?void 0:process.env.AUTHENTICATOR_ATTACHMENT,authenticatorAttachment2FA:process.env.AUTHENTICATOR_ATTACHMENT_2FA==="any"?void 0:process.env.AUTHENTICATOR_ATTACHMENT_2FA,relyingPartyName:process.env.RELYING_PARTY_NAME,relyingPartyID:process.env.RELYING_PARTY_ID,userVerificationRequirement:process.env.USER_VERIFICATION_REQUIREMENT,allowedOrigins:process.env.ALLOWED_ORIGINS?process.env.ALLOWED_ORIGINS.split(",").map(e=>e.trim()).filter(Boolean):void 0});M().length===0&&G();export{Be as api};
+diff --git a/dist/libs/extension/src/package-lock.json b/dist/libs/extension/src/package-lock.json
+index a7fadf8..c34b0c0 100644
+--- a/dist/libs/extension/src/package-lock.json
++++ b/dist/libs/extension/src/package-lock.json
+@@ -135,9 +135,9 @@
+       }
+     },
+     "node_modules/@google-cloud/firestore": {
+-      "version": "8.6.0",
+-      "resolved": "https://registry.npmjs.org/@google-cloud/firestore/-/firestore-8.6.0.tgz",
+-      "integrity": "sha512-TdvZHfwQj5B5CSDEgDqyrhdVqtOSupmBXDQPasMAJiC64tjsGvyMooNiC43fdk1TsUHeklyoZ6/vQ1TjWKVMbg==",
++      "version": "8.7.0",
++      "resolved": "https://registry.npmjs.org/@google-cloud/firestore/-/firestore-8.7.0.tgz",
++      "integrity": "sha512-EvMpZQUXkTRdweSvOu6VL6EEQwHjHAgWz2UYZR+Mj6Ao52S+TWieHbSn15jiNnEw8F8RhbZj7IGXZ1PFB1eA+A==",
+       "license": "Apache-2.0",
+       "optional": true,
+       "peer": true,
+@@ -2433,9 +2433,9 @@
+       }
+     },
+     "node_modules/jose": {
+-      "version": "6.2.3",
+-      "resolved": "https://registry.npmjs.org/jose/-/jose-6.2.3.tgz",
+-      "integrity": "sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==",
++      "version": "6.2.4",
++      "resolved": "https://registry.npmjs.org/jose/-/jose-6.2.4.tgz",
++      "integrity": "sha512-N8acGzVsQy6M/fjFcxtysNc4Q379TcM5dM/qKkNtsHFji88yANnXTr7BLeP75iPnFwBfQzM/jg2BZ9+HZrHCZA==",
+       "license": "MIT",
+       "peer": true,
+       "funding": {
+diff --git a/libs/api/src/lib/getFirebaseWebAuthnApi.ts b/libs/api/src/lib/getFirebaseWebAuthnApi.ts
+index 7b36ca8..ec12bdb 100644
+--- a/libs/api/src/lib/getFirebaseWebAuthnApi.ts
++++ b/libs/api/src/lib/getFirebaseWebAuthnApi.ts
+@@ -121,7 +121,7 @@ export function getFirebaseWebAuthnApi(
+             return verifyAuthentication(
+               {
+                 authenticationOptions:       {
+-                  expectedOrigin:          callableRequest.rawRequest.headers.origin || "",
++                  expectedOrigin:          [callableRequest.rawRequest.headers.origin || "", ...(firebaseWebAuthnConfig.allowedOrigins || [])],
+                   expectedRPID:            firebaseWebAuthnConfig.relyingPartyID || callableRequest.rawRequest.headers.origin?.split("://")[1].split(":")[0] || "",
+                   requireUserVerification: (firebaseWebAuthnConfig.authenticatorAttachment2FA || firebaseWebAuthnConfig.authenticatorAttachment) === "platform" && firebaseWebAuthnConfig.userVerificationRequirement !== "discouraged",
+                   response:                callableRequest.data.authenticationResponse,
+@@ -139,7 +139,7 @@ export function getFirebaseWebAuthnApi(
+             return verifyReauthentication(
+               {
+                 authenticationOptions:       {
+-                  expectedOrigin:          callableRequest.rawRequest.headers.origin || "",
++                  expectedOrigin:          [callableRequest.rawRequest.headers.origin || "", ...(firebaseWebAuthnConfig.allowedOrigins || [])],
+                   expectedRPID:            firebaseWebAuthnConfig.relyingPartyID || callableRequest.rawRequest.headers.origin?.split("://")[1].split(":")[0] || "",
+                   requireUserVerification: (firebaseWebAuthnConfig.authenticatorAttachment2FA || firebaseWebAuthnConfig.authenticatorAttachment) === "platform" && firebaseWebAuthnConfig.userVerificationRequirement !== "discouraged",
+                   response:                callableRequest.data.authenticationResponse,
+@@ -159,7 +159,7 @@ export function getFirebaseWebAuthnApi(
+                 authenticatorAttachment2FA:  firebaseWebAuthnConfig.authenticatorAttachment2FA,
+                 createCustomToken:           () => auth.createCustomToken(userId),
+                 registrationOptions:         {
+-                  expectedOrigin: callableRequest.rawRequest.headers.origin || "",
++                  expectedOrigin: [callableRequest.rawRequest.headers.origin || "", ...(firebaseWebAuthnConfig.allowedOrigins || [])],
+                   expectedRPID:   firebaseWebAuthnConfig.relyingPartyID || callableRequest.rawRequest.headers.origin?.split("://")[1].split(":")[0] || "",
+                   response:       callableRequest.data.registrationResponse,
+                 },
+diff --git a/libs/api/src/lib/interfaces/lib/FirebaseWebAuthnConfig.ts b/libs/api/src/lib/interfaces/lib/FirebaseWebAuthnConfig.ts
+index bcfba34..7150804 100644
+--- a/libs/api/src/lib/interfaces/lib/FirebaseWebAuthnConfig.ts
++++ b/libs/api/src/lib/interfaces/lib/FirebaseWebAuthnConfig.ts
+@@ -58,4 +58,13 @@ export interface FirebaseWebAuthnConfig {
+    *  {@link https://developers.yubico.com/WebAuthn/WebAuthn_Developer_Guide/User_Presence_vs_User_Verification.html User Presence vs User Verification}
+    */
+   "userVerificationRequirement"?: UserVerificationRequirement;
++  /**
++   * Optional list of additional origins to accept during WebAuthn verification, in addition to the
++   * request's HTTP Origin header. Required for native clients (e.g. Android passkeys) whose origin
++   * is `android:apk-key-hash:<hash>` rather than an HTTPS URL.
++   *
++   * @default
++   *  undefined
++   */
++  "allowedOrigins"?: string[];
+ }
+diff --git a/libs/api/src/lib/operations/lib/verifyAuthentication.ts b/libs/api/src/lib/operations/lib/verifyAuthentication.ts
+index f02a338..86dfc78 100644
+--- a/libs/api/src/lib/operations/lib/verifyAuthentication.ts
++++ b/libs/api/src/lib/operations/lib/verifyAuthentication.ts
+@@ -11,7 +11,7 @@ import { type DocumentReference, type DocumentSnapshot, FieldValue, Timestamp }
+ 
+ interface VerifyAuthenticationOptions {
+   authenticationOptions: {
+-    expectedOrigin: string;
++    expectedOrigin: string | string[];
+     expectedRPID: string;
+     requireUserVerification: boolean;
+     response: AuthenticationResponseJSON;
+diff --git a/libs/api/src/lib/operations/lib/verifyReauthentication.ts b/libs/api/src/lib/operations/lib/verifyReauthentication.ts
+index c9d5e02..3ecbd83 100644
+--- a/libs/api/src/lib/operations/lib/verifyReauthentication.ts
++++ b/libs/api/src/lib/operations/lib/verifyReauthentication.ts
+@@ -11,7 +11,7 @@ import { type DocumentReference, type DocumentSnapshot, FieldValue, Timestamp }
+ 
+ interface VerifyReauthenticationOptions {
+   authenticationOptions: {
+-    expectedOrigin: string;
++    expectedOrigin: string | string[];
+     expectedRPID: string;
+     requireUserVerification: boolean;
+     response: AuthenticationResponseJSON;
+diff --git a/libs/api/src/lib/operations/lib/verifyRegistration.ts b/libs/api/src/lib/operations/lib/verifyRegistration.ts
+index 9d1cf71..e6a2e1e 100644
+--- a/libs/api/src/lib/operations/lib/verifyRegistration.ts
++++ b/libs/api/src/lib/operations/lib/verifyRegistration.ts
+@@ -14,7 +14,7 @@ interface VerifyRegistrationOptions {
+   authenticatorAttachment2FA?: AuthenticatorAttachment;
+   createCustomToken: () => Promise<string>;
+   registrationOptions: {
+-    expectedOrigin: string;
++    expectedOrigin: string | string[];
+     expectedRPID: string;
+     response: RegistrationResponseJSON;
+   };
+diff --git a/libs/extension/extension.yaml b/libs/extension/extension.yaml
+index a088a53..45a378a 100644
+--- a/libs/extension/extension.yaml
++++ b/libs/extension/extension.yaml
+@@ -143,3 +143,12 @@ params:
+         value: discouraged
+     required:    true
+     type:        select
++  - param:       ALLOWED_ORIGINS
++    description: >-
++                 Optional comma-separated list of additional origins to accept during WebAuthn verification.
++                 Required for native clients such as Android apps, whose origin is in the format
++                 `android:apk-key-hash:<base64-sha256-of-signing-cert>`.
++                 Example: `android:apk-key-hash:abc123`
++    label:       Allowed Origins
++    required:    false
++    type:        string
+diff --git a/libs/extension/src/lib/api.ts b/libs/extension/src/lib/api.ts
+index aaebd11..2368471 100644
+--- a/libs/extension/src/lib/api.ts
++++ b/libs/extension/src/lib/api.ts
+@@ -17,5 +17,6 @@ export const api: CallableFunction<FunctionRequest, Promise<FunctionResponse>> =
+     relyingPartyName:            process.env["RELYING_PARTY_NAME"] as string,
+     relyingPartyID:              process.env["RELYING_PARTY_ID"] as string,
+     userVerificationRequirement: process.env["USER_VERIFICATION_REQUIREMENT"] as UserVerificationRequirement,
++    allowedOrigins:              process.env["ALLOWED_ORIGINS"] ? process.env["ALLOWED_ORIGINS"].split(",").map((o: string) => o.trim()).filter(Boolean) : undefined,
+   },
+ );
+diff --git a/package-lock.json b/package-lock.json
+index 5567002..07d1baf 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -133,78 +133,6 @@
+         "url": "https://github.com/sponsors/epoberezkin"
+       }
+     },
+-    "node_modules/@angular-devkit/architect/node_modules/chokidar": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz",
+-      "integrity": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "anymatch": "~3.1.2",
+-        "braces": "~3.0.2",
+-        "glob-parent": "~5.1.2",
+-        "is-binary-path": "~2.1.0",
+-        "is-glob": "~4.0.1",
+-        "normalize-path": "~3.0.0",
+-        "readdirp": "~3.6.0"
+-      },
+-      "engines": {
+-        "node": ">= 8.10.0"
+-      },
+-      "funding": {
+-        "url": "https://paulmillr.com/funding/"
+-      },
+-      "optionalDependencies": {
+-        "fsevents": "~2.3.2"
+-      }
+-    },
+-    "node_modules/@angular-devkit/architect/node_modules/glob-parent": {
+-      "version": "5.1.2",
+-      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+-      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+-      "dev": true,
+-      "license": "ISC",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "is-glob": "^4.0.1"
+-      },
+-      "engines": {
+-        "node": ">= 6"
+-      }
+-    },
+-    "node_modules/@angular-devkit/architect/node_modules/readdirp": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.6.0.tgz",
+-      "integrity": "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "picomatch": "^2.2.1"
+-      },
+-      "engines": {
+-        "node": ">=8.10.0"
+-      }
+-    },
+-    "node_modules/@angular-devkit/architect/node_modules/readdirp/node_modules/picomatch": {
+-      "version": "2.3.2",
+-      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-2.3.2.tgz",
+-      "integrity": "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "engines": {
+-        "node": ">=8.6"
+-      },
+-      "funding": {
+-        "url": "https://github.com/sponsors/jonschlinkert"
+-      }
+-    },
+     "node_modules/@angular-devkit/architect/node_modules/rxjs": {
+       "version": "7.8.1",
+       "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.1.tgz",
+@@ -397,78 +325,6 @@
+         "url": "https://github.com/sponsors/epoberezkin"
+       }
+     },
+-    "node_modules/@angular-devkit/build-angular/node_modules/chokidar": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz",
+-      "integrity": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "anymatch": "~3.1.2",
+-        "braces": "~3.0.2",
+-        "glob-parent": "~5.1.2",
+-        "is-binary-path": "~2.1.0",
+-        "is-glob": "~4.0.1",
+-        "normalize-path": "~3.0.0",
+-        "readdirp": "~3.6.0"
+-      },
+-      "engines": {
+-        "node": ">= 8.10.0"
+-      },
+-      "funding": {
+-        "url": "https://paulmillr.com/funding/"
+-      },
+-      "optionalDependencies": {
+-        "fsevents": "~2.3.2"
+-      }
+-    },
+-    "node_modules/@angular-devkit/build-angular/node_modules/glob-parent": {
+-      "version": "5.1.2",
+-      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+-      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+-      "dev": true,
+-      "license": "ISC",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "is-glob": "^4.0.1"
+-      },
+-      "engines": {
+-        "node": ">= 6"
+-      }
+-    },
+-    "node_modules/@angular-devkit/build-angular/node_modules/readdirp": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.6.0.tgz",
+-      "integrity": "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "picomatch": "^2.2.1"
+-      },
+-      "engines": {
+-        "node": ">=8.10.0"
+-      }
+-    },
+-    "node_modules/@angular-devkit/build-angular/node_modules/readdirp/node_modules/picomatch": {
+-      "version": "2.3.2",
+-      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-2.3.2.tgz",
+-      "integrity": "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "engines": {
+-        "node": ">=8.6"
+-      },
+-      "funding": {
+-        "url": "https://github.com/sponsors/jonschlinkert"
+-      }
+-    },
+     "node_modules/@angular-devkit/build-angular/node_modules/rxjs": {
+       "version": "7.8.1",
+       "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.1.tgz",
+@@ -1151,78 +1007,6 @@
+         "url": "https://github.com/sponsors/epoberezkin"
+       }
+     },
+-    "node_modules/@angular/cli/node_modules/chokidar": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz",
+-      "integrity": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "anymatch": "~3.1.2",
+-        "braces": "~3.0.2",
+-        "glob-parent": "~5.1.2",
+-        "is-binary-path": "~2.1.0",
+-        "is-glob": "~4.0.1",
+-        "normalize-path": "~3.0.0",
+-        "readdirp": "~3.6.0"
+-      },
+-      "engines": {
+-        "node": ">= 8.10.0"
+-      },
+-      "funding": {
+-        "url": "https://paulmillr.com/funding/"
+-      },
+-      "optionalDependencies": {
+-        "fsevents": "~2.3.2"
+-      }
+-    },
+-    "node_modules/@angular/cli/node_modules/glob-parent": {
+-      "version": "5.1.2",
+-      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+-      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+-      "dev": true,
+-      "license": "ISC",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "is-glob": "^4.0.1"
+-      },
+-      "engines": {
+-        "node": ">= 6"
+-      }
+-    },
+-    "node_modules/@angular/cli/node_modules/readdirp": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.6.0.tgz",
+-      "integrity": "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "picomatch": "^2.2.1"
+-      },
+-      "engines": {
+-        "node": ">=8.10.0"
+-      }
+-    },
+-    "node_modules/@angular/cli/node_modules/readdirp/node_modules/picomatch": {
+-      "version": "2.3.2",
+-      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-2.3.2.tgz",
+-      "integrity": "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==",
+-      "dev": true,
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "engines": {
+-        "node": ">=8.6"
+-      },
+-      "funding": {
+-        "url": "https://github.com/sponsors/jonschlinkert"
+-      }
+-    },
+     "node_modules/@angular/cli/node_modules/rxjs": {
+       "version": "7.8.1",
+       "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.1.tgz",
+@@ -1504,32 +1288,6 @@
+         "url": "https://github.com/sponsors/epoberezkin"
+       }
+     },
+-    "node_modules/@angular/fire/node_modules/chokidar": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz",
+-      "integrity": "sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==",
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "anymatch": "~3.1.2",
+-        "braces": "~3.0.2",
+-        "glob-parent": "~5.1.2",
+-        "is-binary-path": "~2.1.0",
+-        "is-glob": "~4.0.1",
+-        "normalize-path": "~3.0.0",
+-        "readdirp": "~3.6.0"
+-      },
+-      "engines": {
+-        "node": ">= 8.10.0"
+-      },
+-      "funding": {
+-        "url": "https://paulmillr.com/funding/"
+-      },
+-      "optionalDependencies": {
+-        "fsevents": "~2.3.2"
+-      }
+-    },
+     "node_modules/@angular/fire/node_modules/define-lazy-prop": {
+       "version": "2.0.0",
+       "resolved": "https://registry.npmjs.org/define-lazy-prop/-/define-lazy-prop-2.0.0.tgz",
+@@ -1539,20 +1297,6 @@
+         "node": ">=8"
+       }
+     },
+-    "node_modules/@angular/fire/node_modules/glob-parent": {
+-      "version": "5.1.2",
+-      "resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz",
+-      "integrity": "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==",
+-      "license": "ISC",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "is-glob": "^4.0.1"
+-      },
+-      "engines": {
+-        "node": ">= 6"
+-      }
+-    },
+     "node_modules/@angular/fire/node_modules/is-docker": {
+       "version": "2.2.1",
+       "resolved": "https://registry.npmjs.org/is-docker/-/is-docker-2.2.1.tgz",
+@@ -1597,34 +1341,6 @@
+         "url": "https://github.com/sponsors/sindresorhus"
+       }
+     },
+-    "node_modules/@angular/fire/node_modules/readdirp": {
+-      "version": "3.6.0",
+-      "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.6.0.tgz",
+-      "integrity": "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==",
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "dependencies": {
+-        "picomatch": "^2.2.1"
+-      },
+-      "engines": {
+-        "node": ">=8.10.0"
+-      }
+-    },
+-    "node_modules/@angular/fire/node_modules/readdirp/node_modules/picomatch": {
+-      "version": "2.3.2",
+-      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-2.3.2.tgz",
+-      "integrity": "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==",
+-      "license": "MIT",
+-      "optional": true,
+-      "peer": true,
+-      "engines": {
+-        "node": ">=8.6"
+-      },
+-      "funding": {
+-        "url": "https://github.com/sponsors/jonschlinkert"
+-      }
+-    },
+     "node_modules/@angular/fire/node_modules/source-map": {
+       "version": "0.7.4",
+       "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.7.4.tgz",
+@@ -3646,7 +3362,6 @@
+       "version": "1.5.0",
+       "resolved": "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz",
+       "integrity": "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "engines": {
+@@ -5692,7 +5407,6 @@
+       "version": "4.0.1",
+       "resolved": "https://registry.npmjs.org/@isaacs/fs-minipass/-/fs-minipass-4.0.1.tgz",
+       "integrity": "sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==",
+-      "dev": true,
+       "license": "ISC",
+       "optional": true,
+       "dependencies": {
+@@ -9486,7 +9200,6 @@
+       "version": "0.11.0",
+       "resolved": "https://registry.npmjs.org/@pkgjs/parseargs/-/parseargs-0.11.0.tgz",
+       "integrity": "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "engines": {
+@@ -15176,7 +14889,7 @@
+       "version": "2.2.1",
+       "resolved": "https://registry.npmjs.org/env-paths/-/env-paths-2.2.1.tgz",
+       "integrity": "sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">=6"
+@@ -15411,7 +15124,6 @@
+       "version": "0.6.1",
+       "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+       "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
+-      "dev": true,
+       "license": "BSD-3-Clause",
+       "optional": true,
+       "engines": {
+@@ -15790,7 +15502,7 @@
+       "version": "3.1.3",
+       "resolved": "https://registry.npmjs.org/exponential-backoff/-/exponential-backoff-3.1.3.tgz",
+       "integrity": "sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "Apache-2.0"
+     },
+     "node_modules/express": {
+@@ -16054,7 +15766,7 @@
+       "version": "6.5.0",
+       "resolved": "https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz",
+       "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">=12.0.0"
+@@ -18971,7 +18683,6 @@
+       "version": "1.7.0",
+       "resolved": "https://registry.npmjs.org/install-artifact-from-github/-/install-artifact-from-github-1.7.0.tgz",
+       "integrity": "sha512-qAb91yAKVF9rFY4rVP21ZtYUyCScxAFt9udwzVWNLBE1pQcdQeB2gd1HlNPcQNYCzCDvJ/QJQPuWQ6aTmSlU8g==",
+-      "dev": true,
+       "license": "BSD-3-Clause",
+       "optional": true,
+       "bin": {
+@@ -21732,7 +21443,6 @@
+       "version": "2.28.0",
+       "resolved": "https://registry.npmjs.org/nan/-/nan-2.28.0.tgz",
+       "integrity": "sha512-fTsDz99OTq2sVePhGdp4qQhggZFtKr64ZNVyVajRKtMOkJxYekplBh577PiJB12v/D3s2E5cGtOI45LWp6rnLQ==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true
+     },
+@@ -23201,7 +22911,6 @@
+       "version": "1.4.0",
+       "resolved": "https://registry.npmjs.org/pg-cloudflare/-/pg-cloudflare-1.4.0.tgz",
+       "integrity": "sha512-Vo7z/6rrQYxpNRylp4Tlob2elzbh+N/MOQbxFVWCxS7oEx6jF53GTJFxK2WWpKuBRkmiin4Mt+xofFDjx09R0A==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true
+     },
+@@ -24631,7 +24340,6 @@
+       "version": "1.26.0",
+       "resolved": "https://registry.npmjs.org/re2/-/re2-1.26.0.tgz",
+       "integrity": "sha512-QTEfFp0nu1eT/HKKZC+2BKM9Lb8uqprGkcHhro9r3giiKS+1SnNZBZ1m7C7Axi/VR1YGXiu3mp35UA53yHAuNw==",
+-      "dev": true,
+       "hasInstallScript": true,
+       "license": "BSD-3-Clause",
+       "optional": true,
+@@ -24651,7 +24359,6 @@
+       "version": "5.0.0",
+       "resolved": "https://registry.npmjs.org/abbrev/-/abbrev-5.0.0.tgz",
+       "integrity": "sha512-/XrFJgzQQQHpti1raDJC6m4ws6aNktmjBlhk8Fdlk7LwCEuDoieEJJY9OFHjfiFJFFRM2tK+Ky/IsfbbmlMu1w==",
+-      "dev": true,
+       "license": "ISC",
+       "optional": true,
+       "engines": {
+@@ -24662,7 +24369,6 @@
+       "version": "3.0.0",
+       "resolved": "https://registry.npmjs.org/chownr/-/chownr-3.0.0.tgz",
+       "integrity": "sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==",
+-      "dev": true,
+       "license": "BlueOak-1.0.0",
+       "optional": true,
+       "engines": {
+@@ -24673,7 +24379,6 @@
+       "version": "4.0.0",
+       "resolved": "https://registry.npmjs.org/isexe/-/isexe-4.0.0.tgz",
+       "integrity": "sha512-FFUtZMpoZ8RqHS3XeXEmHWLA4thH+ZxCv2lOiPIn1Xc7CxrqhWzNSDzD+/chS/zbYezmiwWLdQC09JdQKmthOw==",
+-      "dev": true,
+       "license": "BlueOak-1.0.0",
+       "optional": true,
+       "engines": {
+@@ -24684,7 +24389,6 @@
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/minizlib/-/minizlib-3.1.0.tgz",
+       "integrity": "sha512-KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -24698,7 +24402,6 @@
+       "version": "13.0.1",
+       "resolved": "https://registry.npmjs.org/node-gyp/-/node-gyp-13.0.1.tgz",
+       "integrity": "sha512-piOr0S10qy5THB+q5BdqkoOx65XL/tjTMUAit3vciPNp+snTOBnGunWH1Rz7XZUxf2T9uFrfT/Ty4+aC3yPeyg==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -24724,7 +24427,6 @@
+       "version": "10.0.1",
+       "resolved": "https://registry.npmjs.org/nopt/-/nopt-10.0.1.tgz",
+       "integrity": "sha512-df3sBr/6ax9hSGuC3CspvLlbnX8cP5L5nZwXF8cGN8l0zSWR6BvzmQ6jPUKjvo6+/xdpkNvEcucBNUdBeeV13g==",
+-      "dev": true,
+       "license": "ISC",
+       "optional": true,
+       "dependencies": {
+@@ -24741,7 +24443,6 @@
+       "version": "7.0.0",
+       "resolved": "https://registry.npmjs.org/proc-log/-/proc-log-7.0.0.tgz",
+       "integrity": "sha512-FYgfaA69XZ93zaXLoMNQ+ViDXGGBgR8aLh03txzcFhV+9xOXx7+8DLCULrKKpR9+GsH9ZfHm82aSUPpozX0Ztg==",
+-      "dev": true,
+       "license": "ISC",
+       "optional": true,
+       "engines": {
+@@ -24752,7 +24453,6 @@
+       "version": "7.5.20",
+       "resolved": "https://registry.npmjs.org/tar/-/tar-7.5.20.tgz",
+       "integrity": "sha512-9FcyK4PA6+WbzlTM9WhQm6vB5W7cP7dUiPsv1g7YDwEQnQ1CGpK3MGlKk/ITVWMk05kHZuBhmVhiv8LZoy/PFQ==",
+-      "dev": true,
+       "license": "BlueOak-1.0.0",
+       "optional": true,
+       "dependencies": {
+@@ -24770,7 +24470,6 @@
+       "version": "8.8.0",
+       "resolved": "https://registry.npmjs.org/undici/-/undici-8.8.0.tgz",
+       "integrity": "sha512-ubshXMXwF3MQIMF1y/WxZdNBnjEKeSg2wF5mcGUtU55YTw34tnVVpKRlLf7ruDXZ5344KokPVX4RBx1wJm64Bw==",
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "engines": {
+@@ -24781,7 +24480,6 @@
+       "version": "7.0.0",
+       "resolved": "https://registry.npmjs.org/which/-/which-7.0.0.tgz",
+       "integrity": "sha512-RancgH2dmbLdHl6LRhEqvklWMgl/Hdnun0Y90KhBOLkMefg8Qa7/Zel8Sm+8HEcP6DEjzsWzpkuBQEZok58isA==",
+-      "dev": true,
+       "license": "ISC",
+       "optional": true,
+       "dependencies": {
+@@ -24798,7 +24496,6 @@
+       "version": "5.0.0",
+       "resolved": "https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz",
+       "integrity": "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==",
+-      "dev": true,
+       "license": "BlueOak-1.0.0",
+       "optional": true,
+       "engines": {
+@@ -27949,7 +27646,7 @@
+       "version": "0.2.17",
+       "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz",
+       "integrity": "sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "dependencies": {
+         "fdir": "^6.5.0",
+@@ -27966,7 +27663,7 @@
+       "version": "4.0.5",
+       "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.5.tgz",
+       "integrity": "sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==",
+-      "dev": true,
++      "devOptional": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">=12"
