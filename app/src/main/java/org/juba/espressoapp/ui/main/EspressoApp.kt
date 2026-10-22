@@ -17,12 +17,16 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -30,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.juba.espressoapp.designsystem.toolbar.FloatingNavItem
 import org.juba.espressoapp.designsystem.toolbar.FloatingNavigationBar
+import org.juba.espressoapp.ui.auth.AuthScreen
 import org.juba.espressoapp.ui.coffee.CoffeeHomeScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanDetailScreen
 import org.juba.espressoapp.ui.coffee.coffeebean.CoffeeBeanFormScreen
@@ -52,12 +57,35 @@ import org.juba.espressoapp.ui.shots.ShotLogDetailScreen
 import org.juba.espressoapp.ui.shots.ShotLogFormScreen
 import org.juba.espressoapp.ui.shots.ShotsScreen
 
-@PreviewScreenSizes
 @Composable
 fun EspressoApp() {
     val navController = rememberNavController()
     val currentEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentEntry?.destination?.route
+
+    val appViewModel: AppViewModel = hiltViewModel()
+    val showWelcome by appViewModel.showWelcome.collectAsStateWithLifecycle()
+
+    // Freeze the start destination so the nav graph is created only once. Later changes are
+    // handled by navigation instead of by recreating the graph.
+    var startDestination by remember {
+        mutableStateOf(showWelcome?.let { if (it) AppRoutes.AUTH else AppRoutes.SHOTS })
+    }
+    LaunchedEffect(showWelcome) {
+        val welcome = showWelcome
+        if (startDestination == null && welcome != null) {
+            startDestination = if (welcome) AppRoutes.AUTH else AppRoutes.SHOTS
+        }
+    }
+
+    // Return to the welcome screen when the session ends, for example after signing out.
+    LaunchedEffect(showWelcome, currentRoute) {
+        if (showWelcome == true && currentRoute != null && currentRoute != AppRoutes.AUTH) {
+            navController.navigate(AppRoutes.AUTH) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     val showNavBar = currentRoute in showBottomNavBar
 
@@ -123,7 +151,17 @@ fun EspressoApp() {
                 Box(modifier = Modifier
                     .padding(top = innerPadding.calculateTopPadding())
                     .fillMaxSize()) {
-                    NavHost(navController = navController, startDestination = AppRoutes.SHOTS) {
+                    startDestination?.let { destination ->
+                        NavHost(navController = navController, startDestination = destination) {
+                        composable(AppRoutes.AUTH) {
+                            AuthScreen(
+                                onAuthSuccess = {
+                                    navController.navigate(AppRoutes.SHOTS) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                },
+                            )
+                        }
                         composable(AppRoutes.SHOTS) {
                             ShotsScreen(
                                 onShotClick = { id -> navController.navigate("shot_detail/$id") },
@@ -260,7 +298,12 @@ fun EspressoApp() {
                         ) {
                             FilterBasketFormScreen(onDismiss = { navController.popBackStack() })
                         }
-                        composable(AppRoutes.SETTINGS) { SettingsScreen() }
+                        composable(AppRoutes.SETTINGS) {
+                            SettingsScreen(
+                                onSignInClick = { navController.navigate(AppRoutes.AUTH) },
+                            )
+                        }
+                        }
                     }
                 }
             }

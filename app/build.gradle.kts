@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -67,6 +68,16 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.credentials.play.services)
+    implementation(libs.googleid)
+    implementation(libs.datastore.preferences)
+
+    // Import the Firebase BoM
+    implementation(platform(libs.firebase.bom))
+    // BoM manages the version — no version numbers needed here
+    implementation(libs.firebase.auth)
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)

@@ -197,4 +197,19 @@
     <string name="copy_shot_dialog_title">Copy Shot</string>
     <string name="copy_shot_dialog_date_label">Shot date</string>
     <string name="copy_shot_success">Shot copied</string>
+
+    <!-- Settings — account section -->
+    <string name="settings_account_section_title">Account</string>
+    <string name="settings_sign_out_button">Sign Out</string>
+    <string name="settings_sign_in_button">Sign in with Google</string>
+    <string name="settings_guest_message">You are using the app without an account.</string>
+
+    <!-- Auth screen -->
+    <string name="auth_title">Welcome</string>
+    <string name="auth_subtitle">Sign in with Google, or continue without an account.</string>
+    <string name="auth_google_sign_in_button">Continue with Google</string>
+    <string name="auth_continue_as_guest">Continue without an account</string>
+    <string name="auth_error_cancelled">Sign-in cancelled</string>
+    <string name="auth_error_no_account">No Google account found on this device</string>
+    <string name="auth_error_generic">Sign-in failed. Please try again.</string>
 </resources>

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
@@ -41,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.juba.espressoapp.R
+import org.juba.espressoapp.domain.model.AuthUser
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.util.Calendar
 
 @Composable
 fun SettingsScreen(
+    onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -116,6 +120,8 @@ fun SettingsScreen(
             showImportConfirmDialog = false
             pendingImportUri = null
         },
+        onSignOutClick = { viewModel.signOut() },
+        onSignInClick = onSignInClick,
         modifier = modifier,
     )
 }
@@ -129,6 +135,8 @@ private fun SettingsContent(
     onImportClick: () -> Unit,
     onImportConfirm: () -> Unit,
     onImportDismiss: () -> Unit,
+    onSignOutClick: () -> Unit,
+    onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (showImportConfirmDialog) {
@@ -204,6 +212,59 @@ private fun SettingsContent(
                     Text(stringResource(R.string.settings_import_button))
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.settings_account_section_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(4.dp))
+
+            val account = uiState.account
+            if (account == null) {
+                Text(
+                    text = stringResource(R.string.settings_guest_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                OutlinedButton(
+                    onClick = onSignInClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        Icon(
+                            Icons.Filled.AccountCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.settings_sign_in_button))
+                    }
+                }
+            } else {
+                Text(
+                    text = account.email ?: account.displayName.orEmpty(),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+
+                OutlinedButton(
+                    onClick = onSignOutClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.settings_sign_out_button))
+                    }
+                }
+            }
         }
     }
 }
@@ -227,6 +288,8 @@ private fun SettingsContentPreview() {
             onImportClick = {},
             onImportConfirm = {},
             onImportDismiss = {},
+            onSignOutClick = {},
+            onSignInClick = {},
         )
     }
 }
@@ -242,6 +305,31 @@ private fun SettingsContentInProgressPreview() {
             onImportClick = {},
             onImportConfirm = {},
             onImportDismiss = {},
+            onSignOutClick = {},
+            onSignInClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsContentSignedInPreview() {
+    EspressoAppTheme {
+        SettingsContent(
+            uiState = SettingsUiState(
+                account = AuthUser(
+                    uid = "uid",
+                    displayName = "Manu",
+                    email = "manu@example.com",
+                ),
+            ),
+            showImportConfirmDialog = false,
+            onExportClick = {},
+            onImportClick = {},
+            onImportConfirm = {},
+            onImportDismiss = {},
+            onSignOutClick = {},
+            onSignInClick = {},
         )
     }
 }
