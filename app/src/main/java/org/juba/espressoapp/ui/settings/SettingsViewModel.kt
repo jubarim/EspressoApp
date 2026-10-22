@@ -5,28 +5,37 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.juba.espressoapp.domain.repository.AuthRepository
 import org.juba.espressoapp.domain.repository.BackupRepository
+import org.juba.espressoapp.domain.repository.PreferencesRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val backupRepository: BackupRepository,
     private val authRepository: AuthRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private val _backupState = MutableStateFlow(SettingsUiState())
+
+    val uiState: StateFlow<SettingsUiState> = combine(
+        _backupState,
+        authRepository.currentUser(),
+    ) { state, user -> state.copy(account = user) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun export(uri: Uri) {
         viewModelScope.launch {
-            _uiState.update { it.copy(exportState = BackupOperation.InProgress) }
+            _backupState.update { it.copy(exportState = BackupOperation.InProgress) }
             val result = backupRepository.exportBackup(uri)
-            _uiState.update {
+            _backupState.update {
                 it.copy(
                     exportState = if (result.isSuccess) BackupOperation.Success
                     else BackupOperation.Error(result.exceptionOrNull()?.message ?: "Export failed"),
@@ -37,9 +46,9 @@ class SettingsViewModel @Inject constructor(
 
     fun import(uri: Uri) {
         viewModelScope.launch {
-            _uiState.update { it.copy(importState = BackupOperation.InProgress) }
+            _backupState.update { it.copy(importState = BackupOperation.InProgress) }
             val result = backupRepository.importBackup(uri)
-            _uiState.update {
+            _backupState.update {
                 it.copy(
                     importState = if (result.isSuccess) BackupOperation.Success
                     else BackupOperation.Error(result.exceptionOrNull()?.message ?: "Import failed"),
@@ -48,11 +57,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun clearExportState() = _uiState.update { it.copy(exportState = BackupOperation.Idle) }
-    fun clearImportState() = _uiState.update { it.copy(importState = BackupOperation.Idle) }
+    fun clearExportState() = _backupState.update { it.copy(exportState = BackupOperation.Idle) }
+    fun clearImportState() = _backupState.update { it.copy(importState = BackupOperation.Idle) }
 
-    /** Signs the user out. The app-level auth state observer handles navigation to the auth screen. */
+    /** Signs the user out and returns the app to the welcome screen. */
     fun signOut() {
-        viewModelScope.launch { authRepository.signOut() }
+        viewModelScope.launch {
+            authRepository.signOut()
+            preferencesRepository.resetOnboarding()
+        }
     }
 }

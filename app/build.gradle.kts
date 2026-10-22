@@ -71,13 +71,13 @@ dependencies {
 
     implementation(libs.androidx.credentials)
     implementation(libs.credentials.play.services)
+    implementation(libs.googleid)
     implementation(libs.datastore.preferences)
 
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
     // BoM manages the version — no version numbers needed here
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.functions)
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)
@@ -90,6 +90,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(platform(libs.firebase.bom))
-    debugImplementation(libs.firebase.appcheck.debug)
 }

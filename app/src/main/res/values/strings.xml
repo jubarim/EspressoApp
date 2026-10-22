@@ -201,16 +201,15 @@
     <!-- Settings — account section -->
     <string name="settings_account_section_title">Account</string>
     <string name="settings_sign_out_button">Sign Out</string>
+    <string name="settings_sign_in_button">Sign in with Google</string>
+    <string name="settings_guest_message">You are using the app without an account.</string>
 
     <!-- Auth screen -->
     <string name="auth_title">Welcome</string>
-    <string name="auth_subtitle">Sign in with your passkey to continue, or create one if this is your first time.</string>
-    <string name="auth_display_name_label">Your name</string>
-    <string name="auth_sign_in_button">Sign in with Passkey</string>
-    <string name="auth_register_button">Create Passkey</string>
-    <string name="auth_name_empty_error">Please enter your name</string>
-    <string name="auth_returning_hello">Hello, %1$s</string>
-    <string name="auth_returning_subtitle">Tap to sign in with your passkey</string>
-    <string name="auth_fingerprint_content_desc">Sign in with passkey</string>
-    <string name="auth_switch_account">Switch Account</string>
+    <string name="auth_subtitle">Sign in with Google, or continue without an account.</string>
+    <string name="auth_google_sign_in_button">Continue with Google</string>
+    <string name="auth_continue_as_guest">Continue without an account</string>
+    <string name="auth_error_cancelled">Sign-in cancelled</string>
+    <string name="auth_error_no_account">No Google account found on this device</string>
+    <string name="auth_error_generic">Sign-in failed. Please try again.</string>
 </resources>

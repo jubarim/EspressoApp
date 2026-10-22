@@ -1,31 +1,28 @@
 package org.juba.espressoapp.ui.auth
 
 import android.app.Activity
-import android.util.Log
-import androidx.credentials.CreatePublicKeyCredentialRequest
-import androidx.credentials.CreatePublicKeyCredentialResponse
+import androidx.annotation.StringRes
 import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetPublicKeyCredentialOption
-import androidx.credentials.PublicKeyCredential
-import androidx.credentials.exceptions.CreateCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.repository.AuthRepository
+import org.juba.espressoapp.domain.repository.PreferencesRepository
 import javax.inject.Inject
-
-private const val TAG = "jm_PasskeyAuth"
 
 sealed class AuthEvent {
     data object NavigateToMain : AuthEvent()
@@ -34,6 +31,7 @@ sealed class AuthEvent {
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val preferencesRepository: PreferencesRepository,
     private val credentialManager: CredentialManager,
 ) : ViewModel() {
 
@@ -43,80 +41,47 @@ class AuthViewModel @Inject constructor(
     private val _events = MutableSharedFlow<AuthEvent>()
     val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
 
-    /** Emits the locally persisted display name; null means no returning user is known. */
-    val savedDisplayName: StateFlow<String?> = authRepository.getSavedDisplayName()
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
-    /** Registers a new passkey for [displayName], using [activity] to anchor the system UI. */
-    fun register(displayName: String, activity: Activity) {
-        if (!validate(displayName)) return
-        Log.d(TAG, "register: starting passkey registration for '$displayName'")
+    /**
+     * Starts the Google sign-in flow, using [activity] to anchor the system UI.
+     *
+     * @param serverClientId OAuth web client ID the Google ID token is issued for.
+     */
+    fun signInWithGoogle(activity: Activity, serverClientId: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            authRepository.prepareRegistration(displayName)
-                .mapCatching { challengeJson ->
-                    Log.d(TAG, "register: challenge ready, showing biometric prompt")
-                    val request = CreatePublicKeyCredentialRequest(requestJson = challengeJson)
-                    val result = credentialManager.createCredential(activity, request)
-                    Log.d(TAG, "register: biometric prompt completed, sending credential to server")
-                    (result as CreatePublicKeyCredentialResponse).registrationResponseJson
-                }
-                .mapCatching { responseJson ->
-                    authRepository.completeRegistration(responseJson).getOrThrow()
-                }
+            runCatching { requestGoogleIdToken(activity, serverClientId) }
+                .mapCatching { idToken -> authRepository.signInWithGoogle(idToken).getOrThrow() }
                 .onSuccess {
-                    Log.d(TAG, "register: registration successful")
-                    authRepository.saveDisplayName(displayName)
+                    preferencesRepository.setOnboardingComplete()
                     onAuthSuccess()
                 }
-                .onFailure {
-                    Log.e(TAG, "register: FAILED", it)
-                    _uiState.value = AuthUiState.Error(it.toUserMessage())
-                }
+                .onFailure { _uiState.value = AuthUiState.Error(it.toUserMessageRes()) }
         }
     }
 
-    /** Signs in using an existing passkey for [displayName], using [activity] to anchor the system UI. */
-    fun signIn(displayName: String, activity: Activity) {
-        if (!validate(displayName)) return
-        Log.d(TAG, "signIn: starting passkey sign-in for '$displayName'")
+    /** Skips sign-in and enters the app in guest mode, without creating an account. */
+    fun continueAsGuest() {
         viewModelScope.launch {
-            _uiState.value = AuthUiState.Loading
-            authRepository.getLoginChallenge(displayName)
-                .mapCatching { challengeJson ->
-                    Log.d(TAG, "signIn: challenge ready, showing biometric prompt")
-                    val option = GetPublicKeyCredentialOption(requestJson = challengeJson)
-                    val request = GetCredentialRequest(listOf(option))
-                    val result = credentialManager.getCredential(activity, request)
-                    Log.d(TAG, "signIn: biometric prompt completed, sending assertion to server")
-                    (result.credential as PublicKeyCredential).authenticationResponseJson
-                }
-                .mapCatching { authResponseJson ->
-                    authRepository.completeLogin(authResponseJson).getOrThrow()
-                }
-                .onSuccess {
-                    Log.d(TAG, "signIn: sign-in successful")
-                    authRepository.saveDisplayName(displayName)
-                    onAuthSuccess()
-                }
-                .onFailure {
-                    Log.e(TAG, "signIn: FAILED", it)
-                    _uiState.value = AuthUiState.Error(it.toUserMessage())
-                }
+            preferencesRepository.setOnboardingComplete()
+            onAuthSuccess()
         }
     }
 
-    /** Clears the persisted user so the new-user screen is shown on the next visit. */
-    fun clearSavedUser() {
-        viewModelScope.launch { authRepository.clearSavedDisplayName() }
-    }
+    private suspend fun requestGoogleIdToken(activity: Activity, serverClientId: String): String {
+        val option = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(serverClientId)
+            .setAutoSelectEnabled(false)
+            .build()
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(option)
+            .build()
 
-    private fun validate(displayName: String): Boolean {
-        if (displayName.isBlank()) {
-            _uiState.value = AuthUiState.Error("Please enter your name")
-            return false
+        val credential = credentialManager.getCredential(activity, request).credential
+        check(credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            "Unexpected credential type: ${credential.type}"
         }
-        return true
+        return GoogleIdTokenCredential.createFrom(credential.data).idToken
     }
 
     private suspend fun onAuthSuccess() {
@@ -124,9 +89,10 @@ class AuthViewModel @Inject constructor(
         _events.emit(AuthEvent.NavigateToMain)
     }
 
-    private fun Throwable.toUserMessage(): String = when (this) {
-        is GetCredentialCancellationException -> "Sign-in cancelled"
-        is CreateCredentialCancellationException -> "Passkey creation cancelled"
-        else -> message ?: "An unexpected error occurred"
+    @StringRes
+    private fun Throwable.toUserMessageRes(): Int = when (this) {
+        is GetCredentialCancellationException -> R.string.auth_error_cancelled
+        is NoCredentialException -> R.string.auth_error_no_account
+        else -> R.string.auth_error_generic
     }
 }
