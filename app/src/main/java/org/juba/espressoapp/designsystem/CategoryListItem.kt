@@ -20,9 +20,10 @@ fun CategoryListItem(
     modifier: Modifier = Modifier,
 ) {
     ListItem(
-        headlineContent = { Text(label) },
         modifier = modifier.clickable(onClick = onClick),
-    )
+    ) {
+        Text(label)
+    }
     HorizontalDivider()
 }
 

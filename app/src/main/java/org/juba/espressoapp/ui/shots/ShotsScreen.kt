@@ -129,10 +129,6 @@ private fun ShotsScreenContent(
 @Composable
 private fun ShotListItem(shot: ShotLog, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ListItem(
-        headlineContent = {
-            val headline = shot.coffeeBeanName ?: "Unknown Bean"
-            Text(headline)
-        },
         supportingContent = {
             val parts = buildList {
                 add("%.1fg → %.1fg".format(shot.doseGrams, shot.yieldGrams))
@@ -149,7 +145,10 @@ private fun ShotListItem(shot: ShotLog, onClick: () -> Unit, modifier: Modifier 
             )
         },
         modifier = modifier.clickable(onClick = onClick),
-    )
+    ) {
+        val headline = shot.coffeeBeanName ?: "Unknown Bean"
+        Text(headline)
+    }
 }
 
 @Composable

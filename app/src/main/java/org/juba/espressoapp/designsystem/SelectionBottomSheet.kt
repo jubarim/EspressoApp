@@ -13,8 +13,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,8 +56,13 @@ fun SelectionBottomSheet(
     multiSelect: Boolean = false,
     skipPartiallyExpanded: Boolean = false,
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = if (skipPartiallyExpanded) {
+            setOf(SheetValue.Hidden, SheetValue.Expanded)
+        } else {
+            setOf(SheetValue.Hidden, SheetValue.PartiallyExpanded, SheetValue.Expanded)
+        },
     )
 
     ModalBottomSheet(
@@ -116,7 +122,6 @@ private fun SelectionBottomSheetContent(
             items(filteredOptions, key = { it.key }) { option ->
                 if (multiSelect) {
                     ListItem(
-                        headlineContent = { Text(option.label) },
                         trailingContent = {
                             Checkbox(
                                 checked = option.key in pendingKeys,
@@ -129,15 +134,18 @@ private fun SelectionBottomSheetContent(
                                 },
                             )
                         },
-                    )
+                    ) {
+                        Text(option.label)
+                    }
                 } else {
                     ListItem(
-                        headlineContent = { Text(option.label) },
                         modifier = Modifier.clickable {
                             onConfirm(setOf(option.key))
                             onDismiss()
                         },
-                    )
+                    ) {
+                        Text(option.label)
+                    }
                 }
             }
         }

@@ -116,11 +116,12 @@ private fun GrinderListContent(
                 ) {
                     items(state.grinders, key = { it.id }) { grinder ->
                         ListItem(
-                            headlineContent = { Text("${grinder.brand} ${grinder.model}") },
                             supportingContent = grinder.burrType?.let { type -> { Text(type) } },
                             leadingContent = { GrinderAvatar(grinder) },
                             modifier = Modifier.clickable { onGrinderClick(grinder.id) },
-                        )
+                        ) {
+                            Text("${grinder.brand} ${grinder.model}")
+                        }
                         HorizontalDivider()
                     }
                 }

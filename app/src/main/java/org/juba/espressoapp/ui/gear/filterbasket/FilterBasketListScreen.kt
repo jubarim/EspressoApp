@@ -116,14 +116,13 @@ private fun FilterBasketListContent(
                 ) {
                     items(state.baskets, key = { it.id }) { basket ->
                         ListItem(
-                            headlineContent = {
-                                val label = if (basket.model != null) "${basket.brand} ${basket.model}" else basket.brand
-                                Text(label)
-                            },
                             supportingContent = basket.type?.let { type -> { Text(type) } },
                             leadingContent = { FilterBasketAvatar(basket) },
                             modifier = Modifier.clickable { onBasketClick(basket.id) },
-                        )
+                        ) {
+                            val label = if (basket.model != null) "${basket.brand} ${basket.model}" else basket.brand
+                            Text(label)
+                        }
                         HorizontalDivider()
                     }
                 }

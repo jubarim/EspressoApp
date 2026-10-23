@@ -98,12 +98,13 @@ fun CoffeeBeanListScreen(
                 ) {
                     items(state.beans, key = { it.id }) { bean ->
                         ListItem(
-                            headlineContent = { Text(bean.name) },
                             supportingContent = bean.roasterName
                                 ?.let { roaster -> { Text(roaster) } },
                             leadingContent = { CoffeeBeanAvatar(bean) },
                             modifier = Modifier.clickable { onBeanClick(bean.id) },
-                        )
+                        ) {
+                            Text(bean.name)
+                        }
                         HorizontalDivider()
                     }
                 }

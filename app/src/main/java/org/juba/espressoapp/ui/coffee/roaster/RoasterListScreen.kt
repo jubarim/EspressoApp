@@ -98,14 +98,15 @@ fun RoasterListScreen(
                 ) {
                     items(state.roasters, key = { it.id }) { roaster ->
                         ListItem(
-                            headlineContent = { Text(roaster.name) },
                             supportingContent = listOfNotNull(roaster.city, roaster.country)
                                 .joinToString(", ")
                                 .ifEmpty { null }
                                 ?.let { location -> { Text(location) } },
                             leadingContent = { RoasterAvatar(roaster) },
                             modifier = Modifier.clickable { onRoasterClick(roaster.id) },
-                        )
+                        ) {
+                            Text(roaster.name)
+                        }
                         HorizontalDivider()
                     }
                 }

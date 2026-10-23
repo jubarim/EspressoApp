@@ -116,11 +116,12 @@ private fun EspressoMachineListContent(
                 ) {
                     items(state.machines, key = { it.id }) { machine ->
                         ListItem(
-                            headlineContent = { Text("${machine.brand} ${machine.model}") },
                             supportingContent = machine.boilerType?.let { type -> { Text(type) } },
                             leadingContent = { EspressoMachineAvatar(machine) },
                             modifier = Modifier.clickable { onMachineClick(machine.id) },
-                        )
+                        ) {
+                            Text("${machine.brand} ${machine.model}")
+                        }
                         HorizontalDivider()
                     }
                 }
