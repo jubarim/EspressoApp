@@ -45,6 +45,8 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.toolbar.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.designsystem.QuickCopyDialog
+import org.juba.espressoapp.designsystem.StarRating
+import org.juba.espressoapp.designsystem.StarRatingOrientation
 import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.ShotLog
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
@@ -205,9 +207,6 @@ private fun ShotLogDetailContent(shot: ShotLog, modifier: Modifier = Modifier) {
             shot.preInfusionSeconds?.let {
                 DetailRow(label = stringResource(R.string.shot_label_pre_infusion), value = "${it}s")
             }
-            shot.rating?.let {
-                DetailRow(label = stringResource(R.string.shot_label_rating), value = "$it / 5")
-            }
             shot.notes?.let {
                 DetailRow(label = stringResource(R.string.shot_label_notes), value = it)
             }
@@ -226,50 +225,64 @@ private fun ShotMetricsCard(shot: ShotLog, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = "1:%.1f".format(shot.ratio),
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold,
-                color = contentColor,
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "%.1fg".format(shot.doseGrams),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = contentColor,
-                    )
-                    Text(
-                        text = stringResource(R.string.shot_label_dose),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColor.copy(alpha = 0.7f),
-                    )
-                }
                 Text(
-                    text = "→",
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "1:%.1f".format(shot.ratio),
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
                     color = contentColor,
-                    modifier = Modifier.align(Alignment.CenterVertically),
                 )
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "%.1fg".format(shot.doseGrams),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = contentColor,
+                        )
+                        Text(
+                            text = stringResource(R.string.shot_label_dose),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor.copy(alpha = 0.7f),
+                        )
+                    }
                     Text(
-                        text = "%.1fg".format(shot.yieldGrams),
+                        text = "→",
                         style = MaterialTheme.typography.titleLarge,
                         color = contentColor,
+                        modifier = Modifier.align(Alignment.CenterVertically),
                     )
-                    Text(
-                        text = stringResource(R.string.shot_label_yield),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColor.copy(alpha = 0.7f),
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "%.1fg".format(shot.yieldGrams),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = contentColor,
+                        )
+                        Text(
+                            text = stringResource(R.string.shot_label_yield),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor.copy(alpha = 0.7f),
+                        )
+                    }
                 }
+            }
+
+            shot.rating?.let { rating ->
+                StarRating(
+                    rating = rating,
+                    orientation = StarRatingOrientation.Vertical,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 24.dp),
+                )
             }
         }
     }

@@ -36,6 +36,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.EmptyStateContent
+import org.juba.espressoapp.designsystem.StarRating
 import org.juba.espressoapp.ui.main.LocalNavBarPadding
 import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.ShotLog
@@ -140,11 +141,21 @@ private fun ShotListItem(shot: ShotLog, onClick: () -> Unit, modifier: Modifier 
         },
         leadingContent = { RatioBadge(ratio = shot.ratio, basketSizeClass = shot.basketSizeClass) },
         trailingContent = {
-            Text(
-                text = formatShotDate(shot.shotAt),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = formatShotDate(shot.shotAt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                shot.rating?.let { rating ->
+                    StarRating(
+                        rating = rating,
+                        starSize = 12.dp,
+                        spacing = 1.dp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         },
         modifier = modifier.clickable(onClick = onClick),
     ) {
@@ -243,7 +254,7 @@ private fun ShotsScreenWithShotsPreview() {
                         basketName = "IMS 22g", basketSizeClass = FilterBasketSize.TRIPLE,
                         grindSetting = null, doseGrams = 22.0,
                         yieldGrams = 66.0, ratio = 3.0, extractionTimeSeconds = null,
-                        brewTemperatureCelsius = null, preInfusionSeconds = null, rating = null,
+                        brewTemperatureCelsius = null, preInfusionSeconds = null, rating = 2,
                         notes = null, shotAt = now - 172_800_000L, createdAt = now, updatedAt = now,
                     ),
                 ),

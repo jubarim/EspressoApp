@@ -144,6 +144,7 @@
     <string name="shot_log_list_empty_no_shots">No shots logged yet.\nTap + to log your first shot.</string>
     <string name="shot_log_add">Log Shot</string>
     <string name="cd_add_shot">Log a shot</string>
+    <string name="cd_star_rating">Rating: %1$d out of %2$d</string>
     <string name="go_to_gear">Go to Gear</string>
 
     <!-- Shot log form -->
@@ -177,7 +178,6 @@
     <string name="shot_label_extraction_time">Extraction Time</string>
     <string name="shot_label_brew_temperature">Brew Temperature</string>
     <string name="shot_label_pre_infusion">Pre-Infusion</string>
-    <string name="shot_label_rating">Rating</string>
     <string name="shot_label_notes">Notes</string>
     <string name="shot_label_shot_date">Shot Date</string>
 
