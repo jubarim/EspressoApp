@@ -14,7 +14,7 @@ A local-first Android app for logging espresso shots. Helps home and prosumer ba
 
 | | |
 |---|---|
-| Language | Kotlin 2.3 (K2 compiler) |
+| Language | Kotlin 2.4 (K2 compiler) |
 | UI | Jetpack Compose + Material 3 Expressive |
 | Architecture | MVVM / MVI, single-module |
 | Database | Room (local, offline-first) |
@@ -26,15 +26,18 @@ A local-first Android app for logging espresso shots. Helps home and prosumer ba
 
 ```
 app/src/main/java/org/juba/espressoapp/
-├── data/           — Room entities, DAOs, repository implementations, mappers
-├── domain/         — Domain models, repository interfaces, use cases
+├── data/           — Room entities, DAOs, repository implementations, mappers, backup
+├── domain/         — Domain models, repository interfaces, shared utilities
+├── designsystem/   — Reusable M3 components and input fields
+├── extensions/     — Kotlin extension functions
 ├── ui/             — Composables, ViewModels, UiState
 │   ├── auth/       — Google sign-in and guest mode
 │   ├── coffee/     — Roasters and coffee beans
 │   ├── gear/       — Grinders, machines, baskets
-│   ├── shots/      — Shot log list and form
+│   ├── main/       — Root scaffold and navigation
 │   ├── settings/   — App preferences, account, and sign-out
-│   └── designsystem/ — Reusable M3 components
+│   ├── shots/      — Shot list, detail, and form
+│   └── theme/      — Color scheme, typography, and semantic colors
 ```
 
 ## Setup
