@@ -37,8 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.ui.main.LocalNavBarPadding
+import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.ShotLog
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
+import org.juba.espressoapp.ui.theme.LocalBasketBadgeColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -136,7 +138,7 @@ private fun ShotListItem(shot: ShotLog, onClick: () -> Unit, modifier: Modifier 
             }
             Text(parts.joinToString(" · "))
         },
-        leadingContent = { RatioBadge(ratio = shot.ratio) },
+        leadingContent = { RatioBadge(ratio = shot.ratio, basketSizeClass = shot.basketSizeClass) },
         trailingContent = {
             Text(
                 text = formatShotDate(shot.shotAt),
@@ -152,12 +154,18 @@ private fun ShotListItem(shot: ShotLog, onClick: () -> Unit, modifier: Modifier 
 }
 
 @Composable
-private fun RatioBadge(ratio: Double, modifier: Modifier = Modifier) {
+private fun RatioBadge(
+    ratio: Double,
+    basketSizeClass: String?,
+    modifier: Modifier = Modifier,
+) {
+    val badgeColors = LocalBasketBadgeColors.current
+    val (containerColor, contentColor) = badgeColors.colorPairFor(basketSizeClass)
     Box(
         modifier = modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(containerColor),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -165,7 +173,7 @@ private fun RatioBadge(ratio: Double, modifier: Modifier = Modifier) {
                 text = "1:%.1f".format(ratio),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = contentColor,
             )
         }
     }
@@ -212,7 +220,8 @@ private fun ShotsScreenWithShotsPreview() {
                         id = "1", coffeeBeanId = "b1", coffeeBeanName = "Ethiopia Yirgacheffe",
                         roasterName = "Nordic Coffee", grinderId = "g1", grinderName = "Niche Zero",
                         machineId = "m1", machineName = "ECM Synchronika", basketId = "bk1",
-                        basketName = "IMS 18g", grindSetting = "2.5", doseGrams = 18.0,
+                        basketName = "IMS 18g", basketSizeClass = FilterBasketSize.SINGLE,
+                        grindSetting = "2.5", doseGrams = 18.0,
                         yieldGrams = 36.0, ratio = 2.0, extractionTimeSeconds = 30,
                         brewTemperatureCelsius = 93.5, preInfusionSeconds = null, rating = 4,
                         notes = null, shotAt = now, createdAt = now, updatedAt = now,
@@ -221,10 +230,21 @@ private fun ShotsScreenWithShotsPreview() {
                         id = "2", coffeeBeanId = "b1", coffeeBeanName = "Brazil Santos",
                         roasterName = null, grinderId = "g1", grinderName = "Niche Zero",
                         machineId = "m1", machineName = "ECM Synchronika", basketId = "bk1",
-                        basketName = "IMS 18g", grindSetting = null, doseGrams = 18.5,
+                        basketName = "IMS 18g", basketSizeClass = FilterBasketSize.DOUBLE,
+                        grindSetting = null, doseGrams = 18.5,
                         yieldGrams = 40.0, ratio = 2.16, extractionTimeSeconds = null,
                         brewTemperatureCelsius = null, preInfusionSeconds = null, rating = null,
                         notes = null, shotAt = now - 86_400_000L, createdAt = now, updatedAt = now,
+                    ),
+                    ShotLog(
+                        id = "3", coffeeBeanId = "b1", coffeeBeanName = "Kenya Nyeri",
+                        roasterName = null, grinderId = "g1", grinderName = "Niche Zero",
+                        machineId = "m1", machineName = "ECM Synchronika", basketId = "bk1",
+                        basketName = "IMS 22g", basketSizeClass = FilterBasketSize.TRIPLE,
+                        grindSetting = null, doseGrams = 22.0,
+                        yieldGrams = 66.0, ratio = 3.0, extractionTimeSeconds = null,
+                        brewTemperatureCelsius = null, preInfusionSeconds = null, rating = null,
+                        notes = null, shotAt = now - 172_800_000L, createdAt = now, updatedAt = now,
                     ),
                 ),
                 canAddShot = true,

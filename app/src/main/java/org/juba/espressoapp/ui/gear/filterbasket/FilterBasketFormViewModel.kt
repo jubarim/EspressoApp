@@ -37,6 +37,7 @@ class FilterBasketFormViewModel @Inject constructor(
                         brand = basket.brand,
                         model = basket.model ?: "",
                         sizeGrams = basket.sizeGrams ?: "",
+                        sizeClass = basket.sizeClass ?: "",
                         type = basket.type ?: "",
                         diameter = basket.diameter ?: "",
                         purchaseDate = basket.purchaseDate,
@@ -53,6 +54,8 @@ class FilterBasketFormViewModel @Inject constructor(
     fun onModelChange(value: String) = _uiState.update { it.copy(model = value) }
 
     fun onSizeGramsChange(value: String) = _uiState.update { it.copy(sizeGrams = value) }
+
+    fun onSizeClassChange(value: String) = _uiState.update { it.copy(sizeClass = value) }
 
     fun onTypeChange(value: String) = _uiState.update { it.copy(type = value) }
 
@@ -79,6 +82,7 @@ class FilterBasketFormViewModel @Inject constructor(
                 brand = state.brand.trim(),
                 model = state.model.trim().ifBlank { null },
                 sizeGrams = state.sizeGrams.trim().ifBlank { null },
+                sizeClass = state.sizeClass.ifBlank { null },
                 type = state.type.ifBlank { null },
                 diameter = state.diameter.ifBlank { null },
                 purchaseDate = state.purchaseDate,

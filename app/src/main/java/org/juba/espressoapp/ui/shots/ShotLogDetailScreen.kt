@@ -45,9 +45,11 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.toolbar.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.designsystem.QuickCopyDialog
+import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.ShotLog
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
+import org.juba.espressoapp.ui.theme.LocalBasketBadgeColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -218,9 +220,11 @@ private fun ShotLogDetailContent(shot: ShotLog, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ShotMetricsCard(shot: ShotLog, modifier: Modifier = Modifier) {
+    val badgeColors = LocalBasketBadgeColors.current
+    val (containerColor, contentColor) = badgeColors.colorPairFor(shot.basketSizeClass)
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -231,7 +235,7 @@ private fun ShotMetricsCard(shot: ShotLog, modifier: Modifier = Modifier) {
                 text = "1:%.1f".format(shot.ratio),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = contentColor,
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
@@ -240,30 +244,30 @@ private fun ShotMetricsCard(shot: ShotLog, modifier: Modifier = Modifier) {
                     Text(
                         text = "%.1fg".format(shot.doseGrams),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = contentColor,
                     )
                     Text(
                         text = stringResource(R.string.shot_label_dose),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        color = contentColor.copy(alpha = 0.7f),
                     )
                 }
                 Text(
                     text = "→",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = contentColor,
                     modifier = Modifier.align(Alignment.CenterVertically),
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "%.1fg".format(shot.yieldGrams),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = contentColor,
                     )
                     Text(
                         text = stringResource(R.string.shot_label_yield),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        color = contentColor.copy(alpha = 0.7f),
                     )
                 }
             }
@@ -316,6 +320,7 @@ private fun ShotLogDetailContentPreview() {
                 machineName = "ECM Synchronika",
                 basketId = "bk1",
                 basketName = "IMS 18g",
+                basketSizeClass = FilterBasketSize.DOUBLE,
                 grindSetting = "2.5",
                 doseGrams = 18.0,
                 yieldGrams = 36.0,

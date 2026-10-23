@@ -24,7 +24,7 @@ import org.juba.espressoapp.data.local.entity.ShotLogEntity
         FilterBasketEntity::class,
         ShotLogEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

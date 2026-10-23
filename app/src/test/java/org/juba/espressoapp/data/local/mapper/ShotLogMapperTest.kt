@@ -2,6 +2,7 @@ package org.juba.espressoapp.data.local.mapper
 
 import org.juba.espressoapp.data.local.entity.ShotLogEntity
 import org.juba.espressoapp.data.local.entity.ShotLogWithDetails
+import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.ShotLog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -36,6 +37,7 @@ class ShotLogMapperTest {
         grinderName = "Niche Zero",
         machineName = "ECM Synchronika",
         basketName = "IMS Precision",
+        basketSizeClass = FilterBasketSize.DOUBLE,
     )
 
     private val domain = ShotLog(
@@ -49,6 +51,7 @@ class ShotLogMapperTest {
         machineName = "ECM Synchronika",
         basketId = "basket-1",
         basketName = "IMS Precision",
+        basketSizeClass = FilterBasketSize.DOUBLE,
         grindSetting = "3.2",
         doseGrams = 18.0,
         yieldGrams = 36.0,
@@ -103,6 +106,7 @@ class ShotLogMapperTest {
             grinderName = null,
             machineName = null,
             basketName = null,
+            basketSizeClass = null,
         )
         val result = sparse.toDomain()
         assertNull(result.grindSetting)
@@ -116,5 +120,6 @@ class ShotLogMapperTest {
         assertNull(result.grinderName)
         assertNull(result.machineName)
         assertNull(result.basketName)
+        assertNull(result.basketSizeClass)
     }
 }

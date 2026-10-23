@@ -65,6 +65,7 @@ internal fun EspressoMachineDto.toEntity() = EspressoMachineEntity(
 
 internal fun FilterBasketEntity.toDto() = FilterBasketDto(
     id = id, brand = brand, model = model, sizeGrams = sizeGrams,
+    sizeClass = sizeClass,
     type = type, diameter = diameter, purchaseDate = purchaseDate,
     imageUri = imageUri, notes = notes,
     createdAt = createdAt, updatedAt = updatedAt,
@@ -72,6 +73,7 @@ internal fun FilterBasketEntity.toDto() = FilterBasketDto(
 
 internal fun FilterBasketDto.toEntity() = FilterBasketEntity(
     id = id, brand = brand, model = model, sizeGrams = sizeGrams,
+    sizeClass = sizeClass,
     type = type, diameter = diameter, purchaseDate = purchaseDate,
     imageUri = imageUri, notes = notes,
     isDeleted = false, createdAt = createdAt, updatedAt = updatedAt,

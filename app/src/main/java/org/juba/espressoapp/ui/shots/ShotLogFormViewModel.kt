@@ -207,6 +207,7 @@ class ShotLogFormViewModel @Inject constructor(
                 machineName = state.machineLabel,
                 basketId = state.basketId,
                 basketName = state.basketLabel,
+                basketSizeClass = null,
                 grindSetting = state.grindSetting.trim().ifBlank { null },
                 doseGrams = dose!!,
                 yieldGrams = yieldGrams!!,

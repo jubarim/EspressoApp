@@ -164,8 +164,11 @@ All tables use:
 | `id` | TEXT PK | UUID v4 |
 | `brand` | TEXT NOT NULL | e.g. IMS, VST, Decent |
 | `model` | TEXT | |
-| `size_grams` | REAL | Rated dose size |
+| `size_grams` | TEXT | Rated capacity in grams (e.g. 18g, 16 to 22g) |
+| `size_class` | TEXT | Single / Double / Triple, drives the shot list ratio badge colour |
 | `type` | TEXT | Ridged / Ridgeless / Precision |
+| `diameter` | TEXT | 46mm / 49mm / 51mm / 53mm / 54mm / 58mm / 61mm |
+| `purchase_date` | INTEGER | Unix ms, nullable |
 | `image_uri` | TEXT | Optional local URI |
 | `notes` | TEXT | |
 | `is_deleted` | INTEGER | 0 / 1, default 0 |
@@ -297,10 +300,10 @@ Follow the same vertical slice pattern for:
 1. ✅ **Coffee Beans** (FK → roasters, additional fields)
 2. ✅ **Grinders** (brand + model required)
 3. ✅ **Espresso Machines** (brand + model required)
-4. ✅ **Filter Baskets** (brand required; size_grams TEXT, diameter dropdown, type dropdown, purchase_date)
+4. ✅ **Filter Baskets** (brand required; size_grams TEXT, size_class dropdown, diameter dropdown, type dropdown, purchase_date)
 
 Each new entity needs a Room DB version bump and migration script.
-AppDatabase is now at version 6 (filter_baskets added in MIGRATION_5_6).
+AppDatabase is now at version 8 (filter_baskets added in MIGRATION_5_6, size_class added in MIGRATION_7_8).
 
 ### Phase 3 — Shot Log module
 The most complex module. Depends on all equipment entities being queryable.

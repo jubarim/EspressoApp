@@ -5,6 +5,8 @@ data class FilterBasket(
     val brand: String,
     val model: String?,
     val sizeGrams: String?,
+    /** One of [FilterBasketSize.SINGLE], [FilterBasketSize.DOUBLE] or [FilterBasketSize.TRIPLE]. */
+    val sizeClass: String?,
     val type: String?,
     val diameter: String?,
     val purchaseDate: Long?,

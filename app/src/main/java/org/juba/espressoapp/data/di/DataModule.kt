@@ -204,6 +204,20 @@ abstract class DataModule {
             }
         }
 
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `filter_baskets` ADD COLUMN `size_class` TEXT")
+                // Backfill from the rated capacity: 9 g or less is a single, everything else a double.
+                db.execSQL(
+                    """
+                    UPDATE `filter_baskets`
+                    SET `size_class` = CASE WHEN CAST(`size_grams` AS REAL) <= 9 THEN 'Single' ELSE 'Double' END
+                    WHERE `size_grams` IS NOT NULL AND `size_grams` GLOB '[0-9]*'
+                    """.trimIndent(),
+                )
+            }
+        }
+
         @Provides
         @Singleton
         fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
@@ -212,7 +226,7 @@ abstract class DataModule {
                 AppDatabase::class.java,
                 "espresso_app.db",
             ).fallbackToDestructiveMigration(true)
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .apply { if (BuildConfig.DEBUG) addCallback(DatabaseSeedCallback) }
                 .build()
 

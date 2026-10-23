@@ -11,4 +11,5 @@ data class ShotLogWithDetails(
     @ColumnInfo(name = "grinder_name") val grinderName: String?,
     @ColumnInfo(name = "machine_name") val machineName: String?,
     @ColumnInfo(name = "basket_name") val basketName: String?,
+    @ColumnInfo(name = "basket_size_class") val basketSizeClass: String?,
 )

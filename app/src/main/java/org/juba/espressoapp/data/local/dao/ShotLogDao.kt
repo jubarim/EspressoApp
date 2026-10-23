@@ -19,7 +19,8 @@ interface ShotLogDao {
                r.name AS roaster_name,
                g.brand || ' ' || g.model AS grinder_name,
                em.brand || ' ' || em.model AS machine_name,
-               fb.brand || COALESCE(' ' || fb.model, '') AS basket_name
+               fb.brand || COALESCE(' ' || fb.model, '') AS basket_name,
+               fb.size_class AS basket_size_class
         FROM shot_logs sl
         LEFT JOIN coffee_beans cb ON sl.coffee_bean_id = cb.id
         LEFT JOIN roasters r ON cb.roaster_id = r.id
@@ -39,7 +40,8 @@ interface ShotLogDao {
                r.name AS roaster_name,
                g.brand || ' ' || g.model AS grinder_name,
                em.brand || ' ' || em.model AS machine_name,
-               fb.brand || COALESCE(' ' || fb.model, '') AS basket_name
+               fb.brand || COALESCE(' ' || fb.model, '') AS basket_name,
+               fb.size_class AS basket_size_class
         FROM shot_logs sl
         LEFT JOIN coffee_beans cb ON sl.coffee_bean_id = cb.id
         LEFT JOIN roasters r ON cb.roaster_id = r.id

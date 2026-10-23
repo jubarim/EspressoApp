@@ -10,6 +10,7 @@ data class FilterBasketEntity(
     val brand: String,
     val model: String?,
     @ColumnInfo(name = "size_grams") val sizeGrams: String?,
+    @ColumnInfo(name = "size_class") val sizeClass: String?,
     val type: String?,
     val diameter: String?,
     @ColumnInfo(name = "purchase_date") val purchaseDate: Long?,

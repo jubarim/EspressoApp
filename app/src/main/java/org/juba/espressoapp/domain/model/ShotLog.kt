@@ -11,6 +11,7 @@ data class ShotLog(
     val machineName: String?,
     val basketId: String,
     val basketName: String?,
+    val basketSizeClass: String?,
     val grindSetting: String?,
     val doseGrams: Double,
     val yieldGrams: Double,

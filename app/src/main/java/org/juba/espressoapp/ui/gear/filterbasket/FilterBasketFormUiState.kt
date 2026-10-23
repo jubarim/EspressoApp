@@ -4,6 +4,7 @@ data class FilterBasketFormUiState(
     val brand: String = "",
     val model: String = "",
     val sizeGrams: String = "",
+    val sizeClass: String = "",
     val type: String = "",
     val diameter: String = "",
     val purchaseDate: Long? = null,

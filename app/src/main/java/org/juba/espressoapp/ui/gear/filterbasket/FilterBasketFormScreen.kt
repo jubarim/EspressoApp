@@ -37,6 +37,7 @@ import org.juba.espressoapp.designsystem.EspressoTextField
 import org.juba.espressoapp.designsystem.PickerField
 import org.juba.espressoapp.designsystem.SelectionBottomSheet
 import org.juba.espressoapp.domain.model.FilterBasketDiameter
+import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.domain.model.FilterBasketType
 import org.juba.espressoapp.extensions.epochToLocalTimeZoneConvertor
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
@@ -53,6 +54,7 @@ fun FilterBasketFormScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showTypeSheet by rememberSaveable { mutableStateOf(false) }
+    var showSizeSheet by rememberSaveable { mutableStateOf(false) }
     var showDiameterSheet by rememberSaveable { mutableStateOf(false) }
     var showPurchaseDatePicker by rememberSaveable { mutableStateOf(false) }
 
@@ -70,6 +72,7 @@ fun FilterBasketFormScreen(
         onImageUrlChange = viewModel::onImageUrlChange,
         onNotesChange = viewModel::onNotesChange,
         onShowTypeSheet = { showTypeSheet = true },
+        onShowSizeSheet = { showSizeSheet = true },
         onShowDiameterSheet = { showDiameterSheet = true },
         onShowPurchaseDatePicker = { showPurchaseDatePicker = true },
         modifier = modifier,
@@ -82,6 +85,17 @@ fun FilterBasketFormScreen(
             selectedKeys = setOf(uiState.type).filter { it.isNotBlank() }.toSet(),
             onConfirm = { keys -> viewModel.onTypeChange(keys.firstOrNull() ?: "") },
             onDismiss = { showTypeSheet = false },
+            multiSelect = false,
+        )
+    }
+
+    if (showSizeSheet) {
+        SelectionBottomSheet(
+            title = stringResource(R.string.field_basket_size),
+            options = FilterBasketSize.options,
+            selectedKeys = setOf(uiState.sizeClass).filter { it.isNotBlank() }.toSet(),
+            onConfirm = { keys -> viewModel.onSizeClassChange(keys.firstOrNull() ?: "") },
+            onDismiss = { showSizeSheet = false },
             multiSelect = false,
         )
     }
@@ -132,6 +146,7 @@ private fun FilterBasketFormContent(
     onImageUrlChange: (String) -> Unit,
     onNotesChange: (String) -> Unit,
     onShowTypeSheet: () -> Unit,
+    onShowSizeSheet: () -> Unit,
     onShowDiameterSheet: () -> Unit,
     onShowPurchaseDatePicker: () -> Unit,
     modifier: Modifier = Modifier,
@@ -186,7 +201,12 @@ private fun FilterBasketFormContent(
             EspressoTextField(
                 value = uiState.sizeGrams,
                 onValueChange = onSizeGramsChange,
-                label = stringResource(R.string.field_size),
+                label = stringResource(R.string.field_capacity),
+            )
+            PickerField(
+                label = stringResource(R.string.field_basket_size),
+                selectedLabel = uiState.sizeClass.ifBlank { null },
+                onClick = onShowSizeSheet,
             )
             PickerField(
                 label = stringResource(R.string.field_basket_type),
@@ -235,6 +255,7 @@ private fun FilterBasketFormScreenPreview() {
             onImageUrlChange = {},
             onNotesChange = {},
             onShowTypeSheet = {},
+            onShowSizeSheet = {},
             onShowDiameterSheet = {},
             onShowPurchaseDatePicker = {},
         )

@@ -43,6 +43,7 @@ import org.juba.espressoapp.R
 import org.juba.espressoapp.designsystem.toolbar.DetailActionsToolbar
 import org.juba.espressoapp.designsystem.EmptyStateContent
 import org.juba.espressoapp.domain.model.FilterBasket
+import org.juba.espressoapp.domain.model.FilterBasketSize
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -151,8 +152,9 @@ private fun FilterBasketDetailContent(basket: FilterBasket, modifier: Modifier =
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            basket.sizeClass?.let { DetailRow(label = stringResource(R.string.field_basket_size), value = it) }
             basket.type?.let { DetailRow(label = stringResource(R.string.field_basket_type), value = it) }
-            basket.sizeGrams?.let { DetailRow(label = stringResource(R.string.field_size), value = it) }
+            basket.sizeGrams?.let { DetailRow(label = stringResource(R.string.field_capacity), value = it) }
             basket.diameter?.let { DetailRow(label = stringResource(R.string.field_diameter), value = it) }
             basket.purchaseDate?.let {
                 val display = remember(it) { formatDateWithAge(it) }
@@ -205,6 +207,7 @@ private fun FilterBasketDetailContentPreview() {
                 brand = "IMS",
                 model = "Competition",
                 sizeGrams = "18g",
+                sizeClass = FilterBasketSize.DOUBLE,
                 type = "Precision",
                 diameter = "58mm",
                 purchaseDate = 1711929600000L,

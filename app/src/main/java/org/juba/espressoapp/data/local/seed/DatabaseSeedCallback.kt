@@ -417,6 +417,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             brand = "IMS",
             model = "Competition",
             sizeGrams = "18g",
+            sizeClass = "Double",
             type = "Precision",
             diameter = "58mm",
             purchaseDate = 1711929600000L, // 2024-04-01
@@ -427,6 +428,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             brand = "VST",
             model = "Ridgeless",
             sizeGrams = "18g",
+            sizeClass = "Double",
             type = "Ridgeless",
             diameter = "58mm",
             purchaseDate = 1724025600000L, // 2024-08-20
@@ -437,6 +439,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             brand = "La Marzocco",
             model = "Standard",
             sizeGrams = "14g",
+            sizeClass = "Double",
             type = "Ridged",
             diameter = "58mm",
             purchaseDate = 1704067200000L, // 2024-01-01
@@ -447,6 +450,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
             brand = "Graph Coffee",
             model = "58mm to 46mm",
             sizeGrams = "16 to 22g",
+            sizeClass = "Double",
             type = "Ridgeless",
             diameter = "58mm",
             purchaseDate = 1704067200000L, // 2024-01-01
@@ -460,6 +464,7 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         brand: String,
         model: String?,
         sizeGrams: String?,
+        sizeClass: String?,
         type: String?,
         diameter: String?,
         purchaseDate: Long?,
@@ -470,10 +475,10 @@ internal object DatabaseSeedCallback : RoomDatabase.Callback() {
         fun Long?.toSqlValue() = this?.toString() ?: "NULL"
         return """
             INSERT OR IGNORE INTO filter_baskets
-                (id, brand, model, size_grams, type, diameter, purchase_date, image_uri, notes, is_deleted, created_at, updated_at)
+                (id, brand, model, size_grams, size_class, type, diameter, purchase_date, image_uri, notes, is_deleted, created_at, updated_at)
             VALUES
                 ('$id', ${brand.toSqlValue()}, ${model.toSqlValue()}, ${sizeGrams.toSqlValue()},
-                 ${type.toSqlValue()}, ${diameter.toSqlValue()}, ${purchaseDate.toSqlValue()},
+                 ${sizeClass.toSqlValue()}, ${type.toSqlValue()}, ${diameter.toSqlValue()}, ${purchaseDate.toSqlValue()},
                  ${imageUri.toSqlValue()}, ${notes.toSqlValue()}, 0, $SEED_TS, $SEED_TS)
         """.trimIndent()
     }

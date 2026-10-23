@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupDto(
-    val schemaVersion: Int = 7,
+    val schemaVersion: Int = 8,
     val exportedAt: Long,
     val roasters: List<RoasterDto>,
     val coffeeBeans: List<CoffeeBeanDto>,
@@ -79,6 +79,7 @@ data class FilterBasketDto(
     val brand: String,
     val model: String? = null,
     val sizeGrams: String? = null,
+    val sizeClass: String? = null,
     val type: String? = null,
     val diameter: String? = null,
     val purchaseDate: Long? = null,

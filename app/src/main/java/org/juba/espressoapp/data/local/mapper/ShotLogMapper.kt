@@ -15,6 +15,7 @@ fun ShotLogWithDetails.toDomain(): ShotLog = ShotLog(
     machineName = machineName,
     basketId = shot.basketId,
     basketName = basketName,
+    basketSizeClass = basketSizeClass,
     grindSetting = shot.grindSetting,
     doseGrams = shot.doseGrams,
     yieldGrams = shot.yieldGrams,
