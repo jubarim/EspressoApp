@@ -12,5 +12,6 @@ sealed interface BackupOperation {
 data class SettingsUiState(
     val exportState: BackupOperation = BackupOperation.Idle,
     val importState: BackupOperation = BackupOperation.Idle,
+    val syncCheckState: BackupOperation = BackupOperation.Idle,
     val account: AuthUser? = null,
 )

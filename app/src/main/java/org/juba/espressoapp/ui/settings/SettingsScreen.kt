@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.juba.espressoapp.BuildConfig
 import org.juba.espressoapp.R
 import org.juba.espressoapp.domain.model.AuthUser
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
@@ -77,6 +78,8 @@ fun SettingsScreen(
     val exportErrorMessage = stringResource(R.string.settings_export_error)
     val importSuccessMessage = stringResource(R.string.settings_import_success)
     val importErrorMessage = stringResource(R.string.settings_import_error)
+    val syncCheckSuccessMessage = stringResource(R.string.settings_sync_check_success)
+    val syncCheckErrorMessage = stringResource(R.string.settings_sync_check_error)
 
     LaunchedEffect(uiState.exportState) {
         when (val state = uiState.exportState) {
@@ -106,6 +109,20 @@ fun SettingsScreen(
         }
     }
 
+    LaunchedEffect(uiState.syncCheckState) {
+        when (val state = uiState.syncCheckState) {
+            is BackupOperation.Success -> {
+                snackbarHostState.showSnackbar(syncCheckSuccessMessage)
+                viewModel.clearSyncCheckState()
+            }
+            is BackupOperation.Error -> {
+                snackbarHostState.showSnackbar(syncCheckErrorMessage.format(state.message))
+                viewModel.clearSyncCheckState()
+            }
+            else -> Unit
+        }
+    }
+
     SettingsContent(
         uiState = uiState,
         showImportConfirmDialog = showImportConfirmDialog,
@@ -122,6 +139,7 @@ fun SettingsScreen(
         },
         onSignOutClick = { viewModel.signOut() },
         onSignInClick = onSignInClick,
+        onSyncCheckClick = { viewModel.runSyncCheck() },
         modifier = modifier,
     )
 }
@@ -137,6 +155,7 @@ private fun SettingsContent(
     onImportDismiss: () -> Unit,
     onSignOutClick: () -> Unit,
     onSignInClick: () -> Unit,
+    onSyncCheckClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (showImportConfirmDialog) {
@@ -265,6 +284,35 @@ private fun SettingsContent(
                     }
                 }
             }
+
+            if (BuildConfig.DEBUG) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.settings_debug_section_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+
+                val isCheckingSync = uiState.syncCheckState is BackupOperation.InProgress
+                OutlinedButton(
+                    onClick = onSyncCheckClick,
+                    enabled = !isCheckingSync,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        if (isCheckingSync) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(stringResource(R.string.settings_sync_check_button))
+                    }
+                }
+            }
         }
     }
 }
@@ -290,6 +338,7 @@ private fun SettingsContentPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
         )
     }
 }
@@ -307,6 +356,7 @@ private fun SettingsContentInProgressPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
         )
     }
 }
@@ -330,6 +380,7 @@ private fun SettingsContentSignedInPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
         )
     }
 }
