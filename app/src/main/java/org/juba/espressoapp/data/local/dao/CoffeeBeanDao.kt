@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import org.juba.espressoapp.data.local.entity.CoffeeBeanEntity
 import org.juba.espressoapp.data.local.entity.CoffeeBeanWithRoaster
@@ -34,11 +35,18 @@ interface CoffeeBeanDao {
     )
     suspend fun getById(id: String): CoffeeBeanWithRoaster?
 
+    /** Includes soft-deleted rows so sync can read tombstones. */
+    @Query("SELECT * FROM coffee_beans")
+    suspend fun getAllIncludingDeleted(): List<CoffeeBeanEntity>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entity: CoffeeBeanEntity)
 
     @Update
     suspend fun update(entity: CoffeeBeanEntity)
+
+    @Upsert
+    suspend fun upsert(entity: CoffeeBeanEntity)
 
     @Query("UPDATE coffee_beans SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
