@@ -13,6 +13,8 @@ import org.juba.espressoapp.data.remote.RemoteSource
 import org.juba.espressoapp.data.remote.SyncTarget
 import org.juba.espressoapp.data.sync.FirestoreRemoteWriteDispatcher
 import org.juba.espressoapp.data.sync.RemoteWriteDispatcher
+import org.juba.espressoapp.data.sync.SyncMerger
+import org.juba.espressoapp.data.sync.SyncMergerImpl
 import javax.inject.Singleton
 
 @Module
@@ -30,6 +32,10 @@ abstract class SyncModule {
     @Binds
     @Singleton
     abstract fun bindRemoteWriteDispatcher(impl: FirestoreRemoteWriteDispatcher): RemoteWriteDispatcher
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncMerger(impl: SyncMergerImpl): SyncMerger
 
     companion object {
 

@@ -12,4 +12,10 @@ interface RemoteSource {
      * completes with an error when the listener fails, for example on `PERMISSION_DENIED`.
      */
     fun observe(uid: String, collection: SyncCollection): Flow<RemoteChange>
+
+    /**
+     * Reads [collection] once. Used by the initial merge to compare the cloud state with the
+     * local database before deciding what to push.
+     */
+    suspend fun fetchAll(uid: String, collection: SyncCollection): List<RemoteDocument>
 }

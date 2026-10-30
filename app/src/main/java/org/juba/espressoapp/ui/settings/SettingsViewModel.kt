@@ -81,8 +81,10 @@ class SettingsViewModel @Inject constructor(
     /** Signs the user out and returns the app to the welcome screen. */
     fun signOut() {
         viewModelScope.launch {
-            authRepository.signOut()
+            // Reset the onboarding flag first so the sync engine sees the welcome screen, not a
+            // guest session, and therefore does not wipe data that a re-sign-in could reuse.
             preferencesRepository.resetOnboarding()
+            authRepository.signOut()
         }
     }
 }
