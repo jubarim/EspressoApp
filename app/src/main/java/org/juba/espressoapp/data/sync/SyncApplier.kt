@@ -1,6 +1,7 @@
 package org.juba.espressoapp.data.sync
 
 import android.database.sqlite.SQLiteConstraintException
+import android.os.SystemClock
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.juba.espressoapp.data.local.dao.CoffeeBeanDao
@@ -25,6 +26,9 @@ import javax.inject.Singleton
 
 private const val TAG = "EspressoSync"
 
+/** Parent lookups are transient during the initial load, so only report a stall occasionally. */
+private const val WAITING_LOG_INTERVAL_MS = 2_000L
+
 /**
  * Applies remote changes to Room.
  *
@@ -48,6 +52,7 @@ class SyncApplier @Inject constructor(
 ) {
     private val mutex = Mutex()
     private val pending = linkedMapOf<String, RemoteChange>()
+    private var lastWaitingLogAt = 0L
 
     /** Applies [change], serialized so the six listeners cannot interleave their writes. */
     suspend fun apply(change: RemoteChange) = mutex.withLock {
@@ -60,6 +65,9 @@ class SyncApplier @Inject constructor(
         pending[change.document.key] = change
         drain()
     }
+
+    /** Drops buffered changes, used when the local data is wiped on an identity change. */
+    suspend fun clearPending() = mutex.withLock { pending.clear() }
 
     private suspend fun drain() {
         while (true) {
@@ -82,9 +90,16 @@ class SyncApplier @Inject constructor(
             }
 
             if (!appliedAny) {
-                AppLog.w(TAG) { "waiting for parents of ${pending.size} remote documents" }
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastWaitingLogAt >= WAITING_LOG_INTERVAL_MS) {
+                    lastWaitingLogAt = now
+                    AppLog.d(TAG) {
+                        "waiting for parents of ${pending.size} documents: ${pending.keys.joinToString()}"
+                    }
+                }
                 return
             }
+            lastWaitingLogAt = 0L
         }
     }
 
@@ -153,8 +168,12 @@ class SyncApplier @Inject constructor(
         upsert: suspend () -> Unit,
     ): ApplyResult {
         if (localUpdatedAt != null && localUpdatedAt >= remoteUpdatedAt) {
-            AppLog.d(TAG) {
-                "skip ${change.document.key}, remote ${remoteUpdatedAt}ms is not newer than local ${localUpdatedAt}ms"
+            // Equal timestamps are the echo of our own push, which is the common case on every
+            // start, so only a strictly newer local copy is worth a line.
+            if (localUpdatedAt > remoteUpdatedAt) {
+                AppLog.d(TAG) {
+                    "skip ${change.document.key}, local ${localUpdatedAt}ms is newer than remote ${remoteUpdatedAt}ms"
+                }
             }
             return ApplyResult.Skipped
         }

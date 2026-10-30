@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import org.juba.espressoapp.logging.AppLog
 import javax.inject.Inject
 
@@ -46,6 +47,18 @@ class FirestoreRemoteSource @Inject constructor(
                 registration.remove()
             }
         }
+
+    override suspend fun fetchAll(uid: String, collection: SyncCollection): List<RemoteDocument> {
+        val snapshot = firestore.remoteCollection(uid, collection).get().await()
+        AppLog.d(TAG) { "fetch ${collection.path} documents=${snapshot.size()}" }
+        return snapshot.documents.map { document ->
+            RemoteDocument(
+                collection = collection,
+                id = document.id,
+                fields = document.data.orEmpty(),
+            )
+        }
+    }
 }
 
 private fun DocumentChange.Type.toRemoteChangeType(): RemoteChangeType = when (this) {

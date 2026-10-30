@@ -13,6 +13,7 @@ import org.juba.espressoapp.data.remote.SyncCollection
 import org.juba.espressoapp.data.remote.SyncTarget
 import org.juba.espressoapp.domain.model.AuthUser
 import org.juba.espressoapp.domain.repository.AuthRepository
+import org.juba.espressoapp.domain.repository.PreferencesRepository
 
 internal class FakeAuthRepository(private val user: AuthUser?) : AuthRepository {
     override fun currentUser(): Flow<AuthUser?> = flowOf(user)
@@ -45,6 +46,7 @@ internal class FakeSyncTarget : SyncTarget {
 
 internal class FakeRemoteSource(
     private val documentId: String = "sync-health-check",
+    private val remoteDocuments: List<RemoteDocument> = emptyList(),
 ) : RemoteSource {
     override fun observe(uid: String, collection: SyncCollection): Flow<RemoteChange> = flowOf(
         RemoteChange(
@@ -56,6 +58,9 @@ internal class FakeRemoteSource(
             type = RemoteChangeType.Added,
         ),
     )
+
+    override suspend fun fetchAll(uid: String, collection: SyncCollection): List<RemoteDocument> =
+        remoteDocuments.filter { it.collection == collection }
 }
 
 /** Remote source that never emits and records when each listener is attached and cancelled. */
@@ -75,6 +80,43 @@ internal class TrackingRemoteSource : RemoteSource {
             observation.cancelled = true
         }
     }
+
+    override suspend fun fetchAll(uid: String, collection: SyncCollection): List<RemoteDocument> =
+        emptyList()
+}
+
+internal class FakePreferencesRepository(
+    onboardingComplete: Boolean = false,
+    ownerUid: String? = null,
+) : PreferencesRepository {
+    private val onboarding = MutableStateFlow(onboardingComplete)
+    private val owner = MutableStateFlow(ownerUid)
+    private val lastSync = MutableStateFlow<Long?>(null)
+
+    val dataOwnerUidValue: String? get() = owner.value
+    val lastSyncAtValue: Long? get() = lastSync.value
+
+    override fun isOnboardingComplete(): Flow<Boolean> = onboarding
+
+    override suspend fun setOnboardingComplete() {
+        onboarding.value = true
+    }
+
+    override suspend fun resetOnboarding() {
+        onboarding.value = false
+    }
+
+    override fun dataOwnerUid(): Flow<String?> = owner
+
+    override suspend fun setDataOwnerUid(uid: String?) {
+        owner.value = uid
+    }
+
+    override fun lastSyncAt(): Flow<Long?> = lastSync
+
+    override suspend fun setLastSyncAt(timestamp: Long?) {
+        lastSync.value = timestamp
+    }
 }
 
 /** Records dispatched documents without touching the network. */
@@ -83,5 +125,15 @@ internal class RecordingRemoteWriteDispatcher : RemoteWriteDispatcher {
 
     override fun dispatch(document: RemoteDocument) {
         documents += document
+    }
+}
+
+/** Records merge calls without touching Room or the network. */
+internal class FakeSyncMerger : SyncMerger {
+    val mergedUids = mutableListOf<String>()
+
+    override suspend fun merge(uid: String): Result<Unit> {
+        mergedUids += uid
+        return Result.success(Unit)
     }
 }
