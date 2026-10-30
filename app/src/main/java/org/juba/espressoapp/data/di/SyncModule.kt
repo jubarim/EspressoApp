@@ -11,6 +11,8 @@ import org.juba.espressoapp.data.remote.FirestoreRemoteSource
 import org.juba.espressoapp.data.remote.FirestoreSyncTarget
 import org.juba.espressoapp.data.remote.RemoteSource
 import org.juba.espressoapp.data.remote.SyncTarget
+import org.juba.espressoapp.data.sync.FirestoreRemoteWriteDispatcher
+import org.juba.espressoapp.data.sync.RemoteWriteDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -24,6 +26,10 @@ abstract class SyncModule {
     @Binds
     @Singleton
     abstract fun bindRemoteSource(impl: FirestoreRemoteSource): RemoteSource
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoteWriteDispatcher(impl: FirestoreRemoteWriteDispatcher): RemoteWriteDispatcher
 
     companion object {
 

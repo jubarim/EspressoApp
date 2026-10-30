@@ -35,6 +35,10 @@ interface CoffeeBeanDao {
     )
     suspend fun getById(id: String): CoffeeBeanWithRoaster?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM coffee_beans WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): CoffeeBeanEntity?
+
     /** Includes soft-deleted rows so sync can read tombstones. */
     @Query("SELECT * FROM coffee_beans")
     suspend fun getAllIncludingDeleted(): List<CoffeeBeanEntity>
