@@ -3,6 +3,9 @@ package org.juba.espressoapp.data.sync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -13,6 +16,7 @@ import org.juba.espressoapp.data.di.ApplicationScope
 import org.juba.espressoapp.data.local.database.AppDatabase
 import org.juba.espressoapp.data.remote.RemoteSource
 import org.juba.espressoapp.data.remote.SyncCollection
+import org.juba.espressoapp.data.remote.SyncTarget
 import org.juba.espressoapp.domain.repository.AuthRepository
 import org.juba.espressoapp.domain.repository.PreferencesRepository
 import org.juba.espressoapp.logging.AppLog
@@ -39,10 +43,16 @@ class SyncEngine @Inject constructor(
     private val authRepository: AuthRepository,
     private val preferencesRepository: PreferencesRepository,
     private val remoteSource: RemoteSource,
+    private val syncTarget: SyncTarget,
     private val applier: SyncApplier,
     private val merger: SyncMerger,
     private val database: AppDatabase,
 ) {
+    private val _status = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
+
+    /** Observable state, surfaced by the Settings screen. */
+    val status: StateFlow<SyncStatus> = _status.asStateFlow()
+
     private var job: Job? = null
 
     /** Starts observing the session. Safe to call more than once. */
@@ -63,20 +73,43 @@ class SyncEngine @Inject constructor(
                 .collectLatest { session ->
                     when (session) {
                         is SyncSession.User -> runUserSession(session.uid)
-                        SyncSession.Guest -> wipeGuestData()
-                        SyncSession.Welcome -> AppLog.d(TAG) { "welcome screen, sync idle" }
+                        SyncSession.Guest -> {
+                            wipeGuestData()
+                            _status.value = SyncStatus.Idle
+                        }
+                        SyncSession.Welcome -> {
+                            AppLog.d(TAG) { "welcome screen, sync idle" }
+                            _status.value = SyncStatus.Idle
+                        }
                     }
                 }
         }
     }
 
+    /** Restarts the session, merging local changes again and reattaching the listeners. */
+    fun syncNow() {
+        job?.cancel()
+        job = null
+        start()
+    }
+
     fun stop() {
         job?.cancel()
         job = null
+        _status.value = SyncStatus.Idle
     }
 
+    /**
+     * Waits for queued Firestore writes to be acknowledged. Used before signing out so the
+     * last edits made offline are not dropped.
+     */
+    suspend fun awaitPendingWrites(): Result<Unit> = syncTarget.awaitPendingWrites()
+
     private suspend fun runUserSession(uid: String) {
-        prepareFor(uid)
+        _status.value = SyncStatus.Syncing
+        val prepareSucceeded = prepareFor(uid)
+        if (prepareSucceeded) _status.value = SyncStatus.Idle
+
         AppLog.d(TAG) { "pull start uid=$uid" }
         coroutineScope {
             SyncCollection.entries.forEach { collection ->
@@ -84,6 +117,7 @@ class SyncEngine @Inject constructor(
                     remoteSource.observe(uid, collection)
                         .catch { error ->
                             AppLog.e(TAG, error) { "listener failed ${collection.path}" }
+                            _status.value = SyncStatus.Error(error.message ?: "Listener failed")
                         }
                         .collect { change -> applier.apply(change) }
                 }
@@ -95,18 +129,25 @@ class SyncEngine @Inject constructor(
     /**
      * Claims the local data for [uid] and merges it with the cloud. A different owner means the
      * previous account's data must be wiped before the new one is pulled in.
+     *
+     * @return true when the start-up work succeeded, false when it failed and the status is set.
      */
-    private suspend fun prepareFor(uid: String) {
+    private suspend fun prepareFor(uid: String): Boolean {
         val owner = preferencesRepository.dataOwnerUid().first()
         if (owner != null && owner != uid) {
             AppLog.d(TAG) { "identity changed from $owner to $uid, wiping local data" }
             wipeLocalData()
-        } else {
-            merger.merge(uid).onFailure { error ->
-                AppLog.e(TAG, error) { "merge failed uid=$uid" }
-            }
+            preferencesRepository.setDataOwnerUid(uid)
+            return true
+        }
+
+        val result = merger.merge(uid)
+        result.onFailure { error ->
+            AppLog.e(TAG, error) { "merge failed uid=$uid" }
+            _status.value = SyncStatus.Error(error.message ?: "Sync failed")
         }
         preferencesRepository.setDataOwnerUid(uid)
+        return result.isSuccess
     }
 
     private suspend fun wipeGuestData() {

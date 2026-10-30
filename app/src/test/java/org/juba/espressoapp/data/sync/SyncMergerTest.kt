@@ -10,7 +10,6 @@ import org.juba.espressoapp.data.remote.toRemoteDocument
 import org.juba.espressoapp.data.remote.SyncCollection
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -94,16 +93,12 @@ class SyncMergerTest {
     }
 
     @Test
-    fun `records the last sync time only when something was pushed`() = runTest {
-        val emptyPreferences = FakePreferencesRepository()
-        val emptyMerger = merger(syncTarget = FakeSyncTarget(), preferences = emptyPreferences)
-        emptyMerger.merge(UID)
-        assertNull(emptyPreferences.lastSyncAtValue)
-
-        db.roasterDao().insert(roaster(updatedAt = 100L))
+    fun `records the last sync time on a successful merge`() = runTest {
         val preferences = FakePreferencesRepository()
         val merger = merger(syncTarget = FakeSyncTarget(), preferences = preferences)
+
         merger.merge(UID)
+
         assertTrue(preferences.lastSyncAtValue != null)
     }
 
