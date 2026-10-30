@@ -10,6 +10,7 @@ import org.juba.espressoapp.data.local.entity.EspressoMachineEntity
 import org.juba.espressoapp.data.local.entity.FilterBasketEntity
 import org.juba.espressoapp.data.local.entity.GrinderEntity
 import org.juba.espressoapp.data.local.entity.RoasterEntity
+import org.juba.espressoapp.data.sync.RecordingRemoteWriteDispatcher
 import org.juba.espressoapp.domain.model.ShotLog
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -32,7 +33,7 @@ class ShotLogRepositoryTest {
             ApplicationProvider.getApplicationContext(),
             AppDatabase::class.java,
         ).allowMainThreadQueries().build()
-        repository = ShotLogRepositoryImpl(db.shotLogDao())
+        repository = ShotLogRepositoryImpl(db.shotLogDao(), RecordingRemoteWriteDispatcher())
         insertPrerequisites()
     }
 

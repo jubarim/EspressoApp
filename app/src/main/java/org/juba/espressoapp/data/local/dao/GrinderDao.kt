@@ -18,6 +18,10 @@ interface GrinderDao {
     @Query("SELECT * FROM grinders WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun getById(id: String): GrinderEntity?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM grinders WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): GrinderEntity?
+
     /** Includes soft-deleted rows so sync can read tombstones. */
     @Query("SELECT * FROM grinders")
     suspend fun getAllIncludingDeleted(): List<GrinderEntity>

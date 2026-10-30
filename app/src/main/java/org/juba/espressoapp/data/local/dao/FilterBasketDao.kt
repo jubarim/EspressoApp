@@ -18,6 +18,10 @@ interface FilterBasketDao {
     @Query("SELECT * FROM filter_baskets WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun getById(id: String): FilterBasketEntity?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM filter_baskets WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): FilterBasketEntity?
+
     /** Includes soft-deleted rows so sync can read tombstones. */
     @Query("SELECT * FROM filter_baskets")
     suspend fun getAllIncludingDeleted(): List<FilterBasketEntity>

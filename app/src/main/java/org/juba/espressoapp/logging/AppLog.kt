@@ -20,7 +20,7 @@ import org.juba.espressoapp.BuildConfig
  */
 object AppLog {
     private const val PRE_TAG = "jm_"
-    
+
     fun v(tag: String, message: () -> String) {
         if (BuildConfig.DEBUG) Log.v(PRE_TAG + tag, message())
     }

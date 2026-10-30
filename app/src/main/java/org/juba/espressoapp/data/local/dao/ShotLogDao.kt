@@ -55,6 +55,10 @@ interface ShotLogDao {
     )
     suspend fun getById(id: String): ShotLogWithDetails?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM shot_logs WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): ShotLogEntity?
+
     /** Includes soft-deleted rows so sync can read tombstones. */
     @Query("SELECT * FROM shot_logs")
     suspend fun getAllIncludingDeleted(): List<ShotLogEntity>

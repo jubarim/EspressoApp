@@ -5,6 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.juba.espressoapp.data.local.database.AppDatabase
+import org.juba.espressoapp.data.remote.SyncCollection
+import org.juba.espressoapp.data.sync.RecordingRemoteWriteDispatcher
 import org.juba.espressoapp.domain.model.Roaster
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -19,6 +21,7 @@ import org.robolectric.RobolectricTestRunner
 class RoasterRepositoryTest {
 
     private lateinit var db: AppDatabase
+    private lateinit var remoteWriteDispatcher: RecordingRemoteWriteDispatcher
     private lateinit var repository: RoasterRepositoryImpl
 
     @Before
@@ -27,7 +30,8 @@ class RoasterRepositoryTest {
             ApplicationProvider.getApplicationContext(),
             AppDatabase::class.java,
         ).allowMainThreadQueries().build()
-        repository = RoasterRepositoryImpl(db.roasterDao())
+        remoteWriteDispatcher = RecordingRemoteWriteDispatcher()
+        repository = RoasterRepositoryImpl(db.roasterDao(), remoteWriteDispatcher)
     }
 
     @After
@@ -90,5 +94,26 @@ class RoasterRepositoryTest {
         repository.insert(roaster())
         val result = repository.insert(roaster())
         assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun `insert dispatches a remote write`() = runTest {
+        repository.insert(roaster())
+
+        val document = remoteWriteDispatcher.documents.single()
+        assertEquals(SyncCollection.ROASTERS, document.collection)
+        assertEquals("id-1", document.id)
+    }
+
+    @Test
+    fun `delete dispatches a tombstone`() = runTest {
+        repository.insert(roaster())
+        remoteWriteDispatcher.documents.clear()
+
+        repository.delete("id-1")
+
+        val document = remoteWriteDispatcher.documents.single()
+        assertEquals("id-1", document.id)
+        assertEquals(true, document.fields["isDeleted"])
     }
 }
