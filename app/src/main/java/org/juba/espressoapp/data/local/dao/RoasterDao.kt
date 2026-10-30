@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import org.juba.espressoapp.data.local.entity.RoasterEntity
 
@@ -17,11 +18,18 @@ interface RoasterDao {
     @Query("SELECT * FROM roasters WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun getById(id: String): RoasterEntity?
 
+    /** Includes soft-deleted rows so sync can read tombstones. */
+    @Query("SELECT * FROM roasters")
+    suspend fun getAllIncludingDeleted(): List<RoasterEntity>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entity: RoasterEntity)
 
     @Update
     suspend fun update(entity: RoasterEntity)
+
+    @Upsert
+    suspend fun upsert(entity: RoasterEntity)
 
     @Query("UPDATE roasters SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)
