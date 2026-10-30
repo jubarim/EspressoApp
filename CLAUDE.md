@@ -305,13 +305,19 @@ Follow the same vertical slice pattern for:
 Each new entity needs a Room DB version bump and migration script.
 AppDatabase is now at version 8 (filter_baskets added in MIGRATION_5_6, size_class added in MIGRATION_7_8).
 
-### Phase 3 — Shot Log module
-The most complex module. Depends on all equipment entities being queryable.
-Includes ratio calculation, extraction time input, and the main home screen list.
+### ✅ Phase 3 — Shot Log module
+Shot list, detail and form are implemented, including ratio calculation, extraction time input,
+star rating and the main home screen list.
 
-### Future — Firebase remote data source
-The repository interface in domain must be written without any Room-specific assumptions so that
-a `FirebaseRepository` implementation can be added alongside the Room one later.
+### ✅ Phase 4 — Firebase sync
+Two-way sync for signed-in users. Room stays the source of truth; Firestore mirrors it per account.
+- **Push:** `RemoteWriteDispatcher` mirrors repository writes to Firestore on an application scope.
+- **Pull:** one snapshot listener per collection, applied by `SyncApplier` with LWW on `updated_at`.
+- **Merge:** `SyncMerger` uploads local records the cloud is missing or holds an older copy of.
+- **Lifecycle:** `SyncEngine` claims the local data for the signed-in uid and wipes on identity change.
+- **UI:** sync status, last synced time and a manual Sync now in Settings, plus a safe sign-out flush.
+
+See `docs/firebase-sync.md` for the full reference.
 
 ### Future — Global snackbar with undo for destructive actions
 Replace confirmation dialogs on delete with a snackbar + Undo action (leveraging soft-delete:
@@ -321,20 +327,27 @@ dialog before delete.
 
 ---
 
-## 8. Offline-First & Future Firebase Sync
+## 8. Offline-First & Firebase Sync
 
-Design principles to apply now so that sync is possible later:
+Room is the single source of truth. Firestore is a per-account mirror, not a second database.
 
-- **Local-first writes:** all writes go to Room first; Firebase is eventual.
-- **Conflict resolution:** Last Write Wins using `updated_at`. Keep the record with the higher
-  timestamp.
-- **Soft delete propagation:** `is_deleted = 1` must be synced to remote; never filter deleted
-  records before sync.
-- **Auto-push on reconnect:** use `ConnectivityManager` callback or `WorkManager` to trigger
-  pending sync when connectivity is restored.
-- Do not add any Firebase dependencies until Phase 3+ is complete — just keep the interfaces clean.
-- If no firebase is to be implemented, enable back the project's automatic backup that google
-  provides.
+- **Local-first writes:** every write goes to Room first. The remote write is queued after it on an
+  application scope, so an offline push never blocks the UI. Guests are skipped.
+- **Conflict resolution:** Last Write Wins on `updated_at`. A remote document is applied only when
+  strictly newer than the local row. Ties are skipped, so an edit made directly in the Firebase
+  console must also bump `updatedAt`.
+- **Soft delete propagation:** `is_deleted = 1` is pushed as a tombstone and applied like any other
+  update. Sync reads tombstones through `getAllIncludingDeleted` and `getByIdIncludingDeleted`.
+- **Foreign keys:** the applier buffers documents and applies them in dependency order, retrying any
+  document whose parent has not arrived yet.
+- **Merge on start:** `SyncMerger` uploads local-only or locally newer records on every session
+  start. This uploads pre-sync databases and covers a crash between the Room write and the Firestore
+  write.
+- **Identity:** the owning uid lives in DataStore. A different account, or a guest session after an
+  account, wipes Room first. Signing out keeps the data.
+- **No background worker:** listeners live as long as the process does. There is no WorkManager job.
+- **Images:** URL strings, no Firebase Storage.
+- See `docs/firebase-sync.md` for the reference, rules, setup and limitations.
 
 
 ---

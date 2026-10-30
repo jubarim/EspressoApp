@@ -1,6 +1,6 @@
 # Firebase Sync Plan
 
-Status: planned, not implemented.
+Status: implemented. See [firebase-sync.md](firebase-sync.md) for the as-built reference.
 Date: 2026-10-23.
 Owner: João Assis.
 
