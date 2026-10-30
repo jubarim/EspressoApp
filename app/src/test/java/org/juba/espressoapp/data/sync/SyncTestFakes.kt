@@ -1,6 +1,9 @@
 package org.juba.espressoapp.data.sync
 
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.juba.espressoapp.data.remote.RemoteChange
 import org.juba.espressoapp.data.remote.RemoteChangeType
@@ -15,6 +18,16 @@ internal class FakeAuthRepository(private val user: AuthUser?) : AuthRepository 
     override fun currentUser(): Flow<AuthUser?> = flowOf(user)
     override suspend fun signInWithGoogle(idToken: String): Result<Unit> = Result.success(Unit)
     override suspend fun signOut() = Unit
+}
+
+internal class MutableFakeAuthRepository(initialUser: AuthUser?) : AuthRepository {
+    val user = MutableStateFlow(initialUser)
+
+    override fun currentUser(): Flow<AuthUser?> = user
+    override suspend fun signInWithGoogle(idToken: String): Result<Unit> = Result.success(Unit)
+    override suspend fun signOut() {
+        user.value = null
+    }
 }
 
 internal class FakeSyncTarget : SyncTarget {
@@ -43,6 +56,25 @@ internal class FakeRemoteSource(
             type = RemoteChangeType.Added,
         ),
     )
+}
+
+/** Remote source that never emits and records when each listener is attached and cancelled. */
+internal class TrackingRemoteSource : RemoteSource {
+    class Observation(val uid: String, val collection: SyncCollection) {
+        var cancelled = false
+    }
+
+    val observations = mutableListOf<Observation>()
+
+    override fun observe(uid: String, collection: SyncCollection): Flow<RemoteChange> = flow {
+        val observation = Observation(uid, collection)
+        observations += observation
+        try {
+            awaitCancellation()
+        } finally {
+            observation.cancelled = true
+        }
+    }
 }
 
 /** Records dispatched documents without touching the network. */
