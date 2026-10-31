@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.juba.espressoapp.domain.repository.CoffeeBeanRepository
-import java.util.UUID
+import org.juba.espressoapp.extensions.duplicate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,15 +60,9 @@ class CoffeeBeanDetailViewModel @Inject constructor(
     fun copyBean(newRoastDate: Long?) {
         val bean = (uiState.value as? CoffeeBeanDetailUiState.Success)?.bean ?: return
         viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val newBean = bean.copy(
-                id = UUID.randomUUID().toString(),
-                roastDate = newRoastDate,
-                createdAt = now,
-                updatedAt = now,
-            )
-            repository.insert(newBean)
-                .onSuccess { _copyEvent.send(newBean.id) }
+            val copy = bean.duplicate(newRoastDate)
+            repository.insert(copy)
+                .onSuccess { _copyEvent.send(copy.id) }
         }
     }
 }

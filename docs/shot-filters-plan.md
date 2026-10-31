@@ -60,6 +60,13 @@ Selection is transient. The filter survives navigation and tab switches until th
 4. View shots applies a roaster filter and switches to the Shots tab using the same navigation block
    as the bottom bar.
 
+### Coffee beans
+
+1. Long press a coffee bean: the row is highlighted and the Add FAB expands into a toolbar with
+   Edit, Delete, Copy and View shots.
+2. View shots applies a coffee filter and switches to the Shots tab through the shared tab
+   navigation helper.
+
 ---
 
 ## 3. Architecture
@@ -164,10 +171,13 @@ Each list keeps a `selectedId` in `remember`, uses `combinedClickable`, a highli
 | `ui/filter/ShotFiltering.kt` | Pure filter function |
 | `ui/shots/ShotListEvent.kt` | Copy success and failure events |
 | `extensions/ShotLogExtensions.kt` | `duplicate(shotAt)` |
+| `extensions/CoffeeBeanExtensions.kt` | `duplicate(roastDate)` |
+| `ui/coffee/coffeebean/CoffeeBeanListEvent.kt` | Copy success and failure events |
 | `designsystem/toolbar/ContextActionsToolbar.kt` | Expressive toolbar wrapper |
 | `designsystem/ActiveFilterChip.kt` | Active filter chip |
 | `test/.../ui/filter/ShotFilteringTest.kt` | Filter behavior |
 | `test/.../ui/filter/ShotFilterStoreTest.kt` | Store behavior |
+| `test/.../extensions/CoffeeBeanExtensionsTest.kt` | Bean copy helper |
 
 ### Modified
 
@@ -179,6 +189,9 @@ Each list keeps a `selectedId` in `remember`, uses `combinedClickable`, a highli
 | `ui/shots/ShotLogDetailViewModel.kt` | Shared duplicate helper |
 | `ui/coffee/roaster/RoasterListScreen.kt` | Long press, toolbar, edit/delete/view shots |
 | `ui/coffee/roaster/RoasterListViewModel.kt` | Filter store, delete, events |
+| `ui/coffee/coffeebean/CoffeeBeanListScreen.kt` | Long press, toolbar, edit/delete/copy/view shots |
+| `ui/coffee/coffeebean/CoffeeBeanListViewModel.kt` | Filter store, delete, copy, events |
+| `ui/coffee/coffeebean/CoffeeBeanDetailViewModel.kt` | Shared duplicate helper |
 | `ui/main/EspressoApp.kt` | New callbacks and tab navigation helper |
 | `res/values/strings.xml` | Filter, toolbar and error strings |
 

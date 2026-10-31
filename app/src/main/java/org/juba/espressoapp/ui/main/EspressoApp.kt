@@ -216,6 +216,11 @@ fun EspressoApp() {
                                 onBack = { navController.popBackStack() },
                                 onBeanClick = { id -> navController.navigate("coffee_bean_detail/$id") },
                                 onAddBean = { navController.navigate("coffee_bean_form") },
+                                onEditBean = { id -> navController.navigate("coffee_bean_form?beanId=$id") },
+                                onCopyCustomize = { id -> navController.navigate("coffee_bean_form?sourceBeanId=$id") },
+                                onViewShots = {
+                                    navController.navigateToTab(AppDestinations.SHOTS)
+                                },
                             )
                         }
                         composable(AppRoutes.COFFEE_BEAN_DETAIL) {
