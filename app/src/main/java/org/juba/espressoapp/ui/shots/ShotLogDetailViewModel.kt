@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.juba.espressoapp.domain.repository.ShotLogRepository
-import java.util.UUID
+import org.juba.espressoapp.extensions.duplicate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,15 +60,9 @@ class ShotLogDetailViewModel @Inject constructor(
     fun copyShot(newShotAt: Long) {
         val shot = (uiState.value as? ShotLogDetailUiState.Success)?.shot ?: return
         viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val newShot = shot.copy(
-                id = UUID.randomUUID().toString(),
-                shotAt = newShotAt,
-                createdAt = now,
-                updatedAt = now,
-            )
-            repository.insert(newShot)
-                .onSuccess { _copyEvent.send(newShot.id) }
+            val copy = shot.duplicate(newShotAt)
+            repository.insert(copy)
+                .onSuccess { _copyEvent.send(copy.id) }
         }
     }
 }

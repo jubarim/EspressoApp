@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -112,13 +113,7 @@ fun EspressoApp() {
     val snackbarHostState = remember { SnackbarHostState() }
     val selectedIndex = AppDestinations.entries.indexOf(selectedDestination)
     val navItems: List<FloatingNavItem> = AppDestinations.entries.map { dest ->
-        FloatingNavItem(dest.icon, dest.labelRes, onClick = {
-            navController.navigate(dest.startRoute) {
-                popUpTo(AppRoutes.SHOTS) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
-        })
+        FloatingNavItem(dest.icon, dest.labelRes, onClick = { navController.navigateToTab(dest) })
     }
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
@@ -166,12 +161,10 @@ fun EspressoApp() {
                             ShotsScreen(
                                 onShotClick = { id -> navController.navigate("shot_detail/$id") },
                                 onAddShot = { navController.navigate("shot_form") },
+                                onEditShot = { id -> navController.navigate("shot_form?shotId=$id") },
+                                onCopyCustomize = { id -> navController.navigate("shot_form?sourceShotId=$id") },
                                 onNavigateToGear = {
-                                    navController.navigate(AppDestinations.GEAR.startRoute) {
-                                        popUpTo(AppRoutes.SHOTS) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
+                                    navController.navigateToTab(AppDestinations.GEAR)
                                 },
                             )
                         }
@@ -200,6 +193,10 @@ fun EspressoApp() {
                                 onBack = { navController.popBackStack() },
                                 onRoasterClick = { id -> navController.navigate("roaster_detail/$id") },
                                 onAddRoaster = { navController.navigate("roaster_form") },
+                                onEditRoaster = { id -> navController.navigate("roaster_form?roasterId=$id") },
+                                onViewShots = {
+                                    navController.navigateToTab(AppDestinations.SHOTS)
+                                },
                             )
                         }
                         composable(AppRoutes.ROASTER_DETAIL) {
@@ -308,5 +305,18 @@ fun EspressoApp() {
                 }
             }
         }
+    }
+}
+
+/**
+ * Switches to a bottom bar destination, preserving the state of the tab that is left behind.
+ *
+ * Shared by the bottom bar and by cross-tab actions such as View shots on a roaster.
+ */
+private fun NavHostController.navigateToTab(destination: AppDestinations) {
+    navigate(destination.startRoute) {
+        popUpTo(AppRoutes.SHOTS) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
     }
 }
