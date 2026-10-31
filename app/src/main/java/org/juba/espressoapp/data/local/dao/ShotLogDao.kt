@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import org.juba.espressoapp.data.local.entity.ShotLogEntity
 import org.juba.espressoapp.data.local.entity.ShotLogWithDetails
@@ -54,11 +55,22 @@ interface ShotLogDao {
     )
     suspend fun getById(id: String): ShotLogWithDetails?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM shot_logs WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): ShotLogEntity?
+
+    /** Includes soft-deleted rows so sync can read tombstones. */
+    @Query("SELECT * FROM shot_logs")
+    suspend fun getAllIncludingDeleted(): List<ShotLogEntity>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entity: ShotLogEntity)
 
     @Update
     suspend fun update(entity: ShotLogEntity)
+
+    @Upsert
+    suspend fun upsert(entity: ShotLogEntity)
 
     @Query("UPDATE shot_logs SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)

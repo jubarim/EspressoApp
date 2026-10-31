@@ -5,12 +5,15 @@ import kotlinx.coroutines.flow.map
 import org.juba.espressoapp.data.local.dao.GrinderDao
 import org.juba.espressoapp.data.local.mapper.toDomain
 import org.juba.espressoapp.data.local.mapper.toEntity
+import org.juba.espressoapp.data.remote.toRemoteDocument
+import org.juba.espressoapp.data.sync.RemoteWriteDispatcher
 import org.juba.espressoapp.domain.model.Grinder
 import org.juba.espressoapp.domain.repository.GrinderRepository
 import javax.inject.Inject
 
 class GrinderRepositoryImpl @Inject constructor(
     private val dao: GrinderDao,
+    private val remoteWriteDispatcher: RemoteWriteDispatcher,
 ) : GrinderRepository {
 
     override fun getAll(): Flow<List<Grinder>> =
@@ -20,14 +23,19 @@ class GrinderRepositoryImpl @Inject constructor(
         dao.getById(id)?.toDomain()
 
     override suspend fun insert(grinder: Grinder): Result<Unit> = runCatching {
-        dao.insert(grinder.toEntity())
+        val entity = grinder.toEntity()
+        dao.insert(entity)
+        remoteWriteDispatcher.dispatch(entity.toRemoteDocument())
     }
 
     override suspend fun update(grinder: Grinder): Result<Unit> = runCatching {
-        dao.update(grinder.toEntity())
+        val entity = grinder.toEntity()
+        dao.update(entity)
+        remoteWriteDispatcher.dispatch(entity.toRemoteDocument())
     }
 
     override suspend fun delete(id: String): Result<Unit> = runCatching {
         dao.softDelete(id, System.currentTimeMillis())
+        dao.getByIdIncludingDeleted(id)?.let { remoteWriteDispatcher.dispatch(it.toRemoteDocument()) }
     }
 }

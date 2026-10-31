@@ -78,6 +78,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     // BoM manages the version — no version numbers needed here
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     testImplementation(libs.junit)
     testImplementation(libs.room.testing)

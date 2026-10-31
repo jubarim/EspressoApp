@@ -42,8 +42,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.juba.espressoapp.BuildConfig
 import org.juba.espressoapp.R
+import org.juba.espressoapp.data.sync.SyncStatus
 import org.juba.espressoapp.domain.model.AuthUser
+import org.juba.espressoapp.extensions.toDeviceLocaleFormattedDateTime
 import org.juba.espressoapp.ui.main.LocalSnackbarHostState
 import org.juba.espressoapp.ui.theme.EspressoAppTheme
 import java.util.Calendar
@@ -77,6 +80,9 @@ fun SettingsScreen(
     val exportErrorMessage = stringResource(R.string.settings_export_error)
     val importSuccessMessage = stringResource(R.string.settings_import_success)
     val importErrorMessage = stringResource(R.string.settings_import_error)
+    val syncCheckSuccessMessage = stringResource(R.string.settings_sync_check_success)
+    val syncCheckErrorMessage = stringResource(R.string.settings_sync_check_error)
+    val signOutSyncErrorMessage = stringResource(R.string.settings_sign_out_sync_error)
 
     LaunchedEffect(uiState.exportState) {
         when (val state = uiState.exportState) {
@@ -106,6 +112,27 @@ fun SettingsScreen(
         }
     }
 
+    LaunchedEffect(uiState.syncCheckState) {
+        when (val state = uiState.syncCheckState) {
+            is BackupOperation.Success -> {
+                snackbarHostState.showSnackbar(syncCheckSuccessMessage)
+                viewModel.clearSyncCheckState()
+            }
+            is BackupOperation.Error -> {
+                snackbarHostState.showSnackbar(syncCheckErrorMessage.format(state.message))
+                viewModel.clearSyncCheckState()
+            }
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(uiState.signOutFailed) {
+        if (uiState.signOutFailed) {
+            snackbarHostState.showSnackbar(signOutSyncErrorMessage)
+            viewModel.clearSignOutFailure()
+        }
+    }
+
     SettingsContent(
         uiState = uiState,
         showImportConfirmDialog = showImportConfirmDialog,
@@ -122,6 +149,8 @@ fun SettingsScreen(
         },
         onSignOutClick = { viewModel.signOut() },
         onSignInClick = onSignInClick,
+        onSyncNowClick = viewModel::syncNow,
+        onSyncCheckClick = { viewModel.runSyncCheck() },
         modifier = modifier,
     )
 }
@@ -137,6 +166,8 @@ private fun SettingsContent(
     onImportDismiss: () -> Unit,
     onSignOutClick: () -> Unit,
     onSignInClick: () -> Unit,
+    onSyncNowClick: () -> Unit,
+    onSyncCheckClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (showImportConfirmDialog) {
@@ -252,21 +283,106 @@ private fun SettingsContent(
 
                 OutlinedButton(
                     onClick = onSignOutClick,
+                    enabled = !uiState.isSigningOut,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(horizontalArrangement = Arrangement.Center) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
+                        if (uiState.isSigningOut) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Icon(
+                                Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.settings_sign_out_button))
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.settings_sync_section_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = syncStatusText(uiState),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            if (uiState.account != null) {
+                Text(
+                    text = uiState.lastSyncAt?.let {
+                        stringResource(
+                            R.string.settings_sync_last_synced,
+                            it.toDeviceLocaleFormattedDateTime(),
+                        )
+                    } ?: stringResource(R.string.settings_sync_never_synced),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedButton(
+                    onClick = onSyncNowClick,
+                    enabled = uiState.syncStatus !is SyncStatus.Syncing,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.settings_sync_now_button))
+                }
+            }
+
+            if (BuildConfig.DEBUG) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.settings_debug_section_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(4.dp))
+
+                val isCheckingSync = uiState.syncCheckState is BackupOperation.InProgress
+                OutlinedButton(
+                    onClick = onSyncCheckClick,
+                    enabled = !isCheckingSync,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        if (isCheckingSync) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(stringResource(R.string.settings_sync_check_button))
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun syncStatusText(uiState: SettingsUiState): String = when (val status = uiState.syncStatus) {
+    SyncStatus.Idle -> if (uiState.account == null) {
+        stringResource(R.string.settings_sync_status_guest)
+    } else {
+        stringResource(R.string.settings_sync_status_idle)
+    }
+    SyncStatus.Syncing -> stringResource(R.string.settings_sync_status_syncing)
+    is SyncStatus.Error -> stringResource(R.string.settings_sync_status_error, status.message)
 }
 
 private fun defaultBackupFilename(): String {
@@ -290,6 +406,8 @@ private fun SettingsContentPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
+            onSyncNowClick = {},
         )
     }
 }
@@ -307,6 +425,8 @@ private fun SettingsContentInProgressPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
+            onSyncNowClick = {},
         )
     }
 }
@@ -330,6 +450,8 @@ private fun SettingsContentSignedInPreview() {
             onImportDismiss = {},
             onSignOutClick = {},
             onSignInClick = {},
+            onSyncCheckClick = {},
+            onSyncNowClick = {},
         )
     }
 }

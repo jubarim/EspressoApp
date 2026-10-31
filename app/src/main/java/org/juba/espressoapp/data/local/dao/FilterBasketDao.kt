@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import org.juba.espressoapp.data.local.entity.FilterBasketEntity
 
@@ -17,11 +18,22 @@ interface FilterBasketDao {
     @Query("SELECT * FROM filter_baskets WHERE id = :id AND is_deleted = 0 LIMIT 1")
     suspend fun getById(id: String): FilterBasketEntity?
 
+    /** Includes soft-deleted rows so a delete can be pushed as a tombstone. */
+    @Query("SELECT * FROM filter_baskets WHERE id = :id LIMIT 1")
+    suspend fun getByIdIncludingDeleted(id: String): FilterBasketEntity?
+
+    /** Includes soft-deleted rows so sync can read tombstones. */
+    @Query("SELECT * FROM filter_baskets")
+    suspend fun getAllIncludingDeleted(): List<FilterBasketEntity>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entity: FilterBasketEntity)
 
     @Update
     suspend fun update(entity: FilterBasketEntity)
+
+    @Upsert
+    suspend fun upsert(entity: FilterBasketEntity)
 
     @Query("UPDATE filter_baskets SET is_deleted = 1, updated_at = :timestamp WHERE id = :id")
     suspend fun softDelete(id: String, timestamp: Long)

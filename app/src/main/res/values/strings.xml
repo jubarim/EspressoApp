@@ -23,6 +23,23 @@
     <string name="settings_import_confirm_message">Your current espresso data will be permanently replaced with the contents of the backup file. This cannot be undone.</string>
     <string name="settings_import_confirm_action">Replace</string>
 
+    <!-- Settings, debug build only -->
+    <string name="settings_debug_section_title">Debug</string>
+    <string name="settings_sync_check_button">Run sync health check</string>
+    <string name="settings_sync_check_success">Sync check passed</string>
+    <string name="settings_sync_check_error">Sync check failed: %s</string>
+
+    <!-- Settings, sync -->
+    <string name="settings_sync_section_title">Sync</string>
+    <string name="settings_sync_status_guest">Sign in to keep your data in the cloud</string>
+    <string name="settings_sync_status_idle">Everything is synced</string>
+    <string name="settings_sync_status_syncing">Syncing…</string>
+    <string name="settings_sync_status_error">Sync error: %s</string>
+    <string name="settings_sync_last_synced">Last synced: %s</string>
+    <string name="settings_sync_never_synced">Never synced</string>
+    <string name="settings_sync_now_button">Sync now</string>
+    <string name="settings_sign_out_sync_error">Some changes are still syncing. Check your connection and try again.</string>
+
     <!-- Gear screen categories -->
     <string name="gear_category_grinders">Grinders</string>
     <string name="gear_category_espresso_machines">Espresso Machines</string>

@@ -9,6 +9,7 @@ A local-first Android app for logging espresso shots. Helps home and prosumer ba
 - Manage coffee inventory: roasters and coffee beans
 - Ratio calculated automatically from dose and yield
 - Optional Google Sign-In, or use the app without an account
+- Two-way sync of shots and gear across devices, for signed-in users
 
 ## Tech stack
 
@@ -20,13 +21,14 @@ A local-first Android app for logging espresso shots. Helps home and prosumer ba
 | Database | Room (local, offline-first) |
 | DI | Hilt |
 | Auth | Firebase Auth (Google Sign-In), optional |
+| Sync | Cloud Firestore, per-user and optional |
 | Image loading | Coil 3 |
 
 ## Project structure
 
 ```
 app/src/main/java/org/juba/espressoapp/
-├── data/           — Room entities, DAOs, repository implementations, mappers, backup
+├── data/           — Room entities, DAOs, repository implementations, mappers, backup, Firestore sync
 ├── domain/         — Domain models, repository interfaces, shared utilities
 ├── designsystem/   — Reusable M3 components and input fields
 ├── extensions/     — Kotlin extension functions
@@ -57,6 +59,8 @@ Sign-in is optional: the app runs fully without an account. To enable Google Sig
 - Enabling the Google sign-in provider
 - Adding the debug signing SHA-1/SHA-256 fingerprints
 - Re-downloading `google-services.json`
+
+Data sync is also optional and only runs for signed-in users. See **[docs/firebase-sync.md](docs/firebase-sync.md)** for the Firestore setup, the per-user document model, the conflict rules and the known limitations.
 
 ## Building
 
