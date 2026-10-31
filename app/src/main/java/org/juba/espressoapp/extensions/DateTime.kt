@@ -53,3 +53,26 @@ fun Long.toDeviceLocaleFormattedDate(
             .withLocale(Locale.getDefault())
     )
 }
+
+/**
+ * Converts a Unix timestamp in milliseconds to a localized date and time string, using the
+ * device's locale and timezone. Use this for real instants such as the last sync time, not for
+ * date-only values, which [toDeviceLocaleFormattedDate] handles.
+ *
+ * @param dateStyle The style of the date part. Defaults to [FormatStyle.MEDIUM].
+ * @param timeStyle The style of the time part. Defaults to [FormatStyle.SHORT].
+ * @return A localized date and time string.
+ */
+fun Long.toDeviceLocaleFormattedDateTime(
+    dateStyle: FormatStyle = FormatStyle.MEDIUM,
+    timeStyle: FormatStyle = FormatStyle.SHORT,
+): String {
+    val dateTime = Instant.ofEpochMilli(this)
+        .atZone(ZoneId.systemDefault())
+
+    return dateTime.format(
+        DateTimeFormatter
+            .ofLocalizedDateTime(dateStyle, timeStyle)
+            .withLocale(Locale.getDefault())
+    )
+}

@@ -104,6 +104,29 @@ class SyncEngineTest {
     }
 
     @Test
+    fun `sync now reattaches the listeners`() = runTest {
+        val remoteSource = TrackingRemoteSource()
+        val engine = engine(
+            MutableFakeAuthRepository(user()),
+            FakePreferencesRepository(),
+            remoteSource,
+            FakeSyncMerger(),
+        )
+
+        engine.start()
+        advanceUntilIdle()
+        assertEquals(SyncCollection.entries.size, remoteSource.observations.size)
+
+        engine.syncNow()
+        advanceUntilIdle()
+
+        assertEquals(SyncCollection.entries.size * 2, remoteSource.observations.size)
+        assertTrue(remoteSource.observations.take(SyncCollection.entries.size).all { it.cancelled })
+
+        engine.stop()
+    }
+
+    @Test
     fun `merges again for the same owner without wiping`() = runTest {
         db.roasterDao().insert(roaster())
         val preferences = FakePreferencesRepository(ownerUid = "uid-1")
@@ -168,6 +191,7 @@ class SyncEngineTest {
         authRepository = auth,
         preferencesRepository = preferences,
         remoteSource = remoteSource,
+        syncTarget = FakeSyncTarget(),
         applier = applier,
         merger = merger,
         database = db,

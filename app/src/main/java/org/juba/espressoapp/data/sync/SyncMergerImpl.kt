@@ -47,6 +47,7 @@ class SyncMergerImpl @Inject constructor(
         }
 
         if (toPush.isEmpty()) {
+            preferencesRepository.setLastSyncAt(System.currentTimeMillis())
             AppLog.d(TAG) { "merge uid=$uid, nothing to push" }
             return@runCatching
         }
